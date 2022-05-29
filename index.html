@@ -36,8 +36,31 @@
 		        align-items: flex-end;
 		    }
 		    
+		    #gameStatus[data-state='0']
+		    {
+		        --outline: darkblue;
+		        --primary: blue;
+		        --secondary: lightblue;
+		    }
+		    
+		    #gameStatus[data-state='1']
+		    {
+		        --outline: darkred;
+		        --primary: red;
+		        --secondary: purple; /* find a light red */
+		    }
+		    
+		    #gameStatus[data-state='2']
+		    {
+		        --outline: darkgreen;
+		        --primary: green;
+		        --secondary: lightgreen;
+		    }
+		    
 		    #gameStatus
 		    {
+		        --color-fade-time: 0.3s;
+		        
 		        display: flex;
 		        flex-direction: row;
 		        align-items: center;
@@ -50,10 +73,10 @@
 		        width: 128px;
 		        height: 128px;
 		        
-		        background-color: red;
+		        background-color: var(--primary);
 		        
 		        border-radius: 100%;
-		        border: 10px solid darkred;
+		        border: 10px solid var(--outline);
 		        
 		        display: flex;
 		        flex-direction: column;
@@ -62,11 +85,13 @@
 		        
                 position: relative;
                 left: 26px;
+                
+                transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #playerPortrait
 		    {
-		        background-color: darkred;
+		        background-color: var(--outline);
 		        min-height: 96px;
 		        width: 64px;
 		        
@@ -74,6 +99,8 @@
 		        
 		        position: relative;
 		        top: 5px;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #roundStatus
@@ -81,6 +108,8 @@
 		        background-color: #222222bb;
 		        padding: 18px 40px;
 		        text-align: center;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #flag
@@ -106,7 +135,7 @@
 		        padding: 2px 4px;
 		        font-size: 12px;
 		        border-radius: 100%;
-		        background-color: lightblue;
+		        background-color: var(--outline);
 		    }
 		    
 		    #roundType
@@ -127,11 +156,13 @@
 		        border-radius: 5px;
 		        
 		        flex-grow: 1;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    .roundSpace.active
 		    {
-		        background-color: red;
+		        background-color: var(--primary);
 		    }
 		    
 		    #roundName
@@ -139,9 +170,10 @@
 		        text-transform: uppercase;
 		    }
 		    
-		    #nextStageButton
+		    #nextStateButton
 		    {
 		        pointer-events: auto;
+		        color: lightblue;
 		    }
 		    
 		    #counter
@@ -149,10 +181,10 @@
 		        width: 128px;
 		        height: 128px;
 		        
-		        background-color: red;
+		        background-color: var(--primary);
 		        
 		        border-radius: 100%;
-		        border: 10px solid darkred;
+		        border: 10px solid var(--outline);
 		        
 		        display: flex;
 		        flex-direction: column;
@@ -161,11 +193,13 @@
 		        
 		        position: relative;
 		        left: -26px;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #statue
 		    {
-		        background-color: darkred;
+		        background-color: var(--outline);
 		        min-height: 72px;
 		        width: 48px;
 		        
@@ -173,11 +207,13 @@
 		        
 		        position: relative;
 		        top: 10px;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #count
 		    {
-		        background-color: darkred;
+		        background-color: var(--outline);
 		        border-radius: 10px;
 		        padding: 5px;
 		        font-size: 28px;
@@ -187,6 +223,8 @@
 		        
 		        position: relative;
 		        top: 20px;
+		        
+		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    #unitPlaceDialog
@@ -274,7 +312,7 @@
 	
 	<body>
 	    <div id='gameInterfaceContainer'>
-	        <div id='gameStatus'>
+	        <div id='gameStatus' data-state='0'>
 	            <div id='me'>
 	                <div id='playerPortrait'></div>
 	            </div>
@@ -293,8 +331,8 @@
     	                <span id='roundName'>
     	                    Place
     	                </span>
-                        <a href='#' id='nextStageButton'>
-                            next stage
+                        <a href='#' id='nextStateButton'>
+                            next state
                         </a>
 	                </div>
 	            </div>
@@ -521,10 +559,13 @@
             const world = new GameWorld(10, 5);
 			scene.add(world);
 			
+			const states = [
+                "Place",
+                "Attack",
+                "Move"
+		    ];
+		    
 			let gameState = 0;
-			// 0 = Place
-			// 1 = Attack
-			// 2 = Move
 			
 			let ownedTerritory = world.ownedTerritory;
 			let availableUnits = Math.trunc(ownedTerritory / 3);
@@ -558,11 +599,22 @@
                 dismissDropDialog();
 			});
 			
-			$("body").on("click", "#nextStageButton", function(event)
+			$("body").on("click", "#nextStateButton", function(event)
 			{
+			    console.log("next state");
+			    
 			    event.preventDefault();
 			    
-                console.log("next stage");
+			    if (gameState >= 2)
+			        gameState = 0;
+			    else
+			        gameState += 1;
+			        
+			    $(".roundSpace.active").removeClass("active");
+			    $("#roundType").children()[gameState].classList.add("active");
+			    $("#roundName").html(states[gameState]);
+			    
+			    $("#gameStatus").attr("data-state", gameState);
 			});
 			
 			function createDropDialog(id)
@@ -600,7 +652,7 @@
 			    selectedTerritory = null;
 			}
 			
-			function onMouseUp(event)
+            function onMouseUp(event)
             {
                 // FIXME: this is a bug.
                 
