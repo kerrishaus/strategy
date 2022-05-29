@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>strategy</title>
+		<style>
+			body
+			{
+			    margin: 0;
+			    background: navy;
+			    font-family: Tahoma;
+			}
+		</style>
+		
+		<script src="https://kerrishaus.com/assets/scripts/jquery-3.6.0.min.js"></script>
+		
+		<script src="https://portal.kerrishaus.com/assets/javascript/messages.js"></script>
+		<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />
+		
+		<style>
+		    #gameInterfaceContainer
+		    {
+		        box-sizing: border-box;
+		        
+		        pointer-events: none;
+		        color: white;
+		        
+		        position: absolute;
+		        z-index: 99999;
+		        
+		        width: 100vw;
+		        height: 100vh;
+		        
+		        display: flex;
+		        justify-content: center;
+		        align-items: flex-end;
+		    }
+		    
+		    #gameStatus
+		    {
+		        display: flex;
+		        flex-direction: row;
+		        align-items: center;
+		        
+		        padding-bottom: 40px;
+		    }
+		    
+		    #me
+		    {
+		        width: 128px;
+		        height: 128px;
+		        
+		        background-color: red;
+		        
+		        border-radius: 100%;
+		        border: 10px solid darkred;
+		        
+		        display: flex;
+		        flex-direction: column;
+		        align-items: center;
+		        justify-content: flex-end;
+		        
+                position: relative;
+                left: 26px;
+		    }
+		    
+		    #playerPortrait
+		    {
+		        background-color: darkred;
+		        min-height: 96px;
+		        width: 64px;
+		        
+		        border-radius: 10px;
+		        
+		        position: relative;
+		        top: 5px;
+		    }
+		    
+		    #roundStatus
+		    {
+		        background-color: #222222bb;
+		        padding: 18px 40px;
+		        text-align: center;
+		    }
+		    
+		    #flag
+		    {
+		        display: inline-block;
+		        
+		        width: 26px;
+		        height: 14px;
+		        
+		        background-color: red;
+		    }
+		    
+		    #playerName
+		    {
+		        font-size: 24px;
+		        padding: 0px 10px;
+		    }
+		    
+		    #tags
+		    {
+		        padding: 2px 4px;
+		        font-size: 12px;
+		        border-radius: 100%;
+		        background-color: lightblue;
+		    }
+		    
+		    #roundType
+		    {
+		        display: flex;
+		        gap: 5px;
+		        
+		        padding-top: 8px;
+		        padding-bottom: 5px;
+		    }
+		    
+		    .roundSpace
+		    {
+		        height: 12px;
+		        
+		        background-color: black;
+		        
+		        border-radius: 5px;
+		        
+		        flex-grow: 1;
+		    }
+		    
+		    .roundSpace.active
+		    {
+		        background-color: red;
+		    }
+		    
+		    #roundName
+		    {
+		        text-transform: uppercase;
+		    }
+		    
+		    #counter
+		    {
+		        width: 128px;
+		        height: 128px;
+		        
+		        background-color: red;
+		        
+		        border-radius: 100%;
+		        border: 10px solid darkred;
+		        
+		        display: flex;
+		        flex-direction: column;
+		        align-items: center;
+		        justify-content: flex-end;
+		        
+		        position: relative;
+		        left: -26px;
+		    }
+		    
+		    #statue
+		    {
+		        background-color: darkred;
+		        min-height: 72px;
+		        width: 48px;
+		        
+		        border-radius: 10px;
+		        
+		        position: relative;
+		        top: 10px;
+		    }
+		    
+		    #count
+		    {
+		        background-color: darkred;
+		        border-radius: 10px;
+		        padding: 5px;
+		        font-size: 28px;
+		        text-align: center;
+		        
+		        width: 38px;
+		        
+		        position: relative;
+		        top: 20px;
+		    }
+		    
+		    #dropUnitDialog
+		    {
+		        width: 80%;
+		        height: 30%;
+		        overflow-y: hidden;
+		        
+	            position: absolute;
+		        z-index: 999999;
+		        top: 60%;
+		        left: 10%;
+		        
+		        display: flex;
+		        align-items: center;
+		        justify-content: center;
+		        flex-direction: column;
+		        
+		        background-color: #4a4a4aaa;
+		        color: white;
+		        font-size: 40px;
+		        
+		        opacity: 0;
+		        transform: scale(0.8);
+		        
+		        transition: opacity, 0.25s, transform 0.2s;
+		    }
+		    
+		    #dropUnitDialog.open
+		    {
+		        opacity: 1;
+		        transform: scale(1);
+		    }
+		</style>
+	</head>
+	
+	<body>
+	    <div id='gameInterfaceContainer'>
+	        <div id='gameStatus'>
+	            <div id='me'>
+	                <div id='playerPortrait'></div>
+	            </div>
+	            <div id='roundStatus'>
+	                <div>
+	                    <span id='flag'></span>
+	                    <span id='playerName'>Super Idiot</span>
+	                    <span id='tags'>&#10004;</span>
+	                </div>
+	                <div id='roundType'>
+	                    <div class='roundSpace active'></div>
+	                    <div class='roundSpace'></div>
+	                    <div class='roundSpace'></div>
+	                </div>
+	                <div id='roundName'>
+	                    Attack
+	                </div>
+	            </div>
+	            <div id='counter'>
+	                <div id='statue'>
+	                    
+	                </div>
+	                <div id='count'>
+	                    3
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div id='dropUnitDialog'>
+	        <div>How many units?</div>
+	        <div>
+	            <input type="range" min="1" max="4" value="2" class="slider" id="dropUnitAmount"> <span id='dropUnitAmountPreview'>0</span>
+            </div>
+            <div>
+	            <button id='dropUnitButton'>Drop Units</button>
+            </div>
+	    </div>
+	    
+		<script src="https://kerrishaus.com/assets/threejs/build/three.js"></script>
+		
+		<script type='module'>
+		    import { CSS2DObject, CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
+		
+			class WorldObject extends THREE.Mesh
+			{
+			    constructor(width, height, color)
+			    {
+			        const geometry = new THREE.BoxGeometry(width, height, 1);
+			        const material = new THREE.MeshBasicMaterial({ color: color });
+			        
+			        super(geometry, material);
+			        
+			        this.hovered = false;
+			        
+			        this.objectOwner = -1;
+			        this.unitCount = 1;
+			        
+    				const labelDiv = document.createElement("div");
+    				labelDiv.id = this.uuid;
+        			labelDiv.className = 'unitCount';
+        			labelDiv.textContent = this.unitCount;
+        			
+        			this.label = new CSS2DObject(labelDiv);
+        			this.label.color = "white";
+        			this.add(this.label);
+        			
+        			this.userData.canClick = true;
+        			
+        			this.targetPosition = new THREE.Vector3(0, 0, 0);
+			    }
+			    
+			    update(deltaTime)
+			    {
+			        this.position.lerp(this.targetPosition, 0.3);
+			    }
+			    
+			    hover()
+			    {
+			        this.targetPosition.z += 0.4;
+			    }
+			    
+			    unhover()
+			    {
+			        this.targetPosition.z -= 0.4;
+			    }
+			    
+			    addUnits(amount = 1)
+			    {
+			        this.unitCount += amount;
+			        $("#" + this.uuid).html(this.unitCount);
+			    }
+			    
+			    removeUnits(amount = 1)
+			    {
+			        this.unitCount -= amount;
+			        $("#" + this.uuid).html(this.unitCount);
+			    }
+			};
+			
+			class GameWorld extends THREE.Group
+			{
+			    constructor(width, height)
+			    {
+			        super();
+			        
+			        this.tiles = new Array(width * height);
+			        
+		            for (let y = 0; y < height; y++)
+			        {
+			            for (let x = 0; x < width; x++)
+			            {
+                            function getRandomInt(max)
+                            {
+                                return Math.floor(Math.random() * max);
+                            }
+                            
+                            let chance = getRandomInt(2);
+                            
+                            let color = 0x1b6b15;
+			                if (chance > 0)
+			                    color = 0x00ff00
+			                
+			                const object = new WorldObject(2, 2, color);
+			                object.targetPosition.x = x + 1.3 * x;
+			                object.targetPosition.y = y + 1.3 * y;
+			                object.targetPosition.z = 0;
+			                object.userData.team = chance > 0 ? 1 : 2;
+			                this.tiles[x + y * width] = object;
+			                this.add(object);
+			            }
+			        }
+			        
+                    const floorGeometry = new THREE.PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
+                    const floorMaterial = new THREE.MeshBasicMaterial({color: 0x256d8f, side: THREE.FrontSide });
+                    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                    floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
+                    floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
+                    this.add(floor);
+			    }
+			    
+			    update(deltaTime)
+			    {
+			        for (const tile of this.tiles)
+		                tile.update(deltaTime);
+	            }
+			};
+		
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.x = 5 + 0.3 * 5;
+            camera.position.y = 5 + 0.3 * 5;
+			camera.position.z = 14;
+			
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+			
+			const labelRenderer = new CSS2DRenderer();
+			labelRenderer.setSize(window.innerWidth, window.innerHeight);
+			labelRenderer.domElement.style.position = 'absolute';
+			labelRenderer.domElement.style.top = '0px';
+			document.body.appendChild(labelRenderer.domElement).style.pointerEvents = "none";
+			
+			let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
+
+			const world = new GameWorld(10, 5);
+			scene.add(world);
+			
+			const clock = new THREE.Clock();
+			
+			window.addEventListener('resize', onWindowResize);
+			
+			document.addEventListener('keydown', onKeyDown);
+			//document.addEventListener('keyup', onKeyUp);
+
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('mousemove', onPointerMove);
+            
+            let selectedTerritory = null;
+			
+			$("#dropUnitButton").on("click", function()
+			{
+			    const amount = parseInt($("#dropUnitAmount").val());
+			   
+                if (amount > 0)
+                {
+                    scene.getObjectById(selectedTerritory).addUnits(amount);
+                    dismissDropDialog();
+			    }
+			    else
+                    console.error("Invalid amount to drop.");
+			});
+			
+			$("#dropUnitAmount").on('input', function(event)
+			{
+                $("#dropUnitAmountPreview").html($("#dropUnitAmount").val());
+			});
+			
+			function createDropDialog(id)
+			{
+			    selectedTerritory = id;
+			    
+			    if (scene.getObjectById(id) == null)
+			    {
+			        console.error("ID passed to createDropDialog is invalid.");
+			        return;
+			    }
+			    
+			    $("#dropUnitDialog").addClass("open");
+			    //scene.getObjectById(selectedTerritory).hover();
+			}
+			
+			function dismissDropDialog()
+			{
+			    $("#dropUnitDialog").removeClass("open");
+			    //scene.getObjectById(selectedTerritory).unhover();
+			    
+			    selectedTerritory = null;
+			}
+			
+			function onMouseUp(event)
+            {
+                if (INTERSECTED == null)
+                    return;
+                    
+                if (INTERSECTED.userData.team == 1)
+                    createDropDialog(INTERSECTED.id);
+            }
+            
+            function onKeyDown(event)
+            {
+                if (event.code == "Escape")
+                    dismissDropDialog();
+            }
+			
+            function onPointerMove(event)
+            {
+            	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            }
+			
+			function onWindowResize()
+			{
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				labelRenderer.setSize(window.innerWidth, window.innerHeight);
+			}
+			
+			function animate()
+			{
+				requestAnimationFrame(animate);
+				
+                if (selectedTerritory === null)
+                {
+                	raycaster.setFromCamera(pointer, camera);
+                	const intersects = raycaster.intersectObjects(scene.children, true);
+                
+                	if (intersects.length > 0)
+                	{
+                		if (INTERSECTED != intersects[0].object)
+                		{
+                			if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
+                			{
+                			    INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+                			    INTERSECTED.unhover();
+                			    INTERSECTED = null;
+                			}
+                
+                            if (intersects[0].object.userData.hasOwnProperty("canClick")) // the object is now hovered
+                            {
+                                if (intersects[0].object.userData.team == 1)
+                                {
+                    				INTERSECTED = intersects[0].object;
+                    				INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+                    				INTERSECTED.material.color.setHex(0xff0000);
+                    				
+                    				INTERSECTED.hover();
+                                }
+                            }
+                		}
+                	}
+                	else // the object is no longer hovered, and no object is hovered
+                	{
+                		if (INTERSECTED)
+                		{
+                		    INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+                		    INTERSECTED.unhover();
+                		}
+                
+                		INTERSECTED = null;
+                	}
+                }
+				
+				world.update(clock.getElapsedTime());
+
+				renderer.render(scene, camera);
+				labelRenderer.render(scene, camera);
+			};
+
+			animate();
+		</script>
+	</body>
+</html>
