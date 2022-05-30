@@ -18,7 +18,7 @@
 		<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />
 		
 		<style>
-		    #gameInterfaceContainer
+		    .gameInterfaceContainer
 		    {
 		        box-sizing: border-box;
 		        
@@ -72,28 +72,28 @@
 		        opacity: 0 !important;
 		    }
 		    
-		    #gameStatus[data-state='0']
+		    .gameStatus[data-state='0']
 		    {
 		        --outline: darkblue;
 		        --primary: blue;
 		        --secondary: lightblue;
 		    }
 		    
-		    #gameStatus[data-state='1']
+		    .gameStatus[data-state='1']
 		    {
 		        --outline: darkred;
 		        --primary: red;
 		        --secondary: purple; /* find a light red */
 		    }
 		    
-		    #gameStatus[data-state='2']
+		    .gameStatus[data-state='2']
 		    {
 		        --outline: darkgreen;
 		        --primary: green;
 		        --secondary: lightgreen;
 		    }
 		    
-		    #gameStatus
+		    .gameStatus
 		    {
 		        --color-fade-time: 0.3s;
 		        
@@ -107,7 +107,7 @@
 		        bottom: 0px;
 		    }
 		    
-		    #gameStatus[data-visibility="hidden"]
+		    .gameInterfaceContainer[data-visibility="hidden"] > .gameStatus
 		    {
 		        bottom: -200px;
 		    }
@@ -269,6 +269,61 @@
 		        top: 20px;
 		        
 		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
+		    }
+		    
+		    .attackPlanner
+		    {
+		        position: absolute;
+		        
+		        height: 100vh;
+		        width: 100vw;
+		        
+		        background-color: #000000aa;
+		        
+		        opacity: 0;
+		        
+		        transition: opacity 0.3s;
+		        
+		        display: flex;
+		    }
+		    
+		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner
+		    {
+		        opacity: 1;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > div
+		    {
+		        flex-grow: 1;
+		        
+		        position: relative;
+		        
+		        transition: left 0.3s, right 0.3s;
+		        
+		        display: flex;
+		        justify-content: center;
+		        align-items: center;
+		        flex-direction: column;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .attacker
+		    {
+		        left: -50%;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .defender
+		    {
+		        right: -50%;
+		    }
+		    
+		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .attacker
+		    {
+		        left: 0px;
+		    }
+		    
+		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .defender
+		    {
+                right: 0px;
 		    }
 		    
 		    #unitPlaceDialog
@@ -439,8 +494,8 @@
             	    </div>"
         ?>
 	    
-	    <div id='gameInterfaceContainer' class='transition-quick'>
-	        <div id='gameStatus' class='moveableInterfaceElement' data-state='0'>
+	    <div class='gameInterfaceContainer transition-quick'>
+	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
 	            <div id='me'>
 	                <div id='playerPortrait'></div>
 	            </div>
@@ -470,6 +525,18 @@
 	                </div>
 	                <div id='count'>
 	                    
+	                </div>
+	            </div>
+	        </div>
+	        <div class='attackPlanner'>
+	            <div class='attacker'>
+	                <h1>Attacker</h1>
+	                <div style='width: 500px;height: 600px;background-color:red;border-radius:10px;'>
+	                </div>
+	            </div>
+	            <div class='defender'>
+	                <h1>Defender</h1>
+	                <div style='width: 500px;height: 600px;background-color:blue;border-radius:10px;'>
 	                </div>
 	            </div>
 	        </div>
@@ -701,7 +768,7 @@
 			                object.userData.invadeable = false;
 			                object.userData.territoryId = arrayPosition;
 			                
-			                object.label.element.innerHTML = `${arrayPosition} ${object.id} ${object.userData.invadeable}`;
+			                object.label.element.innerHTML = object.unitCount;
 			                
 			                this.tiles[arrayPosition] = object;
 			                this.add(object);
@@ -1081,7 +1148,7 @@
                         tile.material.color.setHex(enemyInvadeablePausedColor);
 			    }
 			    
-			    $("#gameStatus").attr("data-visibility", "hidden");
+			    $(".gameInterfaceContainer").attr("data-visibility", "hidden");
 			    
 		        console.log(`Attack Dialog created for ${selectedTerritory.id} to attack ${attackTerritory.id}`);
 			}
@@ -1100,7 +1167,7 @@
 			    attackTerritory = null;
 			    selectedTerritory = null;
 			    
-			    $("#gameStatus").attr("data-visibility", null);
+			    $(".gameInterfaceContainer").attr("data-visibility", null);
 			    
 			    console.log("Attack dialog removed.");
 			}
@@ -1210,9 +1277,6 @@
 				
 				world.update(clock.getElapsedTime());
 				
-				for (const tile of world.tiles)
-				    tile.label.element.innerHTML = `${tile.id} ${tile.userData.invadeable}`;
-
 				renderer.render(scene, camera);
 				htmlRenderer.render(scene, camera);
 			};
