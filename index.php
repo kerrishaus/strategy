@@ -299,8 +299,6 @@
 		        
 		        position: relative;
 		        
-		        transition: left 0.3s, right 0.3s, top 0.3s;
-		        
 		        display: flex;
 		        justify-content: center;
 		        align-items: center;
@@ -312,11 +310,8 @@
 		    .gameInterfaceContainer > .attackPlanner > .cancelButton
 		    {
 		        min-width: 100%;
-		        
 		        top: -100px;
-		        
 		        height: 0px;
-		        
 		        pointer-events: auto;
 		    }
 		    
@@ -328,13 +323,12 @@
 		        padding: 10px 20px;
 		        border-radius: 10px;
 		        text-decoration: none;
+		        font-size: 26px;
 		    }
 		    
 		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .cancelButton
 		    {
 		        top: 10%;
-		        
-		        font-size: 26px;
 		    }
 		    
 		    .gameInterfaceContainer > .attackPlanner > .attacker
@@ -560,15 +554,15 @@
 	            </div>
 	        </div>
             <div class='attackPlanner'>
-                <div class='cancelButton'>
+                <div class='cancelButton moveableInterfaceElement'>
                     <a href='#' id='attackPlannerCancelButton'>cancel</a>
                 </div>
-                <div class='attacker'>
+                <div class='attacker moveableInterfaceElement'>
                     <h1>Attacker</h1>
                     <div style='width: 400px;height: 500px;background-color:red;border-radius:10px;'>
                     </div>
                 </div>
-                <div class='defender'>
+                <div class='defender moveableInterfaceElement'>
                     <h1>Defender</h1>
                     <div style='width: 400px;height: 500px;background-color:blue;border-radius:10px;'>
                     </div>
