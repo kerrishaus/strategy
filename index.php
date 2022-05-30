@@ -285,6 +285,7 @@
 		        transition: opacity 0.3s;
 		        
 		        display: flex;
+		        flex-wrap: wrap;
 		    }
 		    
 		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner
@@ -304,6 +305,38 @@
 		        justify-content: center;
 		        align-items: center;
 		        flex-direction: column;
+		        
+		        height: 100%;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .cancelButton
+		    {
+		        min-width: 100%;
+		        
+		        top: -100px;
+		        
+		        transition: top 0.3s;
+		        
+		        pointer-events: auto;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .cancelButton > a
+		    {
+		        display: inline-block;
+		        color: white;
+		        background-color: red;
+		        padding: 10px 20px;
+		        border-radius: 10px;
+		        text-decoration: none;
+		    }
+		    
+		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .cancelButton
+		    {
+		        top: 10%;
+		        
+		        font-size: 26px;
+		        
+		        height: 0px;
 		    }
 		    
 		    .gameInterfaceContainer > .attackPlanner > .attacker
@@ -528,18 +561,21 @@
 	                </div>
 	            </div>
 	        </div>
-	        <div class='attackPlanner'>
-	            <div class='attacker'>
-	                <h1>Attacker</h1>
-	                <div style='width: 500px;height: 600px;background-color:red;border-radius:10px;'>
-	                </div>
-	            </div>
-	            <div class='defender'>
-	                <h1>Defender</h1>
-	                <div style='width: 500px;height: 600px;background-color:blue;border-radius:10px;'>
-	                </div>
-	            </div>
-	        </div>
+            <div class='attackPlanner'>
+                <div class='cancelButton'>
+                    <a href='#' id='attackPlannerCancelButton'>cancel</a>
+                </div>
+                <div class='attacker'>
+                    <h1>Attacker</h1>
+                    <div style='width: 400px;height: 500px;background-color:red;border-radius:10px;'>
+                    </div>
+                </div>
+                <div class='defender'>
+                    <h1>Defender</h1>
+                    <div style='width: 400px;height: 500px;background-color:blue;border-radius:10px;'>
+                    </div>
+                </div>
+            </div>
 	    </div>
 	    
 	    <!--
@@ -920,6 +956,16 @@
 			    event.preventDefault();
 			    
 			    nextGameState();
+			});
+			
+			$("#attackPlannerCancelButton").click(function(event)
+			{
+			    event.preventDefault();
+			    
+			    const id = selectedTerritory.id;
+                            
+                removeAttackDialog();
+                createAttackDiagram(id);
 			});
 			
 			function nextGameState()
