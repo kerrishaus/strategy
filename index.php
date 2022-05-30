@@ -299,7 +299,7 @@
 		        
 		        position: relative;
 		        
-		        transition: left 0.3s, right 0.3s;
+		        transition: left 0.3s, right 0.3s, top 0.3s;
 		        
 		        display: flex;
 		        justify-content: center;
@@ -315,7 +315,7 @@
 		        
 		        top: -100px;
 		        
-		        transition: top 0.3s;
+		        height: 0px;
 		        
 		        pointer-events: auto;
 		    }
@@ -335,8 +335,6 @@
 		        top: 10%;
 		        
 		        font-size: 26px;
-		        
-		        height: 0px;
 		    }
 		    
 		    .gameInterfaceContainer > .attackPlanner > .attacker
