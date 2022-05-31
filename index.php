@@ -827,7 +827,7 @@
 			    }
 			}
 			
-			class OwnedTerritory extends Territory
+			class ownedTerritories extends Territory
 			{
 			    construct()
 			    {
@@ -855,7 +855,7 @@
 			        
 			        this.tiles = new Array(this.width * this.height);
 			        
-			        this.ownedTerritory = 0;
+			        this.ownedTerritories = 0;
 			        
 		            for (let y = 0; y < this.height; y++)
 			        {
@@ -867,7 +867,7 @@
 			                if (chance > 0)
 			                {
 			                    color = ownedColor;
-			                    this.ownedTerritory += 1;
+			                    this.ownedTerritories += 1;
 			                }
 			                
 			                const arrayPosition = x + y * this.width;
@@ -997,8 +997,7 @@
 			let gameState = 2;
 			setGameState()
 			
-			let ownedTerritory = world.ownedTerritory;
-			let availableUnits = Math.trunc(ownedTerritory / 3);
+			let availableUnits = Math.trunc(world.ownedTerritories / 3);
 			$("#count").html(availableUnits);
             
             let selectedTerritory = null, attackTerritory = null;
@@ -1170,7 +1169,7 @@
     			        selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
                         attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
                         
-                        world.ownedTerritory += 1;
+                        world.ownedTerritories += 1;
     			        
     			        console.log(`New unit allocation: Attacker: ${selectedTerritory.unitCount}, Defender: ${attackTerritory.unitCount}`);
     			    }
@@ -1188,8 +1187,7 @@
 
                 if (gameState == 0)
                 {
-        			ownedTerritory = world.ownedTerritory;
-        			availableUnits = Math.trunc(ownedTerritory / 3);
+        			availableUnits = Math.trunc(world.ownedTerritories / 3);
         			$("#count").html(availableUnits);
                 }
                 else if (gameState == 1)
@@ -1494,6 +1492,8 @@
 			    {
 			        console.log("You win!");
 			    }
+			    else
+			        console.log(`Owned Territories: ${world.ownedTerritories} out of ${world.tiles.length}`);
 			    
 			    if (attackTerritory === null)
 			    {
