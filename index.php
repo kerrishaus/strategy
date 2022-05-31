@@ -932,7 +932,7 @@
                             if (Math.trunc((id + 1) / this.width) == Math.trunc(id / this.width))
                                 tile.invadeableNeighbors[1] = this.tiles[id + 1].userData.team != 1 ? this.tiles[id + 1] : null;
 		                    
-	                    if (id - this.width > 0)
+	                    if (id - this.width >= 0)
 	                        tile.invadeableNeighbors[2]     = this.tiles[id - this.width].userData.team != 1 ? this.tiles[id - this.width] : null;
                         else
 	                        tile.invadeableNeighbors[2]     = null
