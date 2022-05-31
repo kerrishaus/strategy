@@ -100,6 +100,7 @@
 		        display: flex;
 		        flex-direction: row;
 		        align-items: center;
+		        flex-wrap: wrap;
 		        
 		        padding-bottom: 40px;
 		        
@@ -151,6 +152,7 @@
 		    {
 		        background-color: #222222bb;
 		        padding: 18px 40px;
+		        padding-bottom: 30px;
 		        text-align: center;
 		        
 		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
@@ -179,7 +181,10 @@
 		        padding: 2px 4px;
 		        font-size: 12px;
 		        border-radius: 100%;
-		        background-color: var(--outline);
+		        background-color: lightblue;
+		        position: relative;
+		        top: -4px;
+		        left: -5px;
 		    }
 		    
 		    #roundType
@@ -193,31 +198,59 @@
 		    
 		    .roundSpace
 		    {
-		        height: 12px;
+		        width: 85px;
+		        
+		        padding: 2px 0px;
 		        
 		        background-color: black;
+		        color: black;
 		        
 		        border-radius: 5px;
 		        
 		        flex-grow: 1;
 		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
+		        transition: background-color var(--color-fade-time), color var(--color-fade-time), border-color var(--color-fade-time);
 		    }
 		    
 		    .roundSpace.active
 		    {
 		        background-color: var(--primary);
+		        color: white;
 		    }
 		    
 		    #roundName
 		    {
 		        text-transform: uppercase;
+		        letter-spacing: 5px;
 		    }
 		    
 		    #nextStateButton
 		    {
+		        position: absolute;
+		        left: 37%;
+		        top: 56%;
+		        display: inline-block;
 		        pointer-events: auto;
 		        color: lightblue;
+		        background-color: #222222;
+		        color: white;
+		        border: 5px solid black;
+		        border-radius: 10px;
+		        padding: 10px 30px;
+		        font-size: 22px;
+		        margin-bottom: -100px;
+		        text-decoration: none;
+		    }
+		    
+		    #nextStateButton:hover
+		    {
+		        background-color: #333333;
+		    }
+		    
+		    #nextStateButton:active
+		    {
+		        background-color: #111111;
+		        border-style: outset;
 		    }
 		    
 		    #counter
@@ -303,8 +336,6 @@
 		        justify-content: center;
 		        align-items: center;
 		        flex-direction: column;
-		        
-		        height: 100%;
 		    }
 		    
 		    .gameInterfaceContainer > .attackPlanner > .cancelButton
@@ -315,11 +346,12 @@
 		        pointer-events: auto;
 		    }
 		    
-		    .gameInterfaceContainer > .attackPlanner > .cancelButton > a
+		    .gameInterfaceContainer > .attackPlanner > .cancelButton > button
 		    {
 		        display: inline-block;
 		        color: white;
 		        background-color: red;
+		        border: 5px solid darkred;
 		        padding: 10px 20px;
 		        border-radius: 10px;
 		        text-decoration: none;
@@ -349,6 +381,32 @@
 		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .defender
 		    {
                 right: 0px;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .attackGoButton
+		    {
+		        min-width: 100%;
+		        
+		        position: relative;
+		        bottom: 0px;
+		    }
+		    
+		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .attackGoButton
+		    {
+		        bottom: 10%;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > .attackGoButton > button
+		    {
+		        padding: 10px 30px;
+		        border: 5px solid darkgreen;
+		        color: lightgreen;
+		        background-color: green;
+		        
+		        font-size: 32px;
+		        border-radius: 10px;
+		        
+		        pointer-events: auto;
 		    }
 		    
 		    #unitPlaceDialog
@@ -531,18 +589,13 @@
 	                    <span id='tags'>&#10004;</span>
 	                </div>
 	                <div id='roundType'>
-	                    <div class='roundSpace active'></div>
-	                    <div class='roundSpace'></div>
-	                    <div class='roundSpace'></div>
+	                    <div class='roundSpace active'>Place</div>
+	                    <div class='roundSpace'>Attack</div>
+	                    <div class='roundSpace'>Move</div>
 	                </div>
-	                <div>
-    	                <span id='roundName'>
-    	                    Place
-    	                </span>
-                        <a href='#' id='nextStateButton'>
-                            next state
-                        </a>
-	                </div>
+                    <button id='nextStateButton'>
+                        next state
+                    </button>
 	            </div>
 	            <div id='counter'>
 	                <div id='statue'>
@@ -555,17 +608,27 @@
 	        </div>
             <div class='attackPlanner'>
                 <div class='cancelButton moveableInterfaceElement'>
-                    <a href='#' id='attackPlannerCancelButton'>cancel</a>
+                    <button id='attackPlannerCancelButton'>cancel</button>
                 </div>
                 <div class='attacker moveableInterfaceElement'>
-                    <h1>Attacker</h1>
-                    <div style='width: 400px;height: 500px;background-color:red;border-radius:10px;'>
+                    <h1>Attacking</h1>
+                    <!--<div style='width: 400px;height: 500px;background-color:red;border-radius:10px;'>-->
+                    <div class=''>
+                        <span id='attackerCount'></span>
                     </div>
                 </div>
+                <div>
+                    <h1>vs</h1>
+                </div>
                 <div class='defender moveableInterfaceElement'>
-                    <h1>Defender</h1>
-                    <div style='width: 400px;height: 500px;background-color:blue;border-radius:10px;'>
+                    <h1>Defending</h1>
+                    <!--<div style='width: 400px;height: 500px;background-color:blue;border-radius:10px;'>-->
+                    <div class=''>
+                        <span id='defenderCount'></span>
                     </div>
+                </div>
+                <div class='attackGoButton moveableInterfaceElement'>
+                    <button id='attackPlannerGoButton'>Go!</button>
                 </div>
             </div>
 	    </div>
@@ -586,6 +649,11 @@
 		
 		<script type='module'>
 		    import { CSS2DObject, CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
+		    
+            function getRandomInt(max)
+            {
+                return Math.floor(Math.random() * max);
+            }
 		    
 		    const ownedColor                 = 0x00aa00, 
 		          ownedHoverColor            = 0x00cc00, 
@@ -770,11 +838,6 @@
 			        {
 			            for (let x = 0; x < this.width; x++)
 			            {
-                            function getRandomInt(max)
-                            {
-                                return Math.floor(Math.random() * max);
-                            }
-                            
                             let chance = getRandomInt(2);
                             
                             let color = enemyColor;
@@ -792,6 +855,8 @@
 			                object.targetPosition.y = y + 1.3 * y;
 			                object.targetPosition.z = 0;
 			                
+			                object.unitCount = getRandomInt(4) + 1;
+			                
 			                object.userData.team = chance > 0 ? 1 : 2;
 			                object.userData.invadeable = false;
 			                object.userData.territoryId = arrayPosition;
@@ -804,10 +869,37 @@
 			            
 			        }
 			        
+                    this.calculateInvadeableTerritories();
+			        
+                    const floorGeometry = new THREE.PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
+                    const floorMaterial = new THREE.MeshBasicMaterial({color: 0x256d8f, side: THREE.FrontSide });
+                    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                    floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
+                    floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
+                    this.add(floor);
+			    }
+			    
+			    update(deltaTime)
+			    {
+			        for (const tile of this.tiles)
+		                tile.update(deltaTime);
+	            }
+	            
+	            add(object)
+	            {
+	                object.world = this;
+	                super.add(object);
+	            }
+	            
+	            calculateInvadeableTerritories()
+	            {
 		            // calculate invadeable neighbors
 		            for (const tile of this.tiles)
 		            {
 		                const id = tile.userData.territoryId;
+		                
+		                delete tile.invadeableNeighbors;
+		                tile.invadeableNeighbors = new Array(4);
 		                
 		                if (id - 1 > 0)
 		                    if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
@@ -836,25 +928,6 @@
                                 console.log(id + " has no invadeable neighbors.");
                             }
 		            }
-			        
-                    const floorGeometry = new THREE.PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
-                    const floorMaterial = new THREE.MeshBasicMaterial({color: 0x256d8f, side: THREE.FrontSide });
-                    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-                    floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
-                    floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
-                    this.add(floor);
-			    }
-			    
-			    update(deltaTime)
-			    {
-			        for (const tile of this.tiles)
-		                tile.update(deltaTime);
-	            }
-	            
-	            add(object)
-	            {
-	                object.world = this;
-	                super.add(object);
 	            }
 			};
 			
@@ -865,6 +938,7 @@
 			
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor(0x256d8f);
 			document.body.appendChild(renderer.domElement);
 			
 			const htmlRenderer = new CSS2DRenderer();
@@ -874,7 +948,7 @@
 			document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
 			
 			let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
-
+			
 			const clock = new THREE.Clock();
 			
 			window.addEventListener('resize', onWindowResize);
@@ -897,7 +971,7 @@
                 "Move"
 		    ];
 		    
-			let gameState = 1;
+			let gameState = 2;
 			setGameState()
 			
 			let ownedTerritory = world.ownedTerritory;
@@ -960,12 +1034,94 @@
                 createAttackDiagram(id);
 			});
 			
+			$("#attackPlannerGoButton").click(function(event)
+			{
+			    if (selectedTerritory === null)
+			    {
+			        console.error("selectedTerritory is null.");
+			        return;
+			    }
+			    
+			    if (attackTerritory === null)
+			    {
+			        console.error("attackTerritory is null.");
+			        return;
+			    }
+			    
+			    console.log("Attacking!!!");
+			    
+			    while (attackTerritory.unitCount > 0 && selectedTerritory.unitCount > 1)
+			    {
+			        const attackerRoll = getRandomInt(5) + 1; // 1-6
+			        const defenderRoll = getRandomInt(5) + 1; // 1-6
+			        
+			        if (attackerRoll > defenderRoll)
+			        {
+			            attackTerritory.unitCount -= 1;
+			            console.log("Defenders lost a unit, now at: " + attackTerritory.unitCount + ".");
+			        }
+		            else
+		            {
+		                selectedTerritory.unitCount -= 1;
+		                console.log("Attackers lost a unit, now at: " + selectedTerritory.unitCount + ".");
+		            }
+		                
+                    selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
+                    attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
+			    }
+			    
+			    console.log(`Final score: Attacker: ${selectedTerritory.unitCount}, Defender: ${attackTerritory.unitCount}`);
+			    
+			    if (attackTerritory.unitCount > 0 && selectedTerritory.unitCount > 0)
+			    {
+			        console.log("match was a draw");
+			    }
+			    else
+			    {
+    			    if (attackTerritory.unitCount > 0)
+    			    {
+    			        console.log("defenders won");
+    			    }
+    			    
+    			    if (selectedTerritory.unitCount > 0)
+    			    {
+    			        console.log("attackers won");
+    			        
+    			        attackTerritory.userData.team = 1;
+    			        attackTerritory.material.color.setHex(ownedColor);
+    			        attackTerritory.unitCount = selectedTerritory.unitCount - 1;
+    			        selectedTerritory.unitCount = 1;
+    			        
+    			        selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
+                        attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
+                        
+                        world.ownedTerritory += 1;
+    			        
+    			        console.log(`New unit allocation: Attacker: ${selectedTerritory.unitCount}, Defender: ${attackTerritory.unitCount}`);
+    			    }
+			    }
+			    
+			    finishAttack();
+			});
+			
 			function nextGameState()
 			{
 			    if (gameState >= 2)
 			        gameState = 0;
 			    else
 			        gameState += 1;
+
+                if (gameState == 0)
+                {
+        			ownedTerritory = world.ownedTerritory;
+        			availableUnits = Math.trunc(ownedTerritory / 3);
+        			$("#count").html(availableUnits);
+                }
+                else if (gameState == 1)
+                {
+                    if (attackTerritory !== null)
+                        removeAttackDialog();
+                }
 			        
                 setGameState();
 			}
@@ -976,7 +1132,7 @@
 			    $("#roundType").children()[gameState].classList.add("active");
 			    $("#roundName").html(states[gameState]);
 			    
-			    $("#gameStatus").attr("data-state", gameState);
+			    $(".gameStatus").attr("data-state", gameState);
 			}
 			
 		    function onHover(object)
@@ -1011,13 +1167,23 @@
                         }
                     }
                 }
+                else if (gameState == 2)
+                {
+                    if (selectedTerritory === null)
+                        if (object.userData.team == 1)
+                        {
+                            object.raise();
+                            object.material.color.setHex(ownedHoverColor);
+                        }
+                }
 		    }
 		    
 		    function onStopHover(object)
 		    {
 		        if (gameState == 0)
 		        {
-		            object.lower();
+		            if (selectedTerritory != object)
+		                object.lower();
 		        }
 		        else if (gameState == 1)
 		        {
@@ -1030,6 +1196,17 @@
 		                        object.material.color.setHex(ownedColor);
 		                }
 		        }
+                else if (gameState == 2)
+                {
+                    if (object.userData.team == 1)
+                    {
+                        if (selectedTerritory != object)
+                        {
+                            object.lower();
+                            object.material.color.setHex(ownedColor);
+                        }
+                    }
+                }
 		    }
 			
 			function createDropDialog(id)
@@ -1069,6 +1246,13 @@
 			
 			function dismissDropDialog()
 			{
+			    if (selectedTerritory === null)
+			    {
+			        console.error("selectedTerritory is invalid.");
+			        return;
+			    }
+			    
+			    selectedTerritory.lower();
 			    selectedTerritory.destroyUnitPlaceDialog();
 			    
 			    // TODO: unset hover color here
@@ -1100,6 +1284,12 @@
 			        return;
 			    }
 			    
+			    if (object.unitCount <= 1)
+			    {
+			        console.error("This territory does not have enough units to attack.");
+			        return;
+			    }
+			    
 			    if (object.invadeableNeighbors === null)
 			    {
 			        console.error("This territory does not border any enemy territory.");
@@ -1107,6 +1297,8 @@
 			    }
 			    
 			    selectedTerritory = object;
+			    selectedTerritory.raise();
+			    selectedTerritory.material.color.setHex(selectedOwnedColor);
 			    
 			    for (const tile of selectedTerritory.getInvadeableNeighbors())
 			    {
@@ -1186,6 +1378,8 @@
                         tile.material.color.setHex(enemyInvadeablePausedColor);
 			    }
 			    
+			    $("#attackerCount").html(selectedTerritory.unitCount);
+			    $("#defenderCount").html(attackTerritory.unitCount);
 			    $(".gameInterfaceContainer").attr("data-visibility", "hidden");
 			    
 		        console.log(`Attack Dialog created for ${selectedTerritory.id} to attack ${attackTerritory.id}`);
@@ -1208,6 +1402,61 @@
 			    $(".gameInterfaceContainer").attr("data-visibility", null);
 			    
 			    console.log("Attack dialog removed.");
+			}
+			
+			function finishAttack()
+			{
+			    if (world.ownedTerritories == world.tiles.length)
+			    {
+			        console.log("You win!");
+			    }
+			    
+			    if (attackTerritory === null)
+			    {
+			        console.error("attackTerritory is null.");
+			        return;
+			    }
+			    
+			    if (selectedTerritory === null)
+			    {
+			        console.error("selectedTerritory is null.");
+			        return;
+			    }
+			    
+                for (const tile of selectedTerritory.getInvadeableNeighbors())
+                {
+                    if (!(tile instanceof WorldObject))
+                        continue;
+                    
+		            if (tile != attackTerritory)
+                        tile.material.color.setHex(enemyColor);
+			    }
+			    
+			    if (attackTerritory.userData.team == 1)
+                    attackTerritory.material.color.setHex(ownedColor);
+                else
+                    attackTerritory.material.color.setHex(enemyColor);
+                    
+                attackTerritory.lower();
+                attackTerritory = null;
+                
+			    selectedTerritory.lower();
+			    selectedTerritory.material.color.setHex(ownedColor);
+                selectedTerritory = null;
+                
+                world.calculateInvadeableTerritories();
+                
+                $(".gameInterfaceContainer").attr("data-visibility", null);
+			}
+			
+			function setMoveStartPoint(object)
+			{
+			    
+			}
+			
+			function setMoveEndPoint(object)
+			{
+			    
 			}
 			
             function onMouseDown(event)
@@ -1242,6 +1491,13 @@
                             
                             createAttackDiagram(INTERSECTED.id);
                         }
+                    if (gameState == 2)
+                    {
+                        if (selectedTerritory === null)
+                            setMoveStartPoint(INTERSECTED);
+                        else
+                            setMoveEndPoint(INTERSECTED);
+                    }
                 }
                 else if (INTERSECTED.userData.team == 2)
                     if (gameState == 1)
@@ -1311,9 +1567,9 @@
             		INTERSECTED = null;
             	}
                 
-                camera.position.lerp(cameraPosition, 0.2);
-				
 				world.update(clock.getElapsedTime());
+				
+                camera.position.lerp(cameraPosition, 0.2);
 				
 				renderer.render(scene, camera);
 				htmlRenderer.render(scene, camera);
