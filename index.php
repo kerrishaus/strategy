@@ -409,7 +409,8 @@
 		        pointer-events: auto;
 		    }
 		    
-		    #unitPlaceDialog
+		    #unitPlaceDialog,
+		    #unitMoveDialog
 		    {
 		        position: relative;
 		        z-index: 9999999 !important;
@@ -424,24 +425,28 @@
 		        text-align: center;
 		    }
 		    
-		    #unitPlaceDialog > h1
+		    #unitPlaceDialog > h1,
+		    #unitMoveDialog > h1
 		    {
 		        font-size: 14px;
 		        margin: 0px;
 		    }
 		    
-		    #unitPlaceDialog > div
+		    #unitPlaceDialog > div,
+		    #unitMoveDialog > div
 		    {
 		        margin-top: 10px;
 		        margin-bottom: 5px;
 		    }
 		    
-		    #unitPlaceDialog > div > input[type="range"]
+		    #unitPlaceDialog > div > input[type="range"],
+		    #unitMoveDialog > div > input[type="range"]
 		    {
 		        width: 80%;
 		    }
 		    
-		    #dropUnitAmountPreview
+		    #dropUnitAmountPreview,
+		    #moveUnitAmountPreview,
 		    {
 		        font-size: 20px;
 		        padding-left: 5px;
@@ -449,46 +454,13 @@
 		        top: -3px;
 		    }
 		    
-		    #unitPlaceDialog > button
+		    #unitPlaceDialog > button,
+		    #unitMoveDialog > button
 		    {
 		        width: 100%;
 		        font-size: 14px;
 		        padding: 5px;
 		    }
-		    
-		    /*
-		    #dropUnitDialog
-		    {
-		        width: 80%;
-		        height: 30%;
-		        overflow-y: hidden;
-		        
-	            position: absolute;
-		        z-index: 999999;
-		        top: 35%;
-		        left: 10%;
-		        
-		        display: flex;
-		        align-items: center;
-		        justify-content: center;
-		        flex-direction: column;
-		        
-		        background-color: #222222aa;
-		        color: white;
-		        font-size: 40px;
-		        
-		        opacity: 0;
-		        transform: scale(0.8);
-		        
-		        transition: opacity, 0.25s, transform 0.2s;
-		    }
-		    
-		    #dropUnitDialog.open
-		    {
-		        opacity: 1;
-		        transform: scale(1);
-		    }
-		    */
 		    
 			#loadingCover
 			{
@@ -722,7 +694,7 @@
         			dialog.id = 'unitPlaceDialog';
         			
         			const header = document.createElement("h1");
-        			header.innerHTML = "How many units?";
+        			header.innerHTML = "Place how many units?";
         			dialog.append(header);
         			
         			const inputGroup = document.createElement("div");
@@ -757,6 +729,57 @@
 			    destroyUnitPlaceDialog()
 			    {
         			this.remove(this.dialog);
+        			delete this.dialog;
+        			this.dialog = null;
+			    }
+			    
+			    createUnitMoveDialog(units)
+			    {
+			        if (this.dialog)
+			            this.destroyUnitMoveDialog();
+			            
+		            console.log(units);
+			        
+    				const dialog = document.createElement("div");
+        			dialog.id = 'unitMoveDialog';
+        			
+        			const header = document.createElement("h1");
+        			header.innerHTML = "Move how many units?";
+        			dialog.append(header);
+        			
+        			const inputGroup = document.createElement("div");
+        			dialog.append(inputGroup);
+        			
+        			const input = document.createElement("input");
+        			input.id = 'moveUnitAmount';
+        			input.type = 'range'
+        			input.min = 1;
+        			input.max = units;
+        			input.value = units;
+        			input.addEventListener("input", function(event)
+        			{
+        			    document.getElementById("moveUnitAmountPreview").innerHTML = this.value;
+        			});
+        			inputGroup.append(input);
+        			
+        			const inputCounter = document.createElement("span");
+        			inputCounter.textContent = units;
+        			inputCounter.id = 'moveUnitAmountPreview'
+        			inputGroup.append(inputCounter);
+        			
+        			const button = document.createElement("button");
+        			button.id = 'moveUnitButton';
+        			button.textContent = "Place";
+        			dialog.append(button);
+        			
+        			this.dialog = new CSS2DObject(dialog);
+        			this.add(this.dialog);
+			    }
+			    
+			    destroyUnitMoveDialog()
+			    {
+        			this.remove(this.dialog);
+        			delete this.dialog;
         			this.dialog = null;
 			    }
 			    
@@ -901,7 +924,7 @@
 		                delete tile.invadeableNeighbors;
 		                tile.invadeableNeighbors = new Array(4);
 		                
-		                if (id - 1 > 0)
+		                if (id - 1 >= 0)
 		                    if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
     		                    tile.invadeableNeighbors[0] = this.tiles[id - 1].userData.team != 1 ? this.tiles[id - 1] : null;
     		                
@@ -1013,6 +1036,58 @@
                 $("#count").html(availableUnits);
                 
                 dismissDropDialog();
+			});
+			
+			$(htmlRenderer.domElement).on("click", "#moveUnitButton", function(event)
+			{
+			    event.preventDefault();
+			    
+			    console.log("move");
+			    
+			    if (gameState != 2)
+			    {
+			        console.error("GameState must be 2 to move units.");
+			        return;
+			    }
+			    
+			    const amount = parseInt($("#moveUnitAmount").val());
+			    
+			    if (amount <= 0)
+		        {
+			        console.error("No available units to move.");
+			        return;
+			    }
+			    
+			    if (amount > selectedTerritory.unitCount - 1)
+			    {
+			        console.error("Requested to move too many units.");
+			        return;
+			    }
+			    
+			    if (selectedTerritory === null)
+			    {
+			        console.error("selectedTerritory is null.");
+			        return;
+			    }
+			    
+			    if (attackTerritory === null)
+			    {
+			        console.error("attackTerritory is null.");
+			        return;
+			    }
+			   
+                selectedTerritory.unitCount -= amount;
+                attackTerritory.unitCount += amount;
+                
+                selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
+                attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
+                
+                removeMoveUnitDialog();
+                
+                removeMoveEndPoint();
+                removeMoveStartPoint();
+                
+                nextGameState();
 			});
 			
 			$("body").on("click", "#nextStateButton", function(event)
@@ -1141,7 +1216,10 @@
                 {
                     if (selectedTerritory == null)
                         if (object.userData.team == 1)
+                        {
 		                    object.raise();
+		                    object.material.color.setHex(selectedOwnedColor);
+                        }
                 }
                 else if (gameState == 1)
                 {
@@ -1169,7 +1247,7 @@
                 }
                 else if (gameState == 2)
                 {
-                    if (selectedTerritory === null)
+                    if (selectedTerritory === null || attackTerritory === null)
                         if (object.userData.team == 1)
                         {
                             object.raise();
@@ -1182,8 +1260,12 @@
 		    {
 		        if (gameState == 0)
 		        {
-		            if (selectedTerritory != object)
-		                object.lower();
+		            if (object.userData.team == 1)
+    		            if (selectedTerritory != object)
+    		            {
+    		                object.lower();
+    		                object.material.color.setHex(ownedColor);
+    		            }
 		        }
 		        else if (gameState == 1)
 		        {
@@ -1200,7 +1282,8 @@
                 {
                     if (object.userData.team == 1)
                     {
-                        if (selectedTerritory != object)
+                        if (selectedTerritory != object &&
+                            attackTerritory != object)
                         {
                             object.lower();
                             object.material.color.setHex(ownedColor);
@@ -1253,6 +1336,7 @@
 			    }
 			    
 			    selectedTerritory.lower();
+			    selectedTerritory.material.color.setHex(ownedColor);
 			    selectedTerritory.destroyUnitPlaceDialog();
 			    
 			    // TODO: unset hover color here
@@ -1451,10 +1535,117 @@
 			
 			function setMoveStartPoint(object)
 			{
+			    if (selectedTerritory !== null)
+			    {
+			        removeMoveStartPoint();
+			    }
 			    
+			    selectedTerritory = object;
+			    selectedTerritory.raise();
+			    selectedTerritory.material.color.setHex(selectedOwnedColor);
+			    
+			    console.log("Set move start point.");
+			}
+			
+			function removeMoveStartPoint()
+			{
+			    if (selectedTerritory === null)
+			    {
+			        console.error("selectedTerritory is null.");
+			        return;
+			    }
+			    
+			    selectedTerritory.lower();
+			    selectedTerritory.material.color.setHex(ownedColor);
+			    selectedTerritory = null;
+			    
+			    console.log("Removed move start point.");
 			}
 			
 			function setMoveEndPoint(object)
+			{
+			    if (selectedTerritory === null)
+			    {
+			        console.error("Start point (selectedTerritory) must be set before end point can be set.");
+			        return;
+			    }
+			    
+			    if (object === selectedTerritory)
+			    {
+			        console.error("Cannot set end point to same territory as start point.");
+			        return;
+			    }
+			    
+			    attackTerritory = object;
+			    attackTerritory.raise();
+			    attackTerritory.material.color.setHex(selectedOwnedColor);
+			    
+			    createMoveUnitDialog();
+			    
+			    console.log("Set move end point.");
+			}
+			
+			function removeMoveEndPoint()
+			{
+			    if (attackTerritory === null)
+			    {
+			        console.error("End point (attackTerritory) is null.");
+			        return;
+			    }
+			    
+			    removeMoveUnitDialog();
+			    
+			    attackTerritory.lower();
+			    attackTerritory.material.color.setHex(ownedColor);
+			    attackTerritory = null;
+			    
+			    console.log("Removed move end point.");
+			}
+			
+			function createMoveUnitDialog()
+			{
+			    if (gameState != 2)
+			    {
+			        console.error("GameState must be 2 to move units.");
+			        return;
+			    }
+			    
+			    if (selectedTerritory === null)
+			    {
+			        console.error("Start point (selectedTerritory) is null.");
+			        return;
+			    }
+			    
+			    if (attackTerritory === null)
+			    {
+			        console.error("End point (attackTerritory) is null.");
+			    }
+			    
+			    if (selectedTerritory.unitCount <= 1)
+			    {
+			        console.warn("Not enough units to move.");
+			        return
+			    }
+			    
+			    attackTerritory.createUnitMoveDialog(selectedTerritory.unitCount - 1);
+			    
+			    console.log("Created unit move dialog.");
+			}
+			
+			function removeMoveUnitDialog()
+			{
+			    if (attackTerritory === null)
+			    {
+			        console.error("attackTerritory is invalid.");
+			        return;
+			    }
+			    
+			    attackTerritory.destroyUnitMoveDialog();
+			    
+			    console.log("Removed unit move dialog.");
+			}
+			
+			function moveUnits()
 			{
 			    
 			}
@@ -1495,7 +1686,7 @@
                     {
                         if (selectedTerritory === null)
                             setMoveStartPoint(INTERSECTED);
-                        else
+                        else if (attackTerritory === null)
                             setMoveEndPoint(INTERSECTED);
                     }
                 }
@@ -1511,6 +1702,7 @@
                     if (gameState == 0)
                         dismissDropDialog();
                     else if (gameState == 1)
+                    {
                         if (selectedTerritory !== null && attackTerritory === null)
                             removeAttackDiagram();
                         else if (attackTerritory !== null && selectedTerritory !== null)
@@ -1520,6 +1712,14 @@
                             removeAttackDialog();
                             createAttackDiagram(id);
                         }
+                    }
+                    else if (gameState == 2)
+                    {
+                        if (attackTerritory !== null)
+                            removeMoveEndPoint();
+                        else if (selectedTerritory !== null)
+                            removeMoveStartPoint();
+                    }
             }
 			
             function onPointerMove(event)
