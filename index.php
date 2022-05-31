@@ -14,8 +14,15 @@
 		
 		<script src="https://kerrishaus.com/assets/scripts/jquery-3.6.0.min.js"></script>
 		
-		<script src="https://portal.kerrishaus.com/assets/javascript/messages.js"></script>
-		<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />
+		<script>
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has("debug"))
+            {
+                $("head").append("<script src='https://portal.kerrishaus.com/assets/javascript/messages.js'><\/script>");
+                $("head").append("<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />");
+            }
+        </script>
 		
 		<style>
 		    .gameInterfaceContainer
@@ -462,6 +469,38 @@
 		        padding: 5px;
 		    }
 		    
+		    #gameWin
+		    {
+		        width: 100vw;
+		        height: 100vh;
+		        
+		        position: absolute;
+		        top: 0px;
+		        left: 0px;
+		        
+		        display: flex;
+		        justify-content: center;
+		        align-items: center;
+		        flex-direction: column;
+		        
+		        background-color: #000000aa;
+		        
+		        opacity: 0;
+		        
+		        transition: opacity 0.3s;
+		    }
+		    
+		    #gameWin[data-visibility="shown"]
+		    {
+		        opacity: 1;
+		    }
+		    
+		    #replayGame
+		    {
+		        font-size: 28px;
+		        pointer-events: auto;
+		    }
+		    
 			#loadingCover
 			{
 			    position: absolute;
@@ -534,20 +573,10 @@
 	</head>
 	
 	<body>
-	    <?php 
-	        if (!isset($_GET['skipLoading']))
-	            echo "
-            	    <div id='loadingCover'>
-            	        <div id='status'>
-                	        <img id='kerris' src='https://kerrishaus.com/assets/logo/text-big.png'></img>
-            	            <img id='threejs' src='https://bachasoftware.com/wp-content/uploads/2020/07/icon_2-1.png'></img>
-                	        <img id='webgl' src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/WebGL_Logo.svg/1024px-WebGL_Logo.svg.png'></img>
-            	        </div>
-            	        <div class='help'>
-            	            Copyright &copy;&nbsp;<span translate='no'>Kerris Haus</span>
-            	        </div>
-            	    </div>"
-        ?>
+	    <script>
+	        if (!params.has("skipLoading"))
+	            $("body").prepend("<div id='loadingCover'><div id='status'><img id='kerris' src='https://kerrishaus.com/assets/logo/text-big.png'></img><img id='threejs' src='https://bachasoftware.com/wp-content/uploads/2020/07/icon_2-1.png'></img><img id='webgl' src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/WebGL_Logo.svg/1024px-WebGL_Logo.svg.png'></img></div><div class='help'>Copyright &copy;&nbsp;<span translate='no'>Kerris Haus</span></div></div>");
+        </script>
 	    
 	    <div class='gameInterfaceContainer transition-quick'>
 	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
@@ -602,6 +631,10 @@
                 <div class='attackGoButton moveableInterfaceElement'>
                     <button id='attackPlannerGoButton'>Go!</button>
                 </div>
+            </div>
+            <div id='gameWin'>
+                <h1>You win!</h1>
+                <button id='replayGame'>Replay</button>
             </div>
 	    </div>
 	    
@@ -874,8 +907,8 @@
 			                
 			                const object = new WorldObject(2, 2, color);
 			                
-			                object.targetPosition.x = x + 1.3 * x;
-			                object.targetPosition.y = y + 1.3 * y;
+			                object.targetPosition.x = x + 1.0 * x;
+			                object.targetPosition.y = y + 1.0 * y;
 			                object.targetPosition.z = 0;
 			                
 			                object.unitCount = getRandomInt(4) + 1;
@@ -994,13 +1027,18 @@
                 "Move"
 		    ];
 		    
-			let gameState = 2;
+			let gameState = 0;
 			setGameState()
 			
 			let availableUnits = Math.trunc(world.ownedTerritories / 3);
 			$("#count").html(availableUnits);
             
             let selectedTerritory = null, attackTerritory = null;
+            
+            $("#replayGame").click(function(event)
+            {
+                location.reload();
+            });
 			
 			$(htmlRenderer.domElement).on("click", "#dropUnitButton", function(event)
 			{
@@ -1035,6 +1073,9 @@
                 $("#count").html(availableUnits);
                 
                 dismissDropDialog();
+                
+                if (availableUnits <= 0)
+                    nextGameState();
 			});
 			
 			$(htmlRenderer.domElement).on("click", "#moveUnitButton", function(event)
@@ -1490,7 +1531,8 @@
 			{
 			    if (world.ownedTerritories == world.tiles.length)
 			    {
-			        console.log("You win!");
+			        $("#gameWin").attr("data-visibility", "shown");
+			        return;
 			    }
 			    else
 			        console.log(`Owned Territories: ${world.ownedTerritories} out of ${world.tiles.length}`);
@@ -1775,22 +1817,18 @@
 				htmlRenderer.render(scene, camera);
 			};
 			
-			<?php
-			
-			    if (!isset($_GET['skipLoading']))
-		            echo "
-			// remove loading cover
-			setTimeout(function()
+			if (!params.has("skipLoading"))
 			{
-				document.getElementById('loadingCover').style.opacity = '0';
-				
-				setTimeout(function() 
-				{
-    				document.getElementById('loadingCover').remove();
-				}, 1000);
-			}, 1000);";
-			
-			?>
+    			setTimeout(function()
+    			{
+    				document.getElementById('loadingCover').style.opacity = '0';
+    				
+    				setTimeout(function() 
+    				{
+        				document.getElementById('loadingCover').remove();
+    				}, 1000);
+    			}, 1000);
+			}
 			
 			animate();
 		</script>
