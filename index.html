@@ -25,6 +25,17 @@
         </script>
 		
 		<style>
+		    *
+		    {
+               -webkit-touch-callout: none; /* iOS Safari */
+                 -webkit-user-select: none; /* Safari */
+                  -khtml-user-select: none; /* Konqueror HTML */
+                    -moz-user-select: none; /* Old versions of Firefox */
+                     -ms-user-select: none; /* Internet Explorer/Edge */
+                         user-select: none; /* Non-prefixed version, currently
+                                              supported by Chrome, Edge, Opera and Firefox */
+		    }
+		
 		    .gameInterfaceContainer
 		    {
 		        box-sizing: border-box;
@@ -343,13 +354,20 @@
 		        justify-content: center;
 		        align-items: center;
 		        flex-direction: column;
+		        
+		        height: 80%;
+		    }
+		    
+		    .gameInterfaceContainer > .attackPlanner > div:first-child,
+		    .gameInterfaceContainer > .attackPlanner > div:last-child
+		    {
+		        height: 10%;
 		    }
 		    
 		    .gameInterfaceContainer > .attackPlanner > .cancelButton
 		    {
 		        min-width: 100%;
-		        top: -100px;
-		        height: 0px;
+		        top: -100%;
 		        pointer-events: auto;
 		    }
 		    
@@ -395,7 +413,7 @@
 		        min-width: 100%;
 		        
 		        position: relative;
-		        bottom: 0px;
+		        bottom: -100%;
 		    }
 		    
 		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .attackGoButton
@@ -1741,6 +1759,7 @@
             function onKeyDown(event)
             {
                 if (event.code == "Escape")
+                {
                     if (gameState == 0)
                         dismissDropDialog();
                     else if (gameState == 1)
@@ -1762,6 +1781,11 @@
                         else if (selectedTerritory !== null)
                             removeMoveStartPoint();
                     }
+                }
+                else if (event.code == "Space")
+                {
+                    nextGameState();
+                }
             }
 			
             function onPointerMove(event)
