@@ -499,8 +499,16 @@
 			    
 			    setStateNumber(number)
 			    {
-			        gameState = number;
-			        setGameState();
+			        const gameStates = [
+                        "Place",
+                        "Attack",
+                        "Move"
+		            ];
+
+    			    $(".roundSpace.active").removeClass("active");
+    			    $("#roundType").children()[number].classList.add("active");
+    			    
+    			    $(".gameStatus").attr("data-state", number);
 			    }
 			    
 			    onHover(object)
@@ -1303,19 +1311,6 @@
             world.position.y += 3;
 			scene.add(world);
 
-			const states = [
-                "Place",
-                "Attack",
-                "Move"
-		    ];
-
-			let gameState = 1;
-			setGameState()
-
-			let availableUnits = Math.trunc(world.ownedTerritories / 3);
-
-            let selectedTerritory = null, attackTerritory = null;
-
             stateManager.pushState(new AttackState());
 
             $("#replayGame").click(function(event)
@@ -1363,15 +1358,6 @@
                 setGameState();
 			}
 			*/
-			
-			function setGameState()
-			{
-			    $(".roundSpace.active").removeClass("active");
-			    $("#roundType").children()[gameState].classList.add("active");
-			    $("#roundName").html(states[gameState]);
-			    
-			    $(".gameStatus").attr("data-state", gameState);
-			}
 			
             function onMouseDown(event)
             {
