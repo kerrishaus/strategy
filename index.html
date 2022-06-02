@@ -106,25 +106,25 @@
 	    -->
 	    
 		<script src="https://kerrishaus.com/assets/threejs/build/three.js"></script>
-		
+
 		<script type='module'>
 		    import { CSS2DObject, CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
-		    
+
             function getRandomInt(max)
             {
                 return Math.floor(Math.random() * max);
             }
-		    
+
 		    const ownedColor                 = 0x00aa00, 
 		          ownedHoverColor            = 0x00cc00, 
 		          ownedSelectedColor         = 0x00ff00, 
-		          
+
 		          enemyColor                 = 0xaa0000, 
 		          enemyInvadeableColor       = 0xee0000,
 		          enemyInvadeablePausedColor = 0x550000,
 		          enemyInvadeableHoverColor  = 0xcc0000, 
 		          enemySelectedColor         = 0xff0000;
-		
+
 			class WorldObject extends THREE.Mesh
 			{
 			    constructor(width, height, color)
@@ -305,7 +305,7 @@
 			        $("#" + this.uuid).html(this.unitCount);
 			    }
 			};
-			
+
 			/*
 			class Territory extends WorldObject
 			{
@@ -331,7 +331,7 @@
 			    }
 			}
 			*/
-			
+
 			class GameWorld extends THREE.Group
 			{
 			    constructor(width, height)
@@ -441,7 +441,7 @@
 		            }
 	            }
 			};
-			
+
 			class StateMachine
 			{
 			    constructor(renderer, htmlRenderer)
@@ -529,12 +529,18 @@
 			            this.states[this.states.length - 1].update(deltaTime);
 			    }
 			};
-			
+
 			class State
 			{
+			    constructor()
+			    {
+			        this.stateNumber = -1;
+			    }
+			    
 			    init(stateMachine)
 			    {
 			        this.stateMachine = stateMachine;
+			        this.stateMachine.setStateNumber(this.stateNumber);
 			    }
 			    
 			    cleanup()
@@ -674,7 +680,6 @@
 			    
 			    onMouseDown(event, object)
 			    {
-			        
 			        if (object.userData.team == 1)
 			        {
 			            if (object == this.selectedTerritory)
@@ -718,7 +723,7 @@
 			        
 			    }
 			};
-			
+
 			class UnitMoveState extends State
 			{
 			    constructor()
@@ -896,61 +901,293 @@
 			        this.endTerritory = null;
 			    }
 			};
+
+			class AttackState extends State
+			{
+			    constructor()
+			    {
+			        super();
+
+			        this.selectedTerritory = null;
+			        this.attackTerritory = null;
+
+			        this.stateNumber = 1;
+			    }
+
+			    init(stateMachine)
+			    {
+			        this.stateMachine = stateMachine;
+			        this.stateMachine.setStateNumber(this.stateNumber);
+
+			        console.log("AttackState is ready.");
+			    }
+
+			    cleanup()
+			    {
+			        if (this.attackTerritory !== null)
+			            this.clearDefendingTerritory();
+			        
+			        if (this.selectedTerritory !== null)
+			            this.clearAttackingTerritory();
+			    }
+
+			    onHover(object)
+			    {
+			        if (this.selectedTerritory === null)
+			        {
+			            if (object.userData.team != 1)
+			                return;
+			                
+			            if (object.invadeableNeighbors === null)
+			                return;
+
+		                object.raise();
+		                object.material.color.setHex(ownedHoverColor);
+			        }
+
+			        if (this.attackTerritory === null)
+			        {
+			            if (object.userData.team == 1)
+			                return;
+
+		                if (!object.userData.invadeable)
+		                    return;
+
+		                object.raise();
+		                object.material.color.setHex(enemyInvadeableHoverColor);
+			        }
+			    }
+
+			    onStopHover(object)
+			    {
+			        if (object !== this.selectedTerritory &&
+			            object !== this.attackTerritory)
+			            {
+		                    object.lower();
+		                    
+			                if (object.userData.team == 1)
+			                    object.material.color.setHex(ownedColor);
+			                else
+			                    if (object.userData.invadeable)
+			                        if (this.attackTerritory !== null)
+			                            object.material.color.setHex(enemyInvadeablePausedColor);
+			                        else
+			                            object.material.color.setHex(enemyInvadeableColor);
+			                    else
+			                        object.material.color.setHex(enemyColor);
+			            }
+			    }
+
+			    onMouseDown(event, object)
+			    {
+			        if (this.attackTerritory === null && object.userData.team == 1)
+			            this.setAttackingTerritory(object);
+			        else if (this.attackTerritory === null && object.userData.team != 1)
+			            this.setDefendingTerritory(object);
+			        else
+			            console.error("Invalid object clicked during AttackState.");
+			    }
+
+			    onKeyDown(event)
+			    {
+			        if (event.code == "Escape")
+			        {
+			            if (this.attackTerritory !== null)
+			                this.clearDefendingTerritory();
+		                else if (this.selectedTerritory !== null)
+		                    this.clearAttackingTerritory();
+			        }
+			    }
+
+			    update(deltaTime)
+			    {
+
+			    }
+
+			    setAttackingTerritory(object)
+			    {
+			        if (object.invadeableNeighbors === null)
+			        {
+			            console.error("This tile cannot invade any of its neighbors.");
+			            return;
+			        }
+			        
+			        if (this.selectedTerritory !== null)
+			            this.clearAttackingTerritory();
+			            
+		            object.raise();
+		            object.material.color.setHex(ownedSelectedColor);
+		            this.selectedTerritory = object;
+
+                    if (this.selectedTerritory.invadeableNeighbors !== null)
+        			    for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+        			    {
+        			        if (!(tile instanceof WorldObject))
+        			            continue;
+    
+        	                tile.userData.invadeable = true;
+        	                tile.material.color.setHex(enemyInvadeableColor);
+        			    }
+			    }
+			    
+			    clearAttackingTerritory()
+			    {
+			        if (this.selectedTerritory === null)
+			        {
+			            console.error("selectedTerritory is null in clearAttackingTerritory()");
+			            return;
+			        }
+
+			        if (this.attackTerritory !== null)
+			            this.clearDefendingTerritory();
+			            
+		            if (this.selectedTerritory.invadeableNeighbors !== null)
+        			    for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+        			    {
+        			        if (!(tile instanceof WorldObject))
+        			            continue;
+    
+        	                tile.userData.invadeable = false;
+        	                tile.material.color.setHex(enemyColor);
+        			    }
+
+			        this.selectedTerritory.lower();
+			        this.selectedTerritory.material.color.setHex(ownedColor);
+			        this.selectedTerritory = null;
+			    }
+			    
+			    setDefendingTerritory(object)
+			    {
+			        if (this.selectedTerritory === null)
+			        {
+			            console.error("selectedTerritory must be set before attackTerritory can be set.");
+			            return;
+			        }
+
+			        if (object == this.selectedTerritory)
+			        {
+			            console.error("attackTerritory cannot be selectedTerritory.");
+			            return;
+			        }
+			        
+			        if (!object.userData.invadeable)
+			        {
+			            console.error("This tile is not invadeable.");
+			            return;
+			        }
+			        
+			        object.raise();
+			        object.material.color.setHex(enemySelectedColor);
+			        this.attackTerritory = object;
+			        
+    			    for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+    			    {
+    			        if (!(tile instanceof WorldObject))
+    			            continue;
+    			            
+			            if (tile === this.attackTerritory)
+			                continue;
+
+    	                tile.userData.invadeable = true;
+    	                tile.material.color.setHex(enemyInvadeablePausedColor);
+    			    }
+			        
+    			    $("#attackerCount").html(this.selectedTerritory.unitCount);
+    			    $("#defenderCount").html(this.attackTerritory.unitCount);
+    			    $(".gameInterfaceContainer").attr("data-visibility", "hidden");
+			    }
+			    
+			    clearDefendingTerritory()
+			    {
+			        if (this.attackTerritory === null)
+			        {
+			            console.error("attackTerritory is null.");
+			            return;
+			        }
+			        
+			        this.attackTerritory.lower();
+			        this.attackTerritory.material.color.setHex(enemyInvadeableColor);
+			        this.attackTerritory = null;
+			        
+    			    for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+    			    {
+    			        if (!(tile instanceof WorldObject))
+    			            continue;
+    			            
+			            if (tile === this.attackTerritory)
+			                continue;
+
+    	                tile.userData.invadeable = true;
+    	                tile.material.color.setHex(enemyInvadeableColor);
+    			    }
+			        
+			        $(".gameInterfaceContainer").attr("data-visibility", null);
+			    }
+			};
 			
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-			
+
 			const cameraPosition = new THREE.Vector3(5 + 0.3 * 5, 5 + 0.3 * 5, 14);
-			
+
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.setClearColor(0x256d8f);
 			document.body.appendChild(renderer.domElement);
-			
+
 			const htmlRenderer = new CSS2DRenderer();
 			htmlRenderer.setSize(window.innerWidth, window.innerHeight);
 			htmlRenderer.domElement.style.position = 'absolute';
 			htmlRenderer.domElement.style.top = '0px';
 			document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
-			
+
 			const stateManager = new StateMachine(renderer, htmlRenderer);
-			
+
 			let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
-			
+
 			const clock = new THREE.Clock();
-			
+
 			window.addEventListener('resize', onWindowResize);
-			
+
 			document.addEventListener('keydown', onKeyDown);
 			//document.addEventListener('keyup', onKeyUp);
 
             document.addEventListener('mousedown', onMouseDown);
             //document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onPointerMove);
-            
+
             const world = new GameWorld(10, 5);
             world.position.x -= 3;
             world.position.y += 3;
 			scene.add(world);
-			
+
 			const states = [
                 "Place",
                 "Attack",
                 "Move"
 		    ];
-		    
-			let gameState = 2;
+
+			let gameState = 1;
 			setGameState()
-			
+
 			let availableUnits = Math.trunc(world.ownedTerritories / 3);
-            
+
             let selectedTerritory = null, attackTerritory = null;
-            
-            stateManager.pushState(new UnitMoveState());
-            
+
+            stateManager.pushState(new AttackState());
+
             $("#replayGame").click(function(event)
             {
-                location.reload();
+                /*
+                // for now keep this commented out because it's causing the game to randomly reload.
+                // see #4
+                console.log("reloading game in 5 seconds");
+                
+                setTimeout(function()
+                {
+                    location.reload();
+                }, 5000);
+                */
             });
 			
 			$("body").on("click", "#nextStateButton", function(event)
@@ -1074,191 +1311,6 @@
 			    $(".gameStatus").attr("data-state", gameState);
 			}
 			
-		    function onHover(object)
-		    {
-                if (gameState == 1)
-                {
-                    if (object.userData.team == 1) // picking the guy to attack from
-                    {
-                        // if we have selected a starting point, but not a destination
-                        if (attackTerritory === null)
-                        {
-                            object.raise();
-                            object.material.color.setHex(ownedHoverColor);
-                        }
-                    }
-                    else // not on our team, we're picking who to attack
-                    {
-                        // TODO: not if we're allies maybe
-                        
-                        // we are picking from invadeable territories
-                        if (selectedTerritory !== null && attackTerritory === null && object.userData.invadeable)
-                        {
-                            object.raise();
-                            //object.material.color.setHex(enemyInvadeableHoverColor);
-                            // TODO: need to do unhover logic for this one
-                        }
-                    }
-                }
-		    }
-		    
-		    function onStopHover(object)
-		    {
-                if (gameState == 1)
-		        {
-		            if (selectedTerritory != object &&
-		                attackTerritory != object)
-		                {
-		                    object.lower();
-		                    
-		                    if (object.userData.team == 1)
-		                        object.material.color.setHex(ownedColor);
-		                }
-		        }
-		    }
-			
-			function createAttackDiagram(id)
-			{
-			    if (selectedTerritory !== null)
-			    {
-			        console.log("A territory is already selected for something.");
-			        return;
-			    }
-			    
-			    const object = scene.getObjectById(id);
-			    
-			    if (object === null)
-			    {
-			        console.error("Id passed in CreateDropDialog failed sanity check.");
-			        return;
-			    }
-			    
-			    if (object.userData.team != 1)
-			    {
-			        console.error("This territory is not owned by you.");
-			        return;
-			    }
-			    
-			    if (object.unitCount <= 1)
-			    {
-			        console.error("This territory does not have enough units to attack.");
-			        return;
-			    }
-			    
-			    if (object.invadeableNeighbors === null)
-			    {
-			        console.error("This territory does not border any enemy territory.");
-			        return;
-			    }
-			    
-			    selectedTerritory = object;
-			    selectedTerritory.raise();
-			    selectedTerritory.material.color.setHex(ownedSelectedColor);
-			    
-			    for (const tile of selectedTerritory.getInvadeableNeighbors())
-			    {
-			        if (!(tile instanceof WorldObject))
-			            continue;
-			            
-	                tile.material.color.setHex(enemyInvadeableColor);
-	                tile.userData.invadeable = true;
-			    }
-			    
-			    console.log("Created attack diagram for " + selectedTerritory.id);
-			}
-			
-			function removeAttackDiagram()
-			{
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritorry is null.");
-			        return;
-			    }
-			    
-			    for (const tile of selectedTerritory.getInvadeableNeighbors())
-			    {
-			        if (!(tile instanceof WorldObject))
-			            continue;
-			        
-			        tile.material.color.setHex(enemyColor);
-			        tile.userData.invadeable = false;
-			    }
-
-                selectedTerritory.lower();
-                selectedTerritory.material.color.setHex(ownedColor);
-                
-		        selectedTerritory = null;
-		        
-		        console.log("Attack diagram removed.");
-			}
-			
-			function createAttackDialog(id)
-			{
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritory is not set.");
-			        return;    
-			    }
-			    
-			    if (attackTerritory !== null)
-			    {
-			        console.error("attackTerritory is already set.");
-			        return;    
-			    }
-			    
-			    const attackTarget = scene.getObjectById(id);
-	    
-			    if (attackTarget === null)
-			    {
-			        console.error(id + " is not a valid attack target.");
-			        return;
-			    }
-			    
-			    if (!attackTarget.userData.invadeable)
-			    {
-			        console.error("Tile " + attackTarget.id + " cannot be invaded from " + selectedTerritory.id + ".");
-			        return;
-			    }
-			    
-			    attackTerritory = attackTarget;
-			    
-			    attackTerritory.material.color.setHex(enemySelectedColor);
-			    
-                for (const tile of selectedTerritory.getInvadeableNeighbors())
-                {
-                    if (!(tile instanceof WorldObject))
-                        continue;
-                    
-		            if (tile != attackTerritory)
-                        tile.material.color.setHex(enemyInvadeablePausedColor);
-			    }
-			    
-			    $("#attackerCount").html(selectedTerritory.unitCount);
-			    $("#defenderCount").html(attackTerritory.unitCount);
-			    $(".gameInterfaceContainer").attr("data-visibility", "hidden");
-			    
-		        console.log(`Attack Dialog created for ${selectedTerritory.id} to attack ${attackTerritory.id}`);
-			}
-			
-			function removeAttackDialog()
-			{
-			    if (attackTerritory === null)
-			    {
-			        console.error("attackTerritory is invalid: " + attackTerritory);
-			        return;
-			    }
-			    
-			    attackTerritory.lower();
-			    attackTerritory.material.color.setHex(enemyInvadeableColor);
-			    
-			    attackTerritory = null;
-			    selectedTerritory = null;
-			    
-			    $(".gameInterfaceContainer").attr("data-visibility", null);
-			    
-			    console.log("Attack dialog removed.");
-			}
-			
 			function finishAttack()
 			{
 			    if (world.ownedTerritories == world.tiles.length)
@@ -1313,59 +1365,14 @@
                     return;
                     
                 stateManager.onMouseDown(event, INTERSECTED);
-                    
-                if (INTERSECTED.id == selectedTerritory || INTERSECTED.id == attackTerritory)
-                    return;
-                    
-                if (INTERSECTED.userData.team == 1)
-                {
-                    if (gameState == 1)
-                        if (attackTerritory === null)
-                        {
-                            if (selectedTerritory !== null)
-                            {
-                                if (INTERSECTED.id == selectedTerritory.id)
-                                {
-                                    console.error("This tile is already selected.");
-                                    return;
-                                }
-                                
-                                console.log("selectedTerritory already exists, clearing attack diagram first.");
-                                removeAttackDiagram();
-                            }
-                            
-                            createAttackDiagram(INTERSECTED.id);
-                        }
-                }
-                else // any unowned territory
-                    if (gameState == 1)
-                        if (selectedTerritory !== null && attackTerritory === null)
-                            createAttackDialog(INTERSECTED.id);
             }
             
             function onKeyDown(event)
             {
                 stateManager.onKeyDown(event);
                 
-                if (event.code == "Escape")
-                {
-                    if (gameState == 1)
-                    {
-                        if (selectedTerritory !== null && attackTerritory === null)
-                            removeAttackDiagram();
-                        else if (attackTerritory !== null && selectedTerritory !== null)
-                        {
-                            const id = selectedTerritory.id;
-                            
-                            removeAttackDialog();
-                            createAttackDiagram(id);
-                        }
-                    }
-                }
-                else if (event.code == "Space")
-                {
+                if (event.code == "Space")
                     nextGameState();
-                }
             }
 			
             function onPointerMove(event)
@@ -1396,7 +1403,6 @@
             		{
             			if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
             			{
-            			    onStopHover(INTERSECTED);
             			    stateManager.onStopHover(INTERSECTED);
             			    INTERSECTED = null;
             			}
@@ -1404,14 +1410,12 @@
                         if (intersects[0].object.userData.hasOwnProperty("canClick")) // the object is now hovered
                         {
             				INTERSECTED = intersects[0].object;
-                            onHover(INTERSECTED);
                             stateManager.onHover(INTERSECTED);
                         }
             		}
             	}
             	else if (INTERSECTED !== null)// the object is no longer hovered, and no object is hovered
             	{
-            	    onStopHover(INTERSECTED);
             	    stateManager.onStopHover(INTERSECTED);
             		INTERSECTED = null;
             	}
