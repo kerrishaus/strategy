@@ -595,29 +595,29 @@
 			        
 			    }
 			};
-		    
+
 			class UnitDropState extends State
 			{
 			    constructor(availableUnits)
 			    {
 			        super();
-			        
+
 			        this.availableUnits = availableUnits;
-			        
+
 			        this.selectedTerritory = null;
 			    }
-			    
+
 			    init(stateMachine)
 			    {
 			        this.stateMachine = stateMachine;
 			        this.stateMachine.setStateNumber(0);
-			        
+
 			        console.log("UnitDropState ready.");
-			        
+
 			        this.selectedTerritory = null;
-			        
+
 			        $("#count").html(this.availableUnits);
-			        
+
         			$(htmlRenderer.domElement).on("click", "#dropUnitButton", callback =>
         			{
         			    if (this.selectedTerritory === null)
@@ -625,36 +625,36 @@
         			        console.error("selectedTerritory is null in UnitDropState::init().");
         			        return;
         			    }
-        			    
+
         			    const amount = parseInt($("#dropUnitAmount").val());
-        			    
+
         			    if (this.availableUnits <= 0)
         		        {
         			        console.error("No available units to drop.");
         			        return;
         			    }
-        			    
+
         			    if (amount > this.availableUnits)
         			    {
         			        console.error("Requested to drop too many units.");
         			        return;
         			    }
-        			   
+
                         this.availableUnits -= amount;
                         this.selectedTerritory.addUnits(amount);
-                        
+
                         this.selectedTerritory.destroyUnitPlaceDialog();
                         this.selectedTerritory.lower();
                         this.selectedTerritory.material.color.setHex(ownedColor);
                         this.selectedTerritory = null;
-                            
+
                         if (this.availableUnits <= 0)
                             this.stateMachine.changeState(new AttackState());
-                        
+
                         $("#count").html(this.availableUnits);
         			});
 			    }
-			    
+
 			    cleanup()
 			    {
 			        console.log("UnitDropState cleaned up.");
@@ -1149,9 +1149,9 @@
     	                tile.material.color.setHex(enemyInvadeableColor);
     			    }
     			    
-	    			$("#attackPlannerCancelButton").off("click");
-        			$("#attackPlannerGoButton").off("click");
-			        
+	    			$("#attackPlannerCancelButton").off();
+        			$("#attackPlannerGoButton").off();
+        			
 			        $(".gameInterfaceContainer").attr("data-visibility", null);
 			    }
 			    
@@ -1273,6 +1273,10 @@
                     // TODO: use the official methods to clear attacker and defender
                     
                     world.calculateInvadeableTerritories();
+                    
+                    // TODO: remove these when the above todo is implemented
+                    $("#attackPlannerCancelButton").off();
+        			$("#attackPlannerGoButton").off();
                     
                     $(".gameInterfaceContainer").attr("data-visibility", null);
 			    }
