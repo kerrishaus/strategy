@@ -789,7 +789,7 @@
 
                         // change the state after the units have been moved,
                         // as you can only move once during this turn.
-                        this.stateMachine.changeState(new UnitDropState(world.ownedTerritories / 3));
+                        this.stateMachine.changeState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
         			});
 			    }
 
@@ -1232,6 +1232,12 @@
 			        if (world.ownedTerritories == world.tiles.length)
     			    {
     			        $("#gameWin").attr("data-visibility", "shown");
+    			        
+	                    $("#replayGame").click(function(event)
+                        {
+                            location.reload();
+                        });
+                        
     			        return;
     			    }
     			    else
@@ -1320,20 +1326,6 @@
 
             stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
 
-            $("#replayGame").click(function(event)
-            {
-                /*
-                // for now keep this commented out because it's causing the game to randomly reload.
-                // see #4
-                console.log("reloading game in 5 seconds");
-                
-                setTimeout(function()
-                {
-                    location.reload();
-                }, 5000);
-                */
-            });
-			
 			$("body").on("click", "#nextStateButton", function(event)
 			{
 			    console.log("moving to next state");
