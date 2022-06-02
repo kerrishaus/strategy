@@ -25,17 +25,6 @@
         </script>
 		
 		<style>
-		    *
-		    {
-               -webkit-touch-callout: none; /* iOS Safari */
-                 -webkit-user-select: none; /* Safari */
-                  -khtml-user-select: none; /* Konqueror HTML */
-                    -moz-user-select: none; /* Old versions of Firefox */
-                     -ms-user-select: none; /* Internet Explorer/Edge */
-                         user-select: none; /* Non-prefixed version, currently
-                                              supported by Chrome, Edge, Opera and Firefox */
-		    }
-		
 		    .gameInterfaceContainer
 		    {
 		        box-sizing: border-box;
@@ -1005,6 +994,270 @@
 	            }
 			};
 			
+			class StateMachine
+			{
+			    constructor(renderer, htmlRenderer)
+			    {
+			        this.states = new Array();
+			        
+			        this.renderer = renderer;
+			        this.htmlRenderer = htmlRenderer;
+			        
+			        console.log("StateMachine is ready.");
+			    }
+			    
+			    cleanup()
+			    {
+			        for (state of this.states)
+			        {
+			            state.cleanup();
+			            state = null;
+			        }
+			        
+			        this.states.length = 0;
+			        
+			        console.log("StateMachine is cleaned up.");
+			    }
+			    
+			    pushState(state)
+			    {
+			        if (this.states > 1)
+			            this.states[this.states.length - 1].pause();
+			            
+			        this.states.push(state);
+			        this.states[this.states.length - 1].init(this);
+			        
+			        console.log("Pushed new state.");
+			    }
+			    
+			    popState(state)
+			    {
+			        this.states[this.states.length - 1].cleanup();
+			        this.states.pop();
+			        
+			        if (this.states.length > 0)
+		                this.states[this.states.length - 1].resume();
+		                
+	                console.log("Popped state.");
+			    }
+			    
+			    changeSet(state)
+			    {
+			        this.states[this.states.length - 1].cleanup();
+			        this.states.pop();
+			        
+			        this.states.push(state);
+			        this.states[this.states.length - 1].init(this);
+			        
+			        console.log("Changed state.");
+			    }
+			    
+			    onHover(object)
+			    {
+			        this.states[this.states.length - 1].onHover(object);
+			    }
+			    
+			    onStopHover(object)
+			    {
+			        this.states[this.states.length - 1].onStopHover(object);
+			    }
+			    
+			    onMouseDown(event, object)
+			    {
+			        this.states[this.states.length - 1].onMouseDown(event, object);
+			    }
+			    
+			    onKeyDown(event)
+			    {
+			        this.states[this.states.length - 1].onKeyDown(event);
+			    }
+			    
+			    update()
+			    {
+			        if (this.states.length > 0)
+			            this.states[this.states.length - 1].update();
+			    }
+			};
+			
+			class State
+			{
+			    init(stateMachine)
+			    {
+			        this.stateMachine = stateMachine;
+			    }
+			    
+			    cleanup()
+			    {
+			        
+			    }
+			    
+			    pause()
+			    {
+			        
+			    }
+			    
+			    resume()
+			    {
+			        
+			    }
+			    
+			    onHover(object)
+			    {
+			        
+			    }
+			    
+			    onStopHover(object)
+			    {
+			        
+			    }
+			    
+			    onMouseDown(event, object)
+			    {
+			        
+			    }
+			    
+			    onKeyDown(event)
+			    {
+			        
+			    }
+			    
+			    update()
+			    {
+			        
+			    }
+			};
+			   
+			class UnitDropState extends State
+			{
+			    constructor(availableUnits)
+			    {
+			        super();
+			        
+			        this.availableUnits = availableUnits;
+			    }
+			    
+			    init()
+			    {
+			        console.log("UnitDropState ready.");
+			        
+			        this.selectedTerritory = null;
+			        
+			        $("#count").html(this.availableUnits);
+			        
+        			$(htmlRenderer.domElement).on("click", "#dropUnitButton", callback =>
+        			{
+        			    if (this.selectedTerritory === null)
+        			    {
+        			        console.error("selectedTerritory is null.");
+        			    }
+        			    
+        			    const amount = parseInt($("#dropUnitAmount").val());
+        			    
+        			    if (amount <= 0)
+        		        {
+        			        console.error("No available units to drop.");
+        			        return;
+        			    }
+        			    
+        			    if (amount > this.availableUnits)
+        			    {
+        			        console.error("Requested to drop too many units.");
+        			        return;
+        			    }
+        			   
+                        this.availableUnits -= amount;
+                        this.selectedTerritory.addUnits(amount);
+                        
+                        if (this.availableUnits <= 0)
+                        {
+                            this.selectedTerritory.destroyUnitPlaceDialog();
+                            this.selectedTerritory.lower();
+                            this.selectedTerritory.material.color.setHex(ownedColor);
+                            this.selectedTerritory = null;
+                        }
+                        
+                        $("#count").html(this.availableUnits);
+        			});
+			    }
+			    
+			    cleanup()
+			    {
+			        console.log("UnitDropState cleaned up.");
+			        
+			        $(htmlRenderer).off("click", "#dropUnitButton");
+			    }
+			    
+			    onHover(object)
+			    {
+                    if (object.userData.team != 1)
+                        return;
+                    
+                    if (this.selectedTerritory !== object)
+                    {
+	                    object.raise();
+	                    object.material.color.setHex(ownedHoverColor);
+                    }
+			    }
+			    
+			    onStopHover(object)
+			    {
+			        if (object.userData.team != 1)
+			            return;
+			            
+		            if (object == this.selectedTerritory)
+		                return
+		                
+	                object.lower();
+	                object.material.color.setHex(ownedColor);
+			    }
+			    
+			    onMouseDown(event, object)
+			    {
+			        
+			        if (object.userData.team == 1)
+			        {
+			            if (object == this.selectedTerritory)
+			                return;
+			                
+    			        if (this.availableUnits <= 0)
+    			        {
+    			            console.error("You have no more deployable units.");
+    			            return;
+    			        }
+			            
+                        if (this.selectedTerritory !== null)
+                        {
+                            this.selectedTerritory.lower();
+                            this.selectedTerritory.material.color.setHex(ownedColor);
+                            this.selectedTerritory.destroyUnitPlaceDialog();
+                            this.selectedTerritory = null;
+                        }
+                        
+                        this.selectedTerritory = object;
+                        this.selectedTerritory.raise();
+                        this.selectedTerritory.material.color.setHex(selectedOwnedColor);
+                        this.selectedTerritory.createUnitPlaceDialog(this.availableUnits);
+			        }
+			    }
+			    
+			    onKeyDown(event)
+			    {
+			        if (event.code == "Escape")
+			            if (this.selectedTerritory !== null)
+			            {
+			                this.selectedTerritory.lower();
+			                this.selectedTerritory.material.color.setHex(ownedColor);
+			                this.selectedTerritory.destroyUnitPlaceDialog();
+			                this.selectedTerritory = null;
+			            }
+			    }
+			    
+			    update()
+			    {
+			        
+			    }
+			};
+			
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 			
@@ -1020,6 +1273,8 @@
 			htmlRenderer.domElement.style.position = 'absolute';
 			htmlRenderer.domElement.style.top = '0px';
 			document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
+			
+			const stateManager = new StateMachine(renderer, htmlRenderer);
 			
 			let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
 			
@@ -1049,52 +1304,15 @@
 			setGameState()
 			
 			let availableUnits = Math.trunc(world.ownedTerritories / 3);
-			$("#count").html(availableUnits);
             
             let selectedTerritory = null, attackTerritory = null;
+            
+            stateManager.pushState(new UnitDropState(availableUnits));
             
             $("#replayGame").click(function(event)
             {
                 location.reload();
             });
-			
-			$(htmlRenderer.domElement).on("click", "#dropUnitButton", function(event)
-			{
-			    event.preventDefault();
-			    
-			    console.log("place");
-			    
-			    if (gameState != 0)
-			    {
-			        console.error("GameState must be 0 to place units.");
-			        return;
-			    }
-			    
-			    const amount = parseInt($("#dropUnitAmount").val());
-			    
-			    if (amount <= 0)
-		        {
-			        console.error("No available units to drop.");
-			        return;
-			    }
-			    
-			    if (amount > availableUnits)
-			    {
-			        console.error("Requested to drop too many units.");
-			        return;
-			    }
-			   
-                availableUnits -= amount;
-                
-                selectedTerritory.addUnits(amount);
-                
-                $("#count").html(availableUnits);
-                
-                dismissDropDialog();
-                
-                if (availableUnits <= 0)
-                    nextGameState();
-			});
 			
 			$(htmlRenderer.domElement).on("click", "#moveUnitButton", function(event)
 			{
@@ -1269,16 +1487,7 @@
 			
 		    function onHover(object)
 		    {
-                if (gameState == 0)
-                {
-                    if (selectedTerritory == null)
-                        if (object.userData.team == 1)
-                        {
-		                    object.raise();
-		                    object.material.color.setHex(selectedOwnedColor);
-                        }
-                }
-                else if (gameState == 1)
+                if (gameState == 1)
                 {
                     if (object.userData.team == 1) // picking the guy to attack from
                     {
@@ -1315,16 +1524,7 @@
 		    
 		    function onStopHover(object)
 		    {
-		        if (gameState == 0)
-		        {
-		            if (object.userData.team == 1)
-    		            if (selectedTerritory != object)
-    		            {
-    		                object.lower();
-    		                object.material.color.setHex(ownedColor);
-    		            }
-		        }
-		        else if (gameState == 1)
+                if (gameState == 1)
 		        {
 		            if (selectedTerritory != object &&
 		                attackTerritory != object)
@@ -1348,60 +1548,6 @@
                     }
                 }
 		    }
-			
-			function createDropDialog(id)
-			{
-			    if (gameState != 0)
-			    {
-			        console.error("GameState must be 0 to place units.");
-			        return;
-			    }
-			    
-			    if (selectedTerritory !== null)
-			    {
-			        console.warn("Unit drop dialog is already open");
-			        return;
-			    }
-			    
-			    if (availableUnits <= 0)
-			    {
-			        console.warn("No available units.");
-			        return
-			    }
-			    
-			    selectedTerritory = scene.getObjectById(id);
-			    
-			    if (selectedTerritory == null)
-			    {
-			        console.error("Id passed in CreateDropDialog failed sanity check.");
-			        return;
-			    }
-			    
-			    // TODO: set hover color here
-			    
-			    selectedTerritory.createUnitPlaceDialog(availableUnits);
-			    
-			    console.log("Created drop dialog.");
-			}
-			
-			function dismissDropDialog()
-			{
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritory is invalid.");
-			        return;
-			    }
-			    
-			    selectedTerritory.lower();
-			    selectedTerritory.material.color.setHex(ownedColor);
-			    selectedTerritory.destroyUnitPlaceDialog();
-			    
-			    // TODO: unset hover color here
-			    
-			    selectedTerritory = null;
-			    
-			    console.log("Dismissed drop dialog.");
-			}
 			
 			function createAttackDiagram(id)
 			{
@@ -1712,7 +1858,7 @@
 			
             function onMouseDown(event)
             {
-                // FIXME: this is a bug.
+                stateManager.onMouseDown(event, INTERSECTED);
                 
                 if (INTERSECTED == null)
                     return;
@@ -1722,9 +1868,6 @@
                     
                 if (INTERSECTED.userData.team == 1)
                 {
-                    if (gameState == 0)
-                        if (selectedTerritory === null)
-                            createDropDialog(INTERSECTED.id);
                     if (gameState == 1)
                         if (attackTerritory === null)
                         {
@@ -1758,11 +1901,11 @@
             
             function onKeyDown(event)
             {
+                stateManager.onKeyDown(event);
+                
                 if (event.code == "Escape")
                 {
-                    if (gameState == 0)
-                        dismissDropDialog();
-                    else if (gameState == 1)
+                    if (gameState == 1)
                     {
                         if (selectedTerritory !== null && attackTerritory === null)
                             removeAttackDiagram();
@@ -1817,6 +1960,7 @@
             			if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
             			{
             			    onStopHover(INTERSECTED);
+            			    stateManager.onStopHover(INTERSECTED);
             			    INTERSECTED = null;
             			}
             
@@ -1824,14 +1968,18 @@
                         {
             				INTERSECTED = intersects[0].object;
                             onHover(INTERSECTED);
+                            stateManager.onHover(INTERSECTED);
                         }
             		}
             	}
             	else if (INTERSECTED !== null)// the object is no longer hovered, and no object is hovered
             	{
             	    onStopHover(INTERSECTED);
+            	    stateManager.onStopHover(INTERSECTED);
             		INTERSECTED = null;
             	}
+            	
+            	stateManager.update();
                 
 				world.update(clock.getElapsedTime());
 				
