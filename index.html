@@ -14,6 +14,8 @@
 		
 		<script src="https://kerrishaus.com/assets/scripts/jquery-3.6.0.min.js"></script>
 		
+		<link rel='stylesheet' href='https://kerrishaus.com/games/strategy/assets/styles/interface.css' />
+		
 		<script>
             const params = new URLSearchParams(window.location.search);
             
@@ -23,560 +25,6 @@
                 $("head").append("<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />");
             }
         </script>
-		
-		<style>
-		    .gameInterfaceContainer
-		    {
-		        box-sizing: border-box;
-		        
-		        pointer-events: none;
-		        color: white;
-		        
-		        position: absolute;
-		        z-index: 99999;
-		        
-		        width: 100vw;
-		        height: 100vh;
-		        
-		        overflow-x: hidden;
-		        overflow-y: hidden;
-		        
-		        display: flex;
-		        justify-content: center;
-		        align-items: flex-end;
-		        
-		        opacity: 1;
-		    }
-		    
-		    .transition-quick
-		    {
-		        transition: all 0.3s;
-		    }
-		    
-		    .transition-long
-		    {
-		        transition: all 1s;
-		    }
-		    
-		    .moveableInterfaceElement
-		    {
-		        transition: top    0.3s cubic-bezier(0.175, 0.885, 0.2, 1.13),
-		                    left   0.3s cubic-bezier(0.175, 0.885, 0.2, 1.13),
-		                    bottom 0.3s cubic-bezier(0.175, 0.885, 0.2, 1.13),
-		                    right  0.3s cubic-bezier(0.175, 0.885, 0.2, 1.13);
-		    }
-		    
-    	    .moveableInterfaceElement[data-visibility='hidden']
-		    {
-		        transition: top    0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175),
-		                    left   0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175),
-		                    bottom 0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175),
-		                    right  0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175);
-		    }
-		    
-		    .hidden
-		    {
-		        opacity: 0 !important;
-		    }
-		    
-		    .gameStatus[data-state='0']
-		    {
-		        --outline: darkblue;
-		        --primary: blue;
-		        --secondary: lightblue;
-		    }
-		    
-		    .gameStatus[data-state='1']
-		    {
-		        --outline: darkred;
-		        --primary: red;
-		        --secondary: purple; /* find a light red */
-		    }
-		    
-		    .gameStatus[data-state='2']
-		    {
-		        --outline: darkgreen;
-		        --primary: green;
-		        --secondary: lightgreen;
-		    }
-		    
-		    .gameStatus
-		    {
-		        --color-fade-time: 0.3s;
-		        
-		        display: flex;
-		        flex-direction: row;
-		        align-items: center;
-		        flex-wrap: wrap;
-		        
-		        padding-bottom: 40px;
-		        
-		        position: relative;
-		        bottom: 0px;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility="hidden"] > .gameStatus
-		    {
-		        bottom: -200px;
-		    }
-		    
-		    #me
-		    {
-		        width: 128px;
-		        height: 128px;
-		        
-		        background-color: var(--primary);
-		        
-		        border-radius: 100%;
-		        border: 10px solid var(--outline);
-		        
-		        display: flex;
-		        flex-direction: column;
-		        align-items: center;
-		        justify-content: flex-end;
-		        
-                position: relative;
-                left: 26px;
-                
-                transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    #playerPortrait
-		    {
-		        background-color: var(--outline);
-		        min-height: 96px;
-		        width: 64px;
-		        
-		        border-radius: 10px;
-		        
-		        position: relative;
-		        top: 5px;
-		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    #roundStatus
-		    {
-		        background-color: #222222bb;
-		        padding: 18px 40px;
-		        padding-bottom: 30px;
-		        text-align: center;
-		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    #flag
-		    {
-		        display: inline-block;
-		        
-		        width: 26px;
-		        height: 14px;
-		        
-		        border-radius: 3px;
-		        
-		        background-color: red;
-		    }
-		    
-		    #playerName
-		    {
-		        font-size: 24px;
-		        padding: 0px 10px;
-		    }
-		    
-		    #tags
-		    {
-		        padding: 2px 4px;
-		        font-size: 12px;
-		        border-radius: 100%;
-		        background-color: lightblue;
-		        position: relative;
-		        top: -4px;
-		        left: -5px;
-		    }
-		    
-		    #roundType
-		    {
-		        display: flex;
-		        gap: 5px;
-		        
-		        padding-top: 8px;
-		        padding-bottom: 5px;
-		    }
-		    
-		    .roundSpace
-		    {
-		        width: 85px;
-		        
-		        padding: 2px 0px;
-		        
-		        background-color: black;
-		        color: black;
-		        
-		        border-radius: 5px;
-		        
-		        flex-grow: 1;
-		        
-		        transition: background-color var(--color-fade-time), color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    .roundSpace.active
-		    {
-		        background-color: var(--primary);
-		        color: white;
-		    }
-		    
-		    #roundName
-		    {
-		        text-transform: uppercase;
-		        letter-spacing: 5px;
-		    }
-		    
-		    #nextStateButton
-		    {
-		        position: absolute;
-		        left: 37%;
-		        top: 56%;
-		        display: inline-block;
-		        pointer-events: auto;
-		        color: lightblue;
-		        background-color: #222222;
-		        color: white;
-		        border: 5px solid black;
-		        border-radius: 10px;
-		        padding: 10px 30px;
-		        font-size: 22px;
-		        margin-bottom: -100px;
-		        text-decoration: none;
-		    }
-		    
-		    #nextStateButton:hover
-		    {
-		        background-color: #333333;
-		    }
-		    
-		    #nextStateButton:active
-		    {
-		        background-color: #111111;
-		        border-style: outset;
-		    }
-		    
-		    #counter
-		    {
-		        width: 128px;
-		        height: 128px;
-		        
-		        background-color: var(--primary);
-		        
-		        border-radius: 100%;
-		        border: 10px solid var(--outline);
-		        
-		        display: flex;
-		        flex-direction: column;
-		        align-items: center;
-		        justify-content: flex-end;
-		        
-		        position: relative;
-		        left: -26px;
-		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    #statue
-		    {
-		        background-color: var(--outline);
-		        min-height: 72px;
-		        width: 48px;
-		        
-		        border-radius: 10px;
-		        
-		        position: relative;
-		        top: 10px;
-		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    #count
-		    {
-		        background-color: var(--outline);
-		        border-radius: 10px;
-		        padding: 5px;
-		        font-size: 28px;
-		        text-align: center;
-		        
-		        width: 38px;
-		        
-		        position: relative;
-		        top: 20px;
-		        
-		        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
-		    }
-		    
-		    .attackPlanner
-		    {
-		        position: absolute;
-		        
-		        height: 100vh;
-		        width: 100vw;
-		        
-		        background-color: #000000aa;
-		        
-		        opacity: 0;
-		        
-		        transition: opacity 0.3s;
-		        
-		        display: flex;
-		        flex-wrap: wrap;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner
-		    {
-		        opacity: 1;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > div
-		    {
-		        flex-grow: 1;
-		        
-		        position: relative;
-		        
-		        display: flex;
-		        justify-content: center;
-		        align-items: center;
-		        flex-direction: column;
-		        
-		        height: 80%;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > div:first-child,
-		    .gameInterfaceContainer > .attackPlanner > div:last-child
-		    {
-		        height: 10%;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .cancelButton
-		    {
-		        min-width: 100%;
-		        top: -100%;
-		        pointer-events: auto;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .cancelButton > button
-		    {
-		        display: inline-block;
-		        color: white;
-		        background-color: red;
-		        border: 5px solid darkred;
-		        padding: 10px 20px;
-		        border-radius: 10px;
-		        text-decoration: none;
-		        font-size: 26px;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .cancelButton
-		    {
-		        top: 10%;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .attacker
-		    {
-		        left: -50%;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .defender
-		    {
-		        right: -50%;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .attacker
-		    {
-		        left: 0px;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .defender
-		    {
-                right: 0px;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .attackGoButton
-		    {
-		        min-width: 100%;
-		        
-		        position: relative;
-		        bottom: -100%;
-		    }
-		    
-		    .gameInterfaceContainer[data-visibility='hidden'] > .attackPlanner > .attackGoButton
-		    {
-		        bottom: 10%;
-		    }
-		    
-		    .gameInterfaceContainer > .attackPlanner > .attackGoButton > button
-		    {
-		        padding: 10px 30px;
-		        border: 5px solid darkgreen;
-		        color: lightgreen;
-		        background-color: green;
-		        
-		        font-size: 32px;
-		        border-radius: 10px;
-		        
-		        pointer-events: auto;
-		    }
-		    
-		    #unitPlaceDialog,
-		    #unitMoveDialog
-		    {
-		        position: relative;
-		        z-index: 9999999 !important;
-		        
-		        pointer-events: auto;
-		        
-		        padding: 20px;
-		        border-radius: 10px;
-		        
-		        background-color: #222222aa;
-		        color: white;
-		        text-align: center;
-		    }
-		    
-		    #unitPlaceDialog > h1,
-		    #unitMoveDialog > h1
-		    {
-		        font-size: 14px;
-		        margin: 0px;
-		    }
-		    
-		    #unitPlaceDialog > div,
-		    #unitMoveDialog > div
-		    {
-		        margin-top: 10px;
-		        margin-bottom: 5px;
-		    }
-		    
-		    #unitPlaceDialog > div > input[type="range"],
-		    #unitMoveDialog > div > input[type="range"]
-		    {
-		        width: 80%;
-		    }
-		    
-		    #dropUnitAmountPreview,
-		    #moveUnitAmountPreview,
-		    {
-		        font-size: 20px;
-		        padding-left: 5px;
-		        position: relative;
-		        top: -3px;
-		    }
-		    
-		    #unitPlaceDialog > button,
-		    #unitMoveDialog > button
-		    {
-		        width: 100%;
-		        font-size: 14px;
-		        padding: 5px;
-		    }
-		    
-		    #gameWin
-		    {
-		        width: 100vw;
-		        height: 100vh;
-		        
-		        position: absolute;
-		        top: 0px;
-		        left: 0px;
-		        
-		        display: flex;
-		        justify-content: center;
-		        align-items: center;
-		        flex-direction: column;
-		        
-		        background-color: #000000aa;
-		        
-		        opacity: 0;
-		        
-		        transition: opacity 0.3s;
-		    }
-		    
-		    #gameWin[data-visibility="shown"]
-		    {
-		        opacity: 1;
-		    }
-		    
-		    #replayGame
-		    {
-		        font-size: 28px;
-		        pointer-events: auto;
-		    }
-		    
-			#loadingCover
-			{
-			    position: absolute;
-			    z-index: 99999999;
-			    width: 100%;
-			    height: 100%;
-			    top: 0px;
-			    left: 0px;
-			    
-			    background: rgb(46, 46, 46) center;
-			    background-size: cover;
-			        
-			    backdrop-filter: blur(3px);
-			    -webkit-backdrop-filter: blur(3px);
-			    
-			    display: flex;
-			    justify-content: center;
-			    align-items: center;
-			    flex-direction: column;
-			    
-			    color: white;
-			    font-size: 72px;
-			    
-			    opacity: 1;
-			    transition: all 1s;
-			}
-			
-			#loadingCover > #status
-			{
-			    display: flex;
-			    align-items: center;
-			    gap: 20px;
-			}
-			
-			#kerris
-			{
-			    width: 30vw;
-			    height: 3vw;
-			}
-			
-			#threejs
-			{
-			    width: 10vw;
-			    height: 10vw;
-			}
-			
-			#webgl
-			{
-			    width: 30vw;
-			    height: 10vw;
-			}
-			
-			#loadingCover > .help
-			{
-			    position: absolute;
-			    
-			    width: 100%;
-			    height: 100%;
-			    
-			    display: flex;
-			    justify-content: center;
-			    align-items: flex-end;
-			    
-			    color: white;
-			    font-size: 20px;
-			    
-			    margin-bottom: 2em;
-			}
-		</style>
 	</head>
 	
 	<body>
@@ -1126,7 +574,7 @@
 			        
 			    }
 			};
-			   
+		    
 			class UnitDropState extends State
 			{
 			    constructor(availableUnits)
@@ -1174,6 +622,8 @@
                             this.selectedTerritory.lower();
                             this.selectedTerritory.material.color.setHex(ownedColor);
                             this.selectedTerritory = null;
+                            
+                            this.stateMachine.changeState(new AttackState());
                         }
                         
                         $("#count").html(this.availableUnits);
@@ -1194,8 +644,11 @@
                     
                     if (this.selectedTerritory !== object)
                     {
-	                    object.raise();
-	                    object.material.color.setHex(ownedHoverColor);
+                        if (this.availableUnits > 0)
+                        {
+    	                    object.raise();
+    	                    object.material.color.setHex(ownedHoverColor);
+                        }
                     }
 			    }
 			    
@@ -1250,6 +703,96 @@
 			                this.selectedTerritory.destroyUnitPlaceDialog();
 			                this.selectedTerritory = null;
 			            }
+			    }
+			    
+			    update()
+			    {
+			        
+			    }
+			};
+			
+			class UnitMoveState extends State
+			{
+			    init(stateMachine)
+			    {
+			        this.stateMachine = stateMachine;
+			        
+        			$(htmlRenderer.domElement).on("click", "#moveUnitButton", callback =>
+        			{
+        			    const amount = parseInt($("#moveUnitAmount").val());
+        			    
+        			    if (amount <= 0)
+        		        {
+        			        console.error("No available units to move.");
+        			        return;
+        			    }
+        			    
+        			    if (amount > this.selectedTerritory.unitCount - 1)
+        			    {
+        			        console.error("Requested to move too many units.");
+        			        return;
+        			    }
+        			    
+        			    if (this.selectedTerritory === null)
+        			    {
+        			        console.error("selectedTerritory is null.");
+        			        return;
+        			    }
+        			    
+        			    if (this.attackTerritory === null)
+        			    {
+        			        console.error("attackTerritory is null.");
+        			        return;
+        			    }
+        			   
+                        this.selectedTerritory.unitCount -= amount;
+                        this.attackTerritory.unitCount += amount;
+                        
+                        this.selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
+                        this.attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
+                        
+                        this.removeMoveUnitDialog();
+                        
+                        this.removeMoveEndPoint();
+                        this.removeMoveStartPoint();
+                        
+                        this.stateMachine.changeState(new UnitPlaceState());
+        			});
+			    }
+			    
+			    cleanup()
+			    {
+			        
+			    }
+			    
+			    pause()
+			    {
+			        
+			    }
+			    
+			    resume()
+			    {
+			        
+			    }
+			    
+			    onHover(object)
+			    {
+			        
+			    }
+			    
+			    onStopHover(object)
+			    {
+			        
+			    }
+			    
+			    onMouseDown(event, object)
+			    {
+			        
+			    }
+			    
+			    onKeyDown(event)
+			    {
+			        
 			    }
 			    
 			    update()
