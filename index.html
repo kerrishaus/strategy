@@ -623,11 +623,12 @@
         			    if (this.selectedTerritory === null)
         			    {
         			        console.error("selectedTerritory is null in UnitDropState::init().");
+        			        return;
         			    }
         			    
         			    const amount = parseInt($("#dropUnitAmount").val());
         			    
-        			    if (amount <= 0)
+        			    if (this.availableUnits <= 0)
         		        {
         			        console.error("No available units to drop.");
         			        return;
@@ -642,15 +643,13 @@
                         this.availableUnits -= amount;
                         this.selectedTerritory.addUnits(amount);
                         
-                        if (this.availableUnits <= 0)
-                        {
-                            this.selectedTerritory.destroyUnitPlaceDialog();
-                            this.selectedTerritory.lower();
-                            this.selectedTerritory.material.color.setHex(ownedColor);
-                            this.selectedTerritory = null;
+                        this.selectedTerritory.destroyUnitPlaceDialog();
+                        this.selectedTerritory.lower();
+                        this.selectedTerritory.material.color.setHex(ownedColor);
+                        this.selectedTerritory = null;
                             
+                        if (this.availableUnits <= 0)
                             this.stateMachine.changeState(new AttackState());
-                        }
                         
                         $("#count").html(this.availableUnits);
         			});
@@ -1315,7 +1314,7 @@
             world.position.y += 3;
 			scene.add(world);
 
-            stateManager.pushState(new AttackState());
+            stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
 
             $("#replayGame").click(function(event)
             {
@@ -1346,36 +1345,13 @@
                         stateManager.changeState(new UnitMoveState());
                         break;
                     case 2:
-                        stateManager.changeState(new UnitDropState());
+                        stateManager.changeState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
                         break;
                     default:
                         console.error("Invalid state.");
                         break;
 			    };
 			});
-			
-			/*
-			function nextGameState()
-			{
-			    if (gameState >= 2)
-			        gameState = 0;
-			    else
-			        gameState += 1;
-
-                if (gameState == 0)
-                {
-        			availableUnits = Math.trunc(world.ownedTerritories / 3);
-        			$("#count").html(availableUnits);
-                }
-                else if (gameState == 1)
-                {
-                    if (attackTerritory !== null)
-                        removeAttackDialog();
-                }
-			        
-                setGameState();
-			}
-			*/
 			
             function onMouseDown(event)
             {
