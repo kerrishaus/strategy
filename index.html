@@ -997,6 +997,10 @@
 		                else if (this.selectedTerritory !== null)
 		                    this.clearAttackingTerritory();
 			        }
+			        else if (event.code == "Enter")
+			        {
+			            this.runAttack();
+			        }
 			    }
 
 			    update(deltaTime)
@@ -1099,6 +1103,7 @@
         			
         			$("#attackPlannerGoButton").click(callback =>
         			{
+        			    console.log("Running attack");
         			    this.runAttack();
         			});
 			        
@@ -1132,12 +1137,17 @@
     	                tile.userData.invadeable = true;
     	                tile.material.color.setHex(enemyInvadeableColor);
     			    }
+    			    
+	    			$("#attackPlannerCancelButton").off("click");
+        			$("#attackPlannerGoButton").off("click");
 			        
 			        $(".gameInterfaceContainer").attr("data-visibility", null);
 			    }
 			    
 			    runAttack()
 			    {
+			        console.log("What are you doing stepbro");
+			        
 			        if (this.selectedTerritory === null)
     			    {
     			        console.error("selectedTerritory is null in runAttack()");
@@ -1248,6 +1258,8 @@
     			    this.selectedTerritory.lower();
     			    this.selectedTerritory.material.color.setHex(ownedColor);
                     this.selectedTerritory = null;
+                    
+                    // TODO: use the official methods to clear attacker and defender
                     
                     world.calculateInvadeableTerritories();
                     
