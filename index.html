@@ -610,7 +610,7 @@
         			{
         			    if (this.selectedTerritory === null)
         			    {
-        			        console.error("selectedTerritory is null.");
+        			        console.error("selectedTerritory is null in UnitDropState::init().");
         			    }
         			    
         			    const amount = parseInt($("#dropUnitAmount").val());
@@ -1087,10 +1087,20 @@
     			            
 			            if (tile === this.attackTerritory)
 			                continue;
-
+			                
     	                tile.userData.invadeable = true;
     	                tile.material.color.setHex(enemyInvadeablePausedColor);
     			    }
+    			    
+	    			$("#attackPlannerCancelButton").click(function(event)
+        			{
+        			    $(".gameInterfaceContainer").attr("data-visibility", null);
+        			});
+        			
+        			$("#attackPlannerGoButton").click(callback =>
+        			{
+        			    this.runAttack();
+        			});
 			        
     			    $("#attackerCount").html(this.selectedTerritory.unitCount);
     			    $("#defenderCount").html(this.attackTerritory.unitCount);
@@ -1101,7 +1111,7 @@
 			    {
 			        if (this.attackTerritory === null)
 			        {
-			            console.error("attackTerritory is null.");
+			            console.error("attackTerritory is null in clearDefendingTerritory()");
 			            return;
 			        }
 			        
@@ -1117,11 +1127,134 @@
 			            if (tile === this.attackTerritory)
 			                continue;
 
+                        console.log("tile is invadable");
+
     	                tile.userData.invadeable = true;
     	                tile.material.color.setHex(enemyInvadeableColor);
     			    }
 			        
-			        $(".gameInterfaceContainer").attr("data-visibility", null);
+			        $(".gameInterfaceContainer").attr("data-visibility", "hidden");
+			    }
+			    
+			    runAttack()
+			    {
+			        if (this.selectedTerritory === null)
+    			    {
+    			        console.error("selectedTerritory is null in runAttack()");
+    			        return;
+    			    }
+    			    
+    			    if (this.attackTerritory === null)
+    			    {
+    			        console.error("attackTerritory is null in runAttack()");
+    			        return;
+    			    }
+    			    
+    			    console.log("Attacking!!!");
+    			    
+    			    while (this.attackTerritory.unitCount > 0 && this.selectedTerritory.unitCount > 1)
+    			    {
+    			        const attackerRoll = getRandomInt(5) + 1; // 1-6
+    			        const defenderRoll = getRandomInt(5) + 1; // 1-6
+    			        
+    			        if (attackerRoll > defenderRoll)
+    			        {
+    			            this.attackTerritory.unitCount -= 1;
+    			            console.log("Defenders lost a unit, now at: " + this.attackTerritory.unitCount + ".");
+    			        }
+    		            else
+    		            {
+    		                this.selectedTerritory.unitCount -= 1;
+    		                console.log("Attackers lost a unit, now at: " + this.selectedTerritory.unitCount + ".");
+    		            }
+    		                
+                        this.selectedTerritory.label.element.innerHTML = this.selectedTerritory.unitCount;
+                        this.attackTerritory.label.element.innerHTML = this.attackTerritory.unitCount;
+    			    }
+    			    
+    			    console.log(`Final score: Attacker: ${this.selectedTerritory.unitCount}, Defender: ${this.attackTerritory.unitCount}`);
+    			    
+    			    if (this.attackTerritory.unitCount > 0 && this.selectedTerritory.unitCount > 0)
+    			    {
+    			        console.log("match was a draw");
+    			    }
+    			    else
+    			    {
+        			    if (this.attackTerritory.unitCount > 0)
+        			    {
+        			        console.log("defenders won");
+        			    }
+        			    
+        			    if (this.selectedTerritory.unitCount > 0)
+        			    {
+        			        console.log("attackers won");
+        			        
+        			        this.attackTerritory.userData.team = 1;
+        			        this.attackTerritory.material.color.setHex(ownedColor);
+        			        this.attackTerritory.unitCount = this.selectedTerritory.unitCount - 1;
+        			        this.selectedTerritory.unitCount = 1;
+        			        
+        			        this.selectedTerritory.label.element.innerHTML = this.selectedTerritory.unitCount;
+                            this.attackTerritory.label.element.innerHTML = this.attackTerritory.unitCount;
+                            
+                            world.ownedTerritories += 1;
+        			        
+        			        console.log(`New unit allocation: Attacker: ${this.selectedTerritory.unitCount}, Defender: ${this.attackTerritory.unitCount}`);
+        			    }
+    			    }
+    			    
+    			    this.finaliseAttack();
+			    }
+			    
+			    finaliseAttack()
+			    {
+			        if (world.ownedTerritories == world.tiles.length)
+    			    {
+    			        $("#gameWin").attr("data-visibility", "shown");
+    			        return;
+    			    }
+    			    else
+    			        console.log(`Owned Territories: ${world.ownedTerritories} out of ${world.tiles.length}`);
+    			    
+    			    if (this.attackTerritory === null)
+    			    {
+    			        console.error("attackTerritory is null in finaliseAttack()");
+    			        return;
+    			    }
+    			    
+    			    if (this.selectedTerritory === null)
+    			    {
+    			        console.error("selectedTerritory is null in finaliseAttack()");
+    			        return;
+    			    }
+    			    
+                    for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+                    {
+                        if (!(tile instanceof WorldObject))
+                            continue;
+                        
+    		            if (tile != this.attackTerritory)
+    		            {
+    		                tile.userData.invadeable = false;
+                            tile.material.color.setHex(enemyColor);
+    		            }
+    			    }
+    			    
+    			    if (this.attackTerritory.userData.team == 1)
+                        this.attackTerritory.material.color.setHex(ownedColor);
+                    else
+                        this.attackTerritory.material.color.setHex(enemyColor);
+                        
+                    this.attackTerritory.lower();
+                    this.attackTerritory = null;
+                    
+    			    this.selectedTerritory.lower();
+    			    this.selectedTerritory.material.color.setHex(ownedColor);
+                    this.selectedTerritory = null;
+                    
+                    world.calculateInvadeableTerritories();
+                    
+                    $(".gameInterfaceContainer").attr("data-visibility", "null");
 			    }
 			};
 			
@@ -1199,86 +1332,6 @@
 			    nextGameState();
 			});
 			
-			$("#attackPlannerCancelButton").click(function(event)
-			{
-			    event.preventDefault();
-			    
-			    const id = selectedTerritory.id;
-                            
-                removeAttackDialog();
-                createAttackDiagram(id);
-			});
-			
-			$("#attackPlannerGoButton").click(function(event)
-			{
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritory is null.");
-			        return;
-			    }
-			    
-			    if (attackTerritory === null)
-			    {
-			        console.error("attackTerritory is null.");
-			        return;
-			    }
-			    
-			    console.log("Attacking!!!");
-			    
-			    while (attackTerritory.unitCount > 0 && selectedTerritory.unitCount > 1)
-			    {
-			        const attackerRoll = getRandomInt(5) + 1; // 1-6
-			        const defenderRoll = getRandomInt(5) + 1; // 1-6
-			        
-			        if (attackerRoll > defenderRoll)
-			        {
-			            attackTerritory.unitCount -= 1;
-			            console.log("Defenders lost a unit, now at: " + attackTerritory.unitCount + ".");
-			        }
-		            else
-		            {
-		                selectedTerritory.unitCount -= 1;
-		                console.log("Attackers lost a unit, now at: " + selectedTerritory.unitCount + ".");
-		            }
-		                
-                    selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
-                    attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
-			    }
-			    
-			    console.log(`Final score: Attacker: ${selectedTerritory.unitCount}, Defender: ${attackTerritory.unitCount}`);
-			    
-			    if (attackTerritory.unitCount > 0 && selectedTerritory.unitCount > 0)
-			    {
-			        console.log("match was a draw");
-			    }
-			    else
-			    {
-    			    if (attackTerritory.unitCount > 0)
-    			    {
-    			        console.log("defenders won");
-    			    }
-    			    
-    			    if (selectedTerritory.unitCount > 0)
-    			    {
-    			        console.log("attackers won");
-    			        
-    			        attackTerritory.userData.team = 1;
-    			        attackTerritory.material.color.setHex(ownedColor);
-    			        attackTerritory.unitCount = selectedTerritory.unitCount - 1;
-    			        selectedTerritory.unitCount = 1;
-    			        
-    			        selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
-                        attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
-                        
-                        world.ownedTerritories += 1;
-    			        
-    			        console.log(`New unit allocation: Attacker: ${selectedTerritory.unitCount}, Defender: ${attackTerritory.unitCount}`);
-    			    }
-			    }
-			    
-			    finishAttack();
-			});
-			
 			/*
 			function nextGameState()
 			{
@@ -1309,54 +1362,6 @@
 			    $("#roundName").html(states[gameState]);
 			    
 			    $(".gameStatus").attr("data-state", gameState);
-			}
-			
-			function finishAttack()
-			{
-			    if (world.ownedTerritories == world.tiles.length)
-			    {
-			        $("#gameWin").attr("data-visibility", "shown");
-			        return;
-			    }
-			    else
-			        console.log(`Owned Territories: ${world.ownedTerritories} out of ${world.tiles.length}`);
-			    
-			    if (attackTerritory === null)
-			    {
-			        console.error("attackTerritory is null.");
-			        return;
-			    }
-			    
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritory is null.");
-			        return;
-			    }
-			    
-                for (const tile of selectedTerritory.getInvadeableNeighbors())
-                {
-                    if (!(tile instanceof WorldObject))
-                        continue;
-                    
-		            if (tile != attackTerritory)
-                        tile.material.color.setHex(enemyColor);
-			    }
-			    
-			    if (attackTerritory.userData.team == 1)
-                    attackTerritory.material.color.setHex(ownedColor);
-                else
-                    attackTerritory.material.color.setHex(enemyColor);
-                    
-                attackTerritory.lower();
-                attackTerritory = null;
-                
-			    selectedTerritory.lower();
-			    selectedTerritory.material.color.setHex(ownedColor);
-                selectedTerritory = null;
-                
-                world.calculateInvadeableTerritories();
-                
-                $(".gameInterfaceContainer").attr("data-visibility", null);
 			}
 			
             function onMouseDown(event)
