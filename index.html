@@ -1233,11 +1233,8 @@
                         if (!(tile instanceof WorldObject))
                             continue;
                         
-    		            if (tile != this.attackTerritory)
-    		            {
-    		                tile.userData.invadeable = false;
-                            tile.material.color.setHex(enemyColor);
-    		            }
+		                tile.userData.invadeable = false;
+                        tile.material.color.setHex(enemyColor);
     			    }
     			    
     			    if (this.attackTerritory.userData.team == 1)
