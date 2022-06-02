@@ -451,6 +451,8 @@
 			        this.renderer = renderer;
 			        this.htmlRenderer = htmlRenderer;
 			        
+			        this.number = -1;
+			        
 			        console.log("StateMachine is ready.");
 			    }
 			    
@@ -509,6 +511,8 @@
     			    $("#roundType").children()[number].classList.add("active");
     			    
     			    $(".gameStatus").attr("data-state", number);
+    			    
+			        this.number = number;
 			    }
 			    
 			    onHover(object)
@@ -1329,11 +1333,25 @@
 			
 			$("body").on("click", "#nextStateButton", function(event)
 			{
-			    console.log("next state");
+			    console.log("moving to next state");
 			    
 			    event.preventDefault();
 			    
-			    nextGameState();
+			    switch (stateManager.number)
+			    {
+                    case 0:
+                        stateManager.changeState(new AttackState());
+                        break;
+                    case 1:
+                        stateManager.changeState(new UnitMoveState());
+                        break;
+                    case 2:
+                        stateManager.changeState(new UnitDropState());
+                        break;
+                    default:
+                        console.error("Invalid state.");
+                        break;
+			    };
 			});
 			
 			/*
