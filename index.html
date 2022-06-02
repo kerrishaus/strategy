@@ -1133,7 +1133,7 @@
     	                tile.material.color.setHex(enemyInvadeableColor);
     			    }
 			        
-			        $(".gameInterfaceContainer").attr("data-visibility", "hidden");
+			        $(".gameInterfaceContainer").attr("data-visibility", null);
 			    }
 			    
 			    runAttack()
@@ -1254,7 +1254,7 @@
                     
                     world.calculateInvadeableTerritories();
                     
-                    $(".gameInterfaceContainer").attr("data-visibility", "null");
+                    $(".gameInterfaceContainer").attr("data-visibility", null);
 			    }
 			};
 			
