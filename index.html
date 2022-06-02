@@ -117,7 +117,7 @@
 		    
 		    const ownedColor                 = 0x00aa00, 
 		          ownedHoverColor            = 0x00cc00, 
-		          selectedOwnedColor         = 0x00ff00, 
+		          ownedSelectedColor         = 0x00ff00, 
 		          
 		          enemyColor                 = 0xaa0000, 
 		          enemyInvadeableColor       = 0xee0000,
@@ -688,7 +688,7 @@
                         
                         this.selectedTerritory = object;
                         this.selectedTerritory.raise();
-                        this.selectedTerritory.material.color.setHex(selectedOwnedColor);
+                        this.selectedTerritory.material.color.setHex(ownedSelectedColor);
                         this.selectedTerritory.createUnitPlaceDialog(this.availableUnits);
 			        }
 			    }
@@ -713,6 +713,14 @@
 			
 			class UnitMoveState extends State
 			{
+			    constructor()
+			    {
+			        super();
+			        
+			        this.startTerritory = null;
+			        this.endTerritory = null;
+			    }
+			    
 			    init(stateMachine)
 			    {
 			        this.stateMachine = stateMachine;
@@ -723,46 +731,66 @@
         			    
         			    if (amount <= 0)
         		        {
-        			        console.error("No available units to move.");
+        			        console.error("0 units chosen.");
         			        return;
         			    }
         			    
+        			    // 1 unit must stay behind to maintain ownership of territory
         			    if (amount > this.selectedTerritory.unitCount - 1)
         			    {
         			        console.error("Requested to move too many units.");
         			        return;
         			    }
         			    
-        			    if (this.selectedTerritory === null)
+        			    if (this.startTerritory === null)
         			    {
-        			        console.error("selectedTerritory is null.");
+        			        console.error("startTerritory is null.");
         			        return;
         			    }
         			    
-        			    if (this.attackTerritory === null)
+        			    if (this.endTerritory === null)
         			    {
-        			        console.error("attackTerritory is null.");
+        			        console.error("endTerritory is null.");
         			        return;
         			    }
         			   
-                        this.selectedTerritory.unitCount -= amount;
-                        this.attackTerritory.unitCount += amount;
+                        this.startTerritory.unitCount -= amount;
+                        this.endTerritory.unitCount += amount;
                         
-                        this.selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
-                        this.attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
+                        this.startTerritory.label.element.innerHTML = startTerritory.unitCount;
+                        this.endTerritory.label.element.innerHTML = endTerritory.unitCount;
                         
+                        /*
                         this.removeMoveUnitDialog();
                         
                         this.removeMoveEndPoint();
                         this.removeMoveStartPoint();
+                        */
                         
+                        // change the state after the units have been moved,
+                        // as you can only move once during this turn.
                         this.stateMachine.changeState(new UnitPlaceState());
         			});
 			    }
 			    
 			    cleanup()
 			    {
+			        if (this.startTerritory !== null)
+			        {
+			            this.startTerritory.lower();
+			            this.startTerritory.material.color.setHex(ownedColor);
+			            this.startTerritory = null;
+			            delete this.startTerritory;
+			        }
 			        
+			        if (this.endTerritory !== null)
+			        {
+			            this.endTerritory.lower();
+			            this.endTerritory.material.color.setHex(ownedColor);
+			            this.endTerritory.destroyMoveUnitDialog();
+			            this.endTerritory = null;
+			            delete this.endTerritory;
+			        }
 			    }
 			    
 			    pause()
@@ -777,17 +805,61 @@
 			    
 			    onHover(object)
 			    {
-			        
+			        if (object.userData.team != 1)
+			            return;
+			            
+		            if (object != this.startTerritory ||
+		                object != this.endTerritory)
+	                {
+	                    object.raise();
+	                    object.material.color.setHex(ownedHoverColor);
+	                }
 			    }
 			    
 			    onStopHover(object)
 			    {
+			        if (object.userData.team != 1)
+			            return;
 			        
-			    }
+                    if (this.startTerritory != object &&
+                        this.endTerritory != object)
+                    {
+                        object.lower();
+                        object.material.color.setHex(ownedColor);
+                    }
+                }
 			    
 			    onMouseDown(event, object)
 			    {
+			        if (object.userData.team != 1)
+			            return;
 			        
+			        if (this.startTerritory === null)
+			        {
+			            object.raise();
+			            object.material.color.setHex(ownedSelectedColor);
+			            this.startTerritory = object;
+			        }
+			        else if (this.endTerritory === null)
+			        {
+			            object.raise();
+			            object.material.color.setHex(ownedSelectedColor);
+			            this.endTerritory = object;
+			            // TODO: then open the dialog
+			        }
+			        else if (this.endTerritory !== null) // move the end territory
+			        {
+			            this.endTerritory.lower();
+			            this.endTerritory.material.color.setHex(ownedColor);
+			            // TODO: remove the dialog
+                        this.endTerritory = null;
+                        delete this.endTerritory;
+                        
+                        object.raise();
+                        object.material.color.setHex(ownedSelectedColor);
+                        this.endTerritory = object;
+                        // TODO: then open the dialog
+			        }
 			    }
 			    
 			    onKeyDown(event)
@@ -843,71 +915,19 @@
                 "Move"
 		    ];
 		    
-			let gameState = 0;
+			let gameState = 2;
 			setGameState()
 			
 			let availableUnits = Math.trunc(world.ownedTerritories / 3);
             
             let selectedTerritory = null, attackTerritory = null;
             
-            stateManager.pushState(new UnitDropState(availableUnits));
+            stateManager.pushState(new UnitMoveState());
             
             $("#replayGame").click(function(event)
             {
                 location.reload();
             });
-			
-			$(htmlRenderer.domElement).on("click", "#moveUnitButton", function(event)
-			{
-			    event.preventDefault();
-			    
-			    console.log("move");
-			    
-			    if (gameState != 2)
-			    {
-			        console.error("GameState must be 2 to move units.");
-			        return;
-			    }
-			    
-			    const amount = parseInt($("#moveUnitAmount").val());
-			    
-			    if (amount <= 0)
-		        {
-			        console.error("No available units to move.");
-			        return;
-			    }
-			    
-			    if (amount > selectedTerritory.unitCount - 1)
-			    {
-			        console.error("Requested to move too many units.");
-			        return;
-			    }
-			    
-			    if (selectedTerritory === null)
-			    {
-			        console.error("selectedTerritory is null.");
-			        return;
-			    }
-			    
-			    if (attackTerritory === null)
-			    {
-			        console.error("attackTerritory is null.");
-			        return;
-			    }
-			   
-                selectedTerritory.unitCount -= amount;
-                attackTerritory.unitCount += amount;
-                
-                selectedTerritory.label.element.innerHTML = selectedTerritory.unitCount;
-                attackTerritory.label.element.innerHTML = attackTerritory.unitCount;
-                
-                removeMoveUnitDialog();
-                
-                removeMoveEndPoint();
-                removeMoveStartPoint();
-                
-                nextGameState();
-			});
 			
 			$("body").on("click", "#nextStateButton", function(event)
 			{
@@ -1054,15 +1074,6 @@
                         }
                     }
                 }
-                else if (gameState == 2)
-                {
-                    if (selectedTerritory === null || attackTerritory === null)
-                        if (object.userData.team == 1)
-                        {
-                            object.raise();
-                            object.material.color.setHex(ownedHoverColor);
-                        }
-                }
 		    }
 		    
 		    function onStopHover(object)
@@ -1078,18 +1089,6 @@
 		                        object.material.color.setHex(ownedColor);
 		                }
 		        }
-                else if (gameState == 2)
-                {
-                    if (object.userData.team == 1)
-                    {
-                        if (selectedTerritory != object &&
-                            attackTerritory != object)
-                        {
-                            object.lower();
-                            object.material.color.setHex(ownedColor);
-                        }
-                    }
-                }
 		    }
 			
 			function createAttackDiagram(id)
@@ -1128,7 +1127,7 @@
 			    
 			    selectedTerritory = object;
 			    selectedTerritory.raise();
-			    selectedTerritory.material.color.setHex(selectedOwnedColor);
+			    selectedTerritory.material.color.setHex(ownedSelectedColor);
 			    
 			    for (const tile of selectedTerritory.getInvadeableNeighbors())
 			    {
@@ -1291,7 +1290,7 @@
 			    
 			    selectedTerritory = object;
 			    selectedTerritory.raise();
-			    selectedTerritory.material.color.setHex(selectedOwnedColor);
+			    selectedTerritory.material.color.setHex(ownedSelectedColor);
 			    
 			    console.log("Set move start point.");
 			}
@@ -1327,7 +1326,7 @@
 			    
 			    attackTerritory = object;
 			    attackTerritory.raise();
-			    attackTerritory.material.color.setHex(selectedOwnedColor);
+			    attackTerritory.material.color.setHex(ownedSelectedColor);
 			    
 			    createMoveUnitDialog();
 			    
@@ -1401,10 +1400,10 @@
 			
             function onMouseDown(event)
             {
-                stateManager.onMouseDown(event, INTERSECTED);
-                
                 if (INTERSECTED == null)
                     return;
+                    
+                stateManager.onMouseDown(event, INTERSECTED);
                     
                 if (INTERSECTED.id == selectedTerritory || INTERSECTED.id == attackTerritory)
                     return;
@@ -1428,15 +1427,8 @@
                             
                             createAttackDiagram(INTERSECTED.id);
                         }
-                    if (gameState == 2)
-                    {
-                        if (selectedTerritory === null)
-                            setMoveStartPoint(INTERSECTED);
-                        else if (attackTerritory === null)
-                            setMoveEndPoint(INTERSECTED);
-                    }
                 }
-                else if (INTERSECTED.userData.team == 2)
+                else // any unowned territory
                     if (gameState == 1)
                         if (selectedTerritory !== null && attackTerritory === null)
                             createAttackDialog(INTERSECTED.id);
