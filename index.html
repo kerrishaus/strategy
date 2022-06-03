@@ -441,7 +441,17 @@
 		            }
 	            }
 			};
-
+			
+			class Player
+			{
+			    constructor(name, teamId)
+			    {
+			        this.name = name;
+			        this.team = teamId;
+			        this.type = "human";
+			    }
+			}
+			
 			class StateMachine
 			{
 			    constructor(renderer, htmlRenderer)
@@ -785,7 +795,7 @@
 
                         // change the state after the units have been moved,
                         // as you can only move once during this turn.
-                        this.stateMachine.changeState(new EnemyTurnState());
+                        this.stateMachine.changeState(new BotEnemyTurnState());
         			});
 			    }
 
@@ -1284,7 +1294,7 @@
 			    }
 			};
 			
-			class EnemyTurnState extends State
+			class BotEnemyTurnState extends State
 			{
 			    constructor()
 			    {
@@ -1354,16 +1364,22 @@
     			        {
     			            console.log("add the units");
     			            
-    			            placeTile.addUnits(enemyUnitPlaceCount);
-    			            $("#count").html(0);
+    			            if (placeTile !== null)
+    			            {
+        			            placeTile.addUnits(enemyUnitPlaceCount);
+        			            $("#count").html(0);
+    			            }
     			            
     			            setTimeout(func =>
         			        {
         			            console.log("change to attack");
         			            
-        			            placeTile.lower();
-        			            placeTile.material.color.setHex(enemyColor);
-        			            placeTile = null;
+        			            if (placeTile !== null)
+        			            {
+            			            placeTile.lower();
+            			            placeTile.material.color.setHex(enemyColor);
+            			            placeTile = null;
+        			            }
         			            
         			            changeRoundIndicator(4);
         			            
@@ -1623,9 +1639,7 @@
             world.position.y += 3;
 			scene.add(world);
 
-            //stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
-            
-            stateManager.pushState(new EnemyTurnState());
+            stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
 
 			$("body").on("click", "#nextStateButton", function(event)
 			{
@@ -1646,7 +1660,7 @@
                         stateManager.changeState(new UnitMoveState());
                         break;
                     case 2:
-                        stateManager.changeState(new EnemyTurnState());
+                        stateManager.changeState(new BotEnemyTurnState());
                         break;
                     default:
                         console.error("Invalid state.");
