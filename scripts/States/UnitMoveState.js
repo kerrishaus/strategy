@@ -1,7 +1,7 @@
 import * as Colors from "../Colors.js";
 
 import { State } from "./State.js";
-import { EnemyTurnState } from "./EnemyTurnState.js";
+import { BotTurnState } from "./BotTurnState.js";
 
 export class UnitMoveState extends State
 {
@@ -57,7 +57,7 @@ export class UnitMoveState extends State
 
             // change the state after the units have been moved,
             // as you can only move once during this turn.
-            this.stateMachine.changeState(new EnemyTurnState());
+            this.stateMachine.changeState(new BotTurnState());
         });
     }
 

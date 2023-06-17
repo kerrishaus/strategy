@@ -125,14 +125,14 @@
 
 			import * as Colors from "./scripts/Colors.js";
 
-			import { WorldObject } from "./scripts/WorldObject.js";
-			import { GameWorld } from "./scripts/GameWorld.js";
-			import { StateMachine } from "./scripts/states/StateMachine.js";
-			import { State } from "./scripts/states/State.js";
-			import { UnitDropState } from "./scripts/states/UnitDropState.js";
-			import { UnitMoveState } from "./scripts/states/UnitMoveState.js";
-			import { AttackState } from "./scripts/states/AttackState.js";
-			import { EnemyTurnState } from "./scripts/states/EnemyTurnState.js";
+			import { WorldObject    } from "./scripts/WorldObject.js";
+			import { GameWorld      } from "./scripts/GameWorld.js";
+			import { StateMachine   } from "./scripts/states/StateMachine.js";
+			import { State          } from "./scripts/states/State.js";
+			import { UnitDropState  } from "./scripts/states/UnitDropState.js";
+			import { UnitMoveState  } from "./scripts/states/UnitMoveState.js";
+			import { AttackState    } from "./scripts/states/AttackState.js";
+			import { BotTurnState } from "./scripts/states/BotTurnState.js";
 
 			/*
 			class Territory extends WorldObject
@@ -198,7 +198,7 @@
 
             //stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
             
-            stateManager.pushState(new EnemyTurnState());
+            stateManager.pushState(new BotTurnState());
 
 			$("body").on("click", "#nextStateButton", function(event)
 			{
@@ -219,7 +219,7 @@
                         stateManager.changeState(new UnitMoveState());
                         break;
                     case 2:
-                        stateManager.changeState(new EnemyTurnState());
+                        stateManager.changeState(new BotTurnState());
                         break;
                     default:
                         console.error("Invalid state.");

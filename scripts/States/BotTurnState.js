@@ -7,7 +7,7 @@ import *  as Colors from "../Colors.js";
 import { WorldObject } from "../WorldObject.js";
 import { UnitDropState } from "./UnitDropState.js";
 
-export class EnemyTurnState extends State
+export class BotTurnState extends State
 {
     constructor()
     {
