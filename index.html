@@ -196,9 +196,9 @@
             world.position.y += 3;
 			scene.add(world);
 
-            //stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
+            stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
             
-            stateManager.pushState(new BotTurnState());
+            //stateManager.pushState(new BotTurnState());
 
 			$("body").on("click", "#nextStateButton", function(event)
 			{
