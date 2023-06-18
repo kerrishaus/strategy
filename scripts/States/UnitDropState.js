@@ -49,6 +49,7 @@ export class UnitDropState extends State
 
 			this.availableUnits -= amount;
 			this.selectedTerritory.addUnits(amount);
+			//socket.send(JSON.stringify({ command: "dropUnits", territory: this.selectedTerritory.territoryId, unitCount: this.selectedTerritory.unitCount }));
 
 			this.selectedTerritory.destroyUnitPlaceDialog();
 			this.selectedTerritory.lower();

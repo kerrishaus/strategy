@@ -18,6 +18,34 @@ export class GameWorld extends Group
         
         this.ownedTerritories = 0;
         
+        this.loadWorld(this.generateWorld());
+        
+        this.calculateInvadeableTerritories();
+        
+        const floorGeometry = new PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
+        const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
+        const floor = new Mesh(floorGeometry, floorMaterial);
+        floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
+        floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
+        this.add(floor);
+    }
+    
+    update(deltaTime)
+    {
+        for (const tile of this.tiles)
+            tile.update(deltaTime);
+    }
+    
+    add(object)
+    {
+        object.world = this;
+        super.add(object);
+    }
+
+    generateWorld()
+    {
+        const tiles = [];
+
         for (let y = 0; y < this.height; y++)
         {
             for (let x = 0; x < this.width; x++)
@@ -47,32 +75,19 @@ export class GameWorld extends Group
                 
                 object.label.element.innerHTML = object.unitCount;
                 
-                this.tiles[arrayPosition] = object;
-                this.add(object);
+                tiles[arrayPosition] = object;
             }
-            
         }
-        
-        this.calculateInvadeableTerritories();
-        
-        const floorGeometry = new PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
-        const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
-        const floor = new Mesh(floorGeometry, floorMaterial);
-        floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
-        floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
-        this.add(floor);
+
+        return tiles;
     }
-    
-    update(deltaTime)
+
+    loadWorld(world)
     {
-        for (const tile of this.tiles)
-            tile.update(deltaTime);
-    }
-    
-    add(object)
-    {
-        object.world = this;
-        super.add(object);
+        for (const object of world)
+            this.add(object);
+
+        this.tiles = world;
     }
     
     calculateInvadeableTerritories()

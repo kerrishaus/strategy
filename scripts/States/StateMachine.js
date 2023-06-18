@@ -1,11 +1,8 @@
 export class StateMachine
 {
-    constructor(renderer, htmlRenderer)
+    constructor()
     {
         this.states = new Array();
-        
-        this.renderer = renderer;
-        this.htmlRenderer = htmlRenderer;
         
         this.number = -1;
         
@@ -24,7 +21,7 @@ export class StateMachine
         
         console.log("StateMachine is cleaned up.");
     }
-    
+
     pushState(state)
     {
         if (this.states > 1)
@@ -65,6 +62,8 @@ export class StateMachine
         $(".gameStatus").attr("data-state", number);
         
         this.number = number;
+
+		socket.send(JSON.stringify({ command: "changeState", stateId: number }));
     }
     
     onHover(object)
