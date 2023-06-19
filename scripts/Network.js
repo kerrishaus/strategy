@@ -82,7 +82,7 @@ export class Network
             try
             {
                 const data = JSON.parse(event.data);
-                console.log(data);
+                console.log("SERVER: ", data);
 
                 if (data.command == "welcome")
                 {

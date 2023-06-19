@@ -15,7 +15,7 @@ export class GameSetupState extends State
 		super();
 
 		this.networked = data.networked;
-		this.ownerId = data.ownerId;
+		this.lobby     = data.lobby;
 	}
 
 	init(stateMachine)
@@ -134,8 +134,7 @@ export class GameSetupState extends State
 		//document.addEventListener('mouseup', onMouseUp);
 		document.addEventListener('mousemove', onPointerMove);
 
-		window.game = new Game(this.networked);
-		game.ownerId = this.ownerId;
+		window.game = new Game(this.networked, this.lobby);
 
 		scene.add(game.world);
 

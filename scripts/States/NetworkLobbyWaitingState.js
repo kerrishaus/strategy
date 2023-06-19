@@ -4,14 +4,13 @@ import { GameSetupState } from "./GameSetupState.js";
 
 export class NetworkLobbyWaitingState extends State
 {
-	constructor(lobbyInfo)
+	constructor(lobby)
 	{
 		super();
 
-        this.ownerId = lobbyInfo.owner;
-        this.lobbyId = lobbyInfo.lobbyId;
+        this.lobby = lobby;
 
-        console.log(`Waiting for ${this.ownerId}'s lobby ${this.lobbyId}. We are client ${window.network.clientId}`);
+        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${window.network.clientId}`);
 	}
 
 	init(stateMachine)
@@ -24,7 +23,7 @@ export class NetworkLobbyWaitingState extends State
 
         $("body").append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
 
-        if (this.ownerId == network.clientId)
+        if (this.lobby.ownerId == network.clientId)
         {
             $("body").append(`<button id="startGame">start game</button>`);
 
@@ -35,9 +34,9 @@ export class NetworkLobbyWaitingState extends State
             });
         }
 
-		$(document).on("startGame", { ownerId: this.ownerId }, (event) =>
+		$(document).on("startGame", { lobby: this.lobby }, (event) =>
 		{
-			this.stateMachine.changeState(new GameSetupState({ networked: true, ownerId: event.data.ownerId }));
+			this.stateMachine.changeState(new GameSetupState({ networked: true, lobby: event.data.lobby }));
 		});
 	}
 

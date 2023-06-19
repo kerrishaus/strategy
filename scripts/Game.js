@@ -2,13 +2,13 @@ import { GameWorld } from "./GameWorld.js";
 
 export class Game
 {
-    constructor(networked = false)
+    constructor(networked = false, lobby)
     {
         this.setNetworked(networked);
 
         this.clients = [];
 
-        this.ownerId             = -1;
+        this.ownerId             = lobby.ownerId;
 
         this.currentTurnClientId = -1;
         this.currentTurnStage    = -1;
@@ -21,7 +21,7 @@ export class Game
 
         this.world = new GameWorld(10, 10);
 
-        this.setTurn(0);
+        this.setTurn(this.ownerId);
         this.setStage(0);
     }
 
