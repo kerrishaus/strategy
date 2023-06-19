@@ -3,9 +3,7 @@ export class StateMachine
     constructor()
     {
         this.states = new Array();
-        
-        this.number = -1;
-        
+
         console.log("StateMachine is ready.");
     }
     
@@ -50,20 +48,6 @@ export class StateMachine
         this.pushState(state);
         
         console.log("Changed state.");
-    }
-    
-    setStateNumber(number)
-    {
-        $(".roundSpace.active").removeClass("active");
-        
-        if (number <= 2)
-            $("#roundType").children()[number].classList.add("active");
-        
-        $(".gameStatus").attr("data-state", number);
-        
-        this.number = number;
-
-		socket.send(JSON.stringify({ command: "changeState", stateId: number }));
     }
     
     onHover(object)

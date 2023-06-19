@@ -39,7 +39,7 @@
                 right  0.3s cubic-bezier(0.175, 0.885, 0.2, 1.13);
 }
 
-  .moveableInterfaceElement[data-visibility='hidden']
+.moveableInterfaceElement[data-visibility='hidden']
 {
     transition: top    0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175),
                 left   0.3s cubic-bezier(1.13, 0.2, 0.885, 1.175),
@@ -219,6 +219,11 @@
     font-size: 22px;
     margin-bottom: -100px;
     text-decoration: none;
+}
+
+#nextStateButton[data-visibility="hidden"]
+{
+    top: 110%;
 }
 
 #nextStateButton:hover
@@ -448,7 +453,8 @@
     padding: 5px;
 }
 
-#gameWin
+#gameWin,
+#gameLose
 {
     width: 100vw;
     height: 100vh;
@@ -469,7 +475,8 @@
     transition: opacity 0.3s;
 }
 
-#gameWin[data-visibility="shown"]
+#gameWin[data-visibility="shown"],
+#gameLose[data-visibility="shown"]
 {
     opacity: 1;
 }

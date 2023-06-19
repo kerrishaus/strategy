@@ -2,13 +2,12 @@ export class State
 {
     constructor()
     {
-        this.stateNumber = -1;
     }
     
     init(stateMachine)
     {
+        // TODO: make stateMachine a window global variable
         this.stateMachine = stateMachine;
-        this.stateMachine.setStateNumber(this.stateNumber);
     }
     
     cleanup()

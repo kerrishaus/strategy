@@ -12,28 +12,19 @@ export class BotTurnState extends State
     constructor()
     {
         super();
-        
-        this.stateNumber = 3;
     }
     
     init(stateMachine)
     {
         this.stateMachine = stateMachine;
-        this.stateMachine.setStateNumber(this.stateNumber);
-        
-        function changeRoundIndicator(number)
-        {
-            $(".roundSpace.active").removeClass("active");
-            $("#roundType").children()[number - 3].classList.add("active");
-            $(".gameStatus").attr("data-state", number);
-        }
 
+        this.stateMachine.setInterfaceState("botTurnState");
+        this.stateMachine.stateName = "botTurnState";
+        
         $("#playerName").html("Enemy AI");    
         $("#nextStateButton").attr("data-visibility", "hidden");
         
-        changeRoundIndicator(3);
-        
-        let enemyUnitPlaceCount = Math.round((world.tiles.length - world.ownedTerritories) / 3);
+        let enemyUnitPlaceCount = Math.round((game.world.tiles.length - game.world.ownedTerritories) / 3);
         $("#count").html(enemyUnitPlaceCount);
         
         console.log("Starting AI turn");
@@ -55,9 +46,9 @@ export class BotTurnState extends State
                     break;
                 }
                 
-                const tileId = getRandomInt(world.tiles.length);
+                const tileId = getRandomInt(game.world.tiles.length);
                 
-                const tile = world.tiles[tileId];
+                const tile = game.world.tiles[tileId];
                 
                 if (tile.userData.team != 1)
                 {
@@ -98,9 +89,9 @@ export class BotTurnState extends State
                         
                         while (true)
                         {
-                            const tileId = getRandomInt(world.tiles.length);
+                            const tileId = getRandomInt(game.world.tiles.length);
                             
-                            const tile = world.tiles[tileId];
+                            const tile = game.world.tiles[tileId];
                 
                             if (tile.userData.team != 1)
                             {
@@ -200,18 +191,20 @@ export class BotTurnState extends State
                                         attackingTerritory.lower();
                                         attackingTerritory.material.color.setHex(Colors.enemyColor);
 
-                                        world.ownedTerritories -= 1;
+                                        game.world.ownedTerritories -= 1;
 
                                         console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
                                     }
                                     
-                                    world.calculateInvadeableTerritories();
+                                    game.world.calculateInvadeableTerritories();
                                 }
                                 
                                 setTimeout(func =>
                                 {
                                     console.log("move");
-                                    changeRoundIndicator(5);
+                                    
+                                    stateMachine.setInterfaceState("moveUnitState");
+                                    stateMachine.stateName = "botTurnState";
                                     
                                     let moveStart = null, moveEnd = null;
                                     
@@ -224,24 +217,24 @@ export class BotTurnState extends State
                                             break;
                                         }
                                         
-                                        const tileId = getRandomInt(world.tiles.length);
+                                        const tileId = getRandomInt(game.world.tiles.length);
                                         
-                                        if (world.tiles[tileId].userData.team == 2)
+                                        if (game.world.tiles[tileId].userData.team == 2)
                                             if (moveStart === null)
                                             {
-                                                if (world.tiles[tileId].invadeableNeighbors === null)
-                                                    if (world.tiles[tileId].unitCount > 1)
+                                                if (game.world.tiles[tileId].invadeableNeighbors === null)
+                                                    if (game.world.tiles[tileId].unitCount > 1)
                                                     {
-                                                        moveStart = world.tiles[tileId];
+                                                        moveStart = game.world.tiles[tileId];
                                                         iterations = 0; // restart and find the end
                                                     }
                                             }
                                             else
                                             {
-                                                if (world.tiles[tileId].invadeableNeighbors !== null)
-                                                    if (world.tiles[tileId].unitCount < 15)
+                                                if (game.world.tiles[tileId].invadeableNeighbors !== null)
+                                                    if (game.world.tiles[tileId].unitCount < 15)
                                                     {
-                                                        moveEnd = world.tiles[tileId];
+                                                        moveEnd = game.world.tiles[tileId];
                                                         break;
                                                     }
                                             }
@@ -285,7 +278,7 @@ export class BotTurnState extends State
                                                 
                                                 $("#playerName").html("Super Idiot");
                                                 $("#nextStateButton").attr("data-visibility", null);
-                                                this.stateMachine.changeState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
+                                                this.stateMachine.changeState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
                                             }, aiDelay);
                                         }, aiDelay);
                                     }, aiDelay);

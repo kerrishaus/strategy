@@ -9,6 +9,10 @@ export class Network
         
         this.connectionRetryInterval = 3000;
         this.connectionRetryCount    = 0;
+
+        this.clientId = -1;
+
+        console.log("Network class is ready.");
     }
 
     attemptConnection()
@@ -80,7 +84,21 @@ export class Network
                 const data = JSON.parse(event.data);
                 console.log(data);
 
-                document.dispatchEvent(new CustomEvent(data.command));
+                if (data.command == "welcome")
+                {
+                    if (network.clientId > 0)
+                    {
+                        console.error("Client ID is already set, wwhy are we being welcomed again?!");
+                        return;
+                    }
+
+                    network.clientId = data.clientId;
+                    console.log("We are client " + network.clientId);
+                    document.dispatchEvent(new CustomEvent("networkClientReady"));
+                    return;
+                }
+
+                document.dispatchEvent(new CustomEvent(data.command, { detail: data }));
             }
             catch (exception)
             {

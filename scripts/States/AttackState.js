@@ -14,14 +14,11 @@ export class AttackState extends State
 
         this.selectedTerritory = null;
         this.attackTerritory = null;
-
-        this.stateNumber = 1;
     }
 
     init(stateMachine)
     {
         this.stateMachine = stateMachine;
-        this.stateMachine.setStateNumber(this.stateNumber);
 
         console.log("AttackState is ready.");
     }
@@ -311,7 +308,7 @@ export class AttackState extends State
                 this.selectedTerritory.label.element.innerHTML = this.selectedTerritory.unitCount;
                 this.attackTerritory.label.element.innerHTML = this.attackTerritory.unitCount;
                 
-                world.ownedTerritories += 1;
+                game.world.ownedTerritories += 1;
                 
                 console.log(`New unit allocation: Attacker: ${this.selectedTerritory.unitCount}, Defender: ${this.attackTerritory.unitCount}`);
             }
@@ -322,7 +319,7 @@ export class AttackState extends State
     
     finaliseAttack()
     {
-        if (world.ownedTerritories == world.tiles.length)
+        if (game.world.ownedTerritories == game.world.tiles.length)
         {
             $("#gameWin").attr("data-visibility", "shown");
             
@@ -334,7 +331,7 @@ export class AttackState extends State
             return;
         }
         else
-            console.log(`Owned Territories: ${world.ownedTerritories} out of ${world.tiles.length}`);
+            console.log(`Owned Territories: ${game.world.ownedTerritories} out of ${game.world.tiles.length}`);
         
         if (this.attackTerritory === null)
         {
@@ -371,7 +368,7 @@ export class AttackState extends State
         
         // TODO: use the official methods to clear attacker and defender
         
-        world.calculateInvadeableTerritories();
+        game.world.calculateInvadeableTerritories();
         
         // TODO: remove these when the above todo is implemented
         $("#attackPlannerCancelButton").off();

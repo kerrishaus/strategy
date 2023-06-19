@@ -17,7 +17,6 @@ export class UnitDropState extends State
 	init(stateMachine)
 	{
 		this.stateMachine = stateMachine;
-		this.stateMachine.setStateNumber(0);
 
 		console.log("UnitDropState ready.");
 

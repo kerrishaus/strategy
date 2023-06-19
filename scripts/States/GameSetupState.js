@@ -2,22 +2,20 @@ import * as THREE from "https://kerrishaus.com/assets/threejs/build/three.module
 			
 import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
-import { GameWorld      } from "../GameWorld.js";
+import { Game      } from "../Game.js";
 import { State          } from "./State.js";
 import { StateMachine   } from "./StateMachine.js";
 import { MainMenuState  } from "./MainMenuState.js";
 import { UnitDropState  } from "./UnitDropState.js";
-import { UnitMoveState  } from "./UnitMoveState.js";
-import { AttackState    } from "./AttackState.js";
-import { BotTurnState   } from "./BotTurnState.js";
 
 export class GameSetupState extends State
 {
-	constructor(networked = false)
+	constructor(data)
 	{
 		super();
 
-		this.networked = networked;
+		this.networked = data.networked;
+		this.ownerId = data.ownerId;
 	}
 
 	init(stateMachine)
@@ -42,7 +40,7 @@ export class GameSetupState extends State
 	                    <span id='tags'>&#10004;</span>
 	                </div>
 	                <div id='roundType'>
-	                    <div class='roundSpace active'>Place</div>
+	                    <div class='roundSpace'>Place</div>
 	                    <div class='roundSpace'>Attack</div>
 	                    <div class='roundSpace'>Move</div>
 	                </div>
@@ -88,10 +86,11 @@ export class GameSetupState extends State
                 <h1>You are victorious!</h1>
                 <button id='replayGame'>Replay</button>
             </div>
-			<div id='gameLost'>
+			<div id='gameLose'>
                 <h1>You have been defeated!</h1>
                 <button id='replayGame'>Replay</button>
             </div>
+			<!--
 			<div id="networkControls">
 				<div id="networkOnline">
 					<h1>You are connected to the network.</h1>
@@ -100,11 +99,12 @@ export class GameSetupState extends State
 					<h1>The network is online.</h1>
 				</div>
 			</div>
+			-->
 	    </div>`
 		);
 
-		const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		window.scene = new THREE.Scene();
+		window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 		const cameraPosition = new THREE.Vector3(5 + 0.3 * 5, 5 + 0.3 * 5, 14);
 
@@ -119,7 +119,7 @@ export class GameSetupState extends State
 		htmlRenderer.domElement.style.top = '0px';
 		document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
 
-		const stateManager = new StateMachine(renderer, htmlRenderer);
+		window.stateManager = new StateMachine(renderer, htmlRenderer);
 
 		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
 
@@ -134,40 +134,16 @@ export class GameSetupState extends State
 		//document.addEventListener('mouseup', onMouseUp);
 		document.addEventListener('mousemove', onPointerMove);
 
-		window.world = new GameWorld(10, 5);
-		world.position.x -= 3;
-		world.position.y += 3;
-		scene.add(world);
+		window.game = new Game(this.networked);
+		game.ownerId = this.ownerId;
 
-		stateManager.pushState(new UnitDropState(Math.round(world.ownedTerritories / 3)));
+		scene.add(game.world);
 
-		//stateManager.pushState(new BotTurnState());
-
-		$("body").on("click", "#nextStateButton", function(event)
+		$("#nextStateButton").click(function(event)
 		{
 			event.preventDefault();
 			
-			// don't do anything if it's not our turn
-			if (stateManager.number >= 3)
-				return;
-			
-			console.log("moving to next state");
-			
-			switch (stateManager.number)
-			{
-				case 0:
-					stateManager.changeState(new AttackState());
-					break;
-				case 1:
-					stateManager.changeState(new UnitMoveState());
-					break;
-				case 2:
-					stateManager.changeState(new BotTurnState());
-					break;
-				default:
-					console.error("Invalid state.");
-					break;
-			};
+			document.dispatchEvent(new CustomEvent("clientNextStage"));
 		});
 
 		function onMouseDown(event)
@@ -233,7 +209,7 @@ export class GameSetupState extends State
 			
 			stateManager.update(clock.getElapsedTime());
 			
-			world.update(clock.getElapsedTime());
+			game.world.update(clock.getElapsedTime());
 			
 			camera.position.lerp(cameraPosition, 0.2);
 			
@@ -242,5 +218,7 @@ export class GameSetupState extends State
 		};
 
 		animate();
+
+		stateManager.pushState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
 	}
 }

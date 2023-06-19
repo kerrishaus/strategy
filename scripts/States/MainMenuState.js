@@ -1,8 +1,8 @@
 import { State } from "./State.js";
 
 import { GameSetupState } from "./GameSetupState.js";
-import { NetworkedLobbyFindState } from "./NetworkedLobbyFindState.js";
-import { NetworkedLobbyPrepareState } from "./NetworkPrepareState.js";
+import { NetworkLobbyFindState } from "./NetworkLobbyFindState.js";
+import { NetworkLobbyPrepareState } from "./NetworkPrepareState.js";
 
 export class MainMenuState extends State
 {
@@ -16,7 +16,6 @@ export class MainMenuState extends State
         console.log("Initialising MainMenuState...");
 
 		this.stateMachine = stateMachine;
-		this.stateMachine.setStateNumber(0);
 
 		console.log("MainMenuState is ready.");
 
@@ -26,7 +25,7 @@ export class MainMenuState extends State
         $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
 
 		$("#playLocal")[0].onclick = () => { this.stateMachine.changeState(new GameSetupState(false)) };
-		$("#playNetworked")[0].onclick = () => { this.stateMachine.changeState(new NetworkedLobbyPrepareState()) };
+		$("#playNetworked")[0].onclick = () => { this.stateMachine.changeState(new NetworkLobbyPrepareState()) };
 	}
 
 	cleanup()

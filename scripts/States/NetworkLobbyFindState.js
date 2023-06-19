@@ -1,8 +1,8 @@
 import { State } from "./State.js";
 
-import { GameSetupState } from "./GameSetupState.js";
+import { NetworkLobbyWaitingState } from "./NetworkLobbyWaitingState.js";
 
-export class NetworkedLobbyFindState extends State
+export class NetworkLobbyFindState extends State
 {
 	constructor()
 	{
@@ -11,11 +11,11 @@ export class NetworkedLobbyFindState extends State
 
 	init(stateMachine)
 	{
-        console.log("Initialising NetworkedLobbyFindState...");
+        console.log("Initialising NetworkLobbyFindState...");
 
 		this.stateMachine = stateMachine;
 
-		console.log("NetworkedLobbyFindState is ready.");
+		console.log("NetworkLobbyFindState is ready.");
 
         $("body").append(`<div id="mainMenu">`);
         $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='play'>play</button><button id='create'>create</button>");
@@ -42,9 +42,11 @@ export class NetworkedLobbyFindState extends State
 			socket.send(response);
         });
 
-		$(document).on("joinedLobby", () =>
+		$(document).on("joinedLobby", (event) =>
 		{
-			this.stateMachine.changeState(new GameSetupState(true));
+			this.stateMachine.networked = true;
+
+			this.stateMachine.changeState(new NetworkLobbyWaitingState(event.detail));
 		});
 
 		$(document).on("invalidLobbyId", () =>
@@ -57,10 +59,10 @@ export class NetworkedLobbyFindState extends State
 
 	cleanup()
 	{
-        console.log("Cleaning up NetworkedLobbyFindState...");
+        console.log("Cleaning up NetworkLobbyFindState...");
 
 		$("#mainMenu").remove();
 
-		console.log("NetworkedLobbyFindState cleaned up.");
+		console.log("NetworkLobbyFindState cleaned up.");
 	}
 };

@@ -1,10 +1,10 @@
 import { State } from "./State.js";
 
 import { Network } from "../Network.js";
-import { NetworkedLobbyFindState } from "./NetworkedLobbyFindState.js";
+import { NetworkLobbyFindState } from "./NetworkLobbyFindState.js";
 import { MainMenuState } from "./MainMenuState.js";
 
-export class NetworkedLobbyPrepareState extends State
+export class NetworkLobbyPrepareState extends State
 {
 	constructor()
 	{
@@ -13,17 +13,18 @@ export class NetworkedLobbyPrepareState extends State
 
 	init(stateMachine)
 	{
-        console.log("Initialising NetworkedLobbyPrepareState...");
+        console.log("Initialising NetworkLobbyPrepareState...");
 
 		this.stateMachine = stateMachine;
 
-		console.log("NetworkedLobbyPrepareState is ready.");
+		console.log("NetworkLobbyPrepareState is ready.");
         
         window.network = new Network();
 
-        $(document).on("serverConnected", () => {
+        $(document).on("networkClientReady", () => {
             console.log("Server connection is ready, switching to lobby finder.");
-            this.stateMachine.changeState(new NetworkedLobbyFindState());
+			console.log(network.clientId);
+            this.stateMachine.changeState(new NetworkLobbyFindState());
         });
 
         $(document).on("serverConnectionFailed", () => {
@@ -36,8 +37,8 @@ export class NetworkedLobbyPrepareState extends State
 
 	cleanup()
 	{
-        console.log("Cleaning up NetworkedLobbyPrepareState...");
+        console.log("Cleaning up NetworkLobbyPrepareState...");
 
-		console.log("NetworkedLobbyPrepareState cleaned up.");
+		console.log("NetworkLobbyPrepareState cleaned up.");
 	}
 };
