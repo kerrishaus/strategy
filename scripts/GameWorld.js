@@ -52,8 +52,9 @@ export class GameWorld extends Group
                 /*
                 object.userData.owner = ;
                 object.unitCount = getRandomInt(4) + 1;
-                object.label.element.innerHTML = object.unitCount;
                 */
+
+                object.label.element.innerHTML = object.userData.territoryId;
                 
                 tiles[arrayPosition] = object;
             }

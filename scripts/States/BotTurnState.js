@@ -16,9 +16,7 @@ export class BotTurnState extends State
     
     init()
     {
-        stateManager.setInterfaceState("botTurnState");
-        
-        $("#playerName").html("Enemy AI");    
+        $("#playerName").html("Enemy AI");
         $("#nextStateButton").attr("data-visibility", "hidden");
         
         let enemyUnitPlaceCount = Math.round((game.world.tiles.length - game.world.ownedTerritories) / 3);

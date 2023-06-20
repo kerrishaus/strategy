@@ -40,7 +40,8 @@ export class Game
 
             this.world.calculateInvadeableTerritories();
 
-            socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
+            if (this.networked)
+                socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
         }
         
         // if we are not the owner of this lobby, we wait until we receive the world data
@@ -166,15 +167,27 @@ export class Game
 
         if (this.currentTurnClientId == clientId)
         {
-            if (stageId == 0) // DropUnitState
+            if (stageId == 0)
                 stateManager.changeState(new UnitDropState());
-            else if (stageId == 0) // DropUnitState
+            else if (stageId == 1)
                 stateManager.changeState(new AttackState());
-            else if (stageId == 0) // DropUnitState
+            else if (stageId == 2)
                 stateManager.changeState(new UnitMoveState());
         }
 
         $("#debug-stage").text(this.stageId);
+    }
+
+    // moves all territories back down and applies their idle colours
+    resetTerritoryGraphics()
+    {
+        for (const object of this.world.tiles)
+        {
+            object.lower();
+            object.material.color.setHex(Colors.ownedColor);
+
+            //object.destroyUnitPlaceDialog();
+        }
     }
 
     dropUnits(clientId, territoryId, amount)
