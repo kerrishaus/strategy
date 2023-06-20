@@ -16,7 +16,7 @@ export class BotTurnState extends State
     
     init()
     {
-        this.stateMachine.setInterfaceState("botTurnState");
+        stateManager.setInterfaceState("botTurnState");
         
         $("#playerName").html("Enemy AI");    
         $("#nextStateButton").attr("data-visibility", "hidden");
@@ -275,7 +275,7 @@ export class BotTurnState extends State
                                                 
                                                 $("#playerName").html("Super Idiot");
                                                 $("#nextStateButton").attr("data-visibility", null);
-                                                this.stateMachine.changeState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
+                                                stateManager.changeState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
                                             }, aiDelay);
                                         }, aiDelay);
                                     }, aiDelay);

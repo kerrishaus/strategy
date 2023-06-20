@@ -22,7 +22,7 @@ export class GameSetupState extends State
 	{
 		$(document).on("serverDisconnected", () =>
 		{
-			this.stateMachine.changeState(new MainMenuState());
+			stateManager.changeState(new MainMenuState());
 		});
 
 		$("body").append(
@@ -116,8 +116,6 @@ export class GameSetupState extends State
 		htmlRenderer.domElement.style.position = 'absolute';
 		htmlRenderer.domElement.style.top = '0px';
 		document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
-
-		window.stateManager = new StateMachine(renderer, htmlRenderer);
 
 		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
 

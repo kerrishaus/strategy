@@ -18,8 +18,6 @@ export class AttackState extends State
 
     init()
     {
-        console.log("Initialising AttackState...");
-        console.log("AttackState is ready.");
     }
 
     cleanup()

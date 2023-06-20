@@ -4,10 +4,8 @@ export class State
     {
     }
     
-    init(stateMachine)
+    init()
     {
-        // TODO: make stateMachine a window global variable
-        this.stateMachine = stateMachine;
     }
     
     cleanup()

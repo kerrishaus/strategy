@@ -13,26 +13,18 @@ export class MainMenuState extends State
 
 	init()
 	{
-        console.log("Initialising MainMenuState...");
-
         $("head").append(`<link rel='stylesheet' id="mainMenuStyles" href='./assets/styles/mainMenu.css' />`);
 
         $("body").append(`<div id="mainMenu">`);
         $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
 
-		$("#playLocal")[0].onclick = () => { this.stateMachine.changeState(new GameSetupState(false)) };
-		$("#playNetworked")[0].onclick = () => { this.stateMachine.changeState(new NetworkLobbyPrepareState()) };
-
-		console.log("MainMenuState is ready.");
+		$("#playLocal")[0].onclick = () => { stateManager.changeState(new GameSetupState(false)) };
+		$("#playNetworked")[0].onclick = () => { stateManager.changeState(new NetworkLobbyPrepareState()) };
 	}
 
 	cleanup()
 	{
-        console.log("Cleaning up MainMenuState...");
-
 		$("#mainMenu").remove();
 		$("#mainMenuStyles").remove();
-
-		console.log("MainMenuState cleaned up.");
 	}
 };

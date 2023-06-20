@@ -11,10 +11,6 @@ export class NetworkLobbyFindState extends State
 
 	init()
 	{
-        console.log("Initialising NetworkLobbyFindState...");
-
-		console.log("NetworkLobbyFindState is ready.");
-
         $("body").append(`<div id="mainMenu">`);
         $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='play'>play</button><button id='create'>create</button>");
 
@@ -42,7 +38,7 @@ export class NetworkLobbyFindState extends State
 
 		$(document).on("joinedLobby", (event) =>
 		{
-			this.stateMachine.changeState(new NetworkLobbyWaitingState(event.detail));
+			stateManager.changeState(new NetworkLobbyWaitingState(event.detail));
 		});
 
 		$(document).on("invalidLobbyId", () =>
@@ -55,10 +51,6 @@ export class NetworkLobbyFindState extends State
 
 	cleanup()
 	{
-        console.log("Cleaning up NetworkLobbyFindState...");
-
 		$("#mainMenu").remove();
-
-		console.log("NetworkLobbyFindState cleaned up.");
 	}
 };

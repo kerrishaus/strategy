@@ -9,8 +9,6 @@ export class UnitDropState extends State
 	{
 		super();
 
-		this.name = "UnitDropState";
-
 		this.availableUnits = availableUnits;
 
 		this.selectedTerritory = null;
@@ -18,8 +16,6 @@ export class UnitDropState extends State
 
 	init()
 	{
-		console.log("UnitDropState ready.");
-
 		this.selectedTerritory = null;
 
 		$("#count").html(this.availableUnits);
@@ -56,7 +52,7 @@ export class UnitDropState extends State
 			this.selectedTerritory = null;
 
 			if (this.availableUnits <= 0)
-				this.stateMachine.changeState(new AttackState());
+				stateManager.changeState(new AttackState());
 
 			$("#count").html(this.availableUnits);
 		});
@@ -64,8 +60,6 @@ export class UnitDropState extends State
 
 	cleanup()
 	{
-		console.log("UnitDropState cleaned up.");
-		
 		$(htmlRenderer).off("click", "#dropUnitButton");
 	}
 	

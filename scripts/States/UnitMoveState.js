@@ -50,11 +50,9 @@ export class UnitMoveState extends State
             this.startTerritory.label.element.innerHTML = this.startTerritory.unitCount;
             this.endTerritory.label.element.innerHTML = this.endTerritory.unitCount;
 
-            console.log(this.stateMachine);
-
             // change the state after the units have been moved,
             // as you can only move once during this turn.
-            this.stateMachine.changeState(new BotTurnState());
+            stateManager.changeState(new BotTurnState());
         });
     }
 
