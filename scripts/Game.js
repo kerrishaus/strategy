@@ -1,15 +1,22 @@
 import { GameWorld } from "./GameWorld.js";
 
+import { NetworkClientState } from "./states/NetworkClientState.js";
+import { UnitMoveState      } from "./states/UnitMoveState.js";
+import { AttackState        } from "./states/AttackState.js";
+import { UnitDropState      } from "./states/UnitDropState.js";
+import { BotTurnState } from "./states/BotTurnState.js";
+
 export class Game
 {
     constructor(networked = false, lobby)
     {
+        console.log(lobby);
+
         this.setNetworked(networked);
 
         this.clients = [];
 
         this.ownerId             = lobby.ownerId;
-        this.clientId            = -1;
 
         this.currentTurnClientId = -1;
         this.currentTurnStage    = -1;
@@ -22,38 +29,44 @@ export class Game
 
         this.world = new GameWorld();
 
-        if (clientId == this.ownerId)
-            this.world.
+        const world = this.world.generateWorld(lobby.width, lobby.height);
 
-        socket.send(JSON.stringify({ command: "worldData", worldData: this.world.toJSON() }));
+        if (clientId == this.ownerId && networked)
+            socket.send(JSON.stringify({ command: "worldData", width: lobby.width, height: lobby.height, territories: this.world.territories }));
+
+        this.world.loadWorld(world);
+
+        // if we are not the owner of this lobby, we wait until we receive the world data
 
         this.setTurn(this.ownerId);
         this.setStage(0);
     }
 
-    setNetworked(networked)
+    setNetworked(useNetwork)
     {
-        if (this.networked == networked)
+        if (window.networked == useNetwork)
             return;
 
-        this.networked = networked;
+        window.networked = useNetwork;
 
-        $("#debug-networked").text(this.networked);
+        $("#debug-networked").text(networked);
 
-        if (this.networked && !networked)
+        if (networked && !useNetwork)
         {
             // TODO: remove all network event listeners. i don't know how though lol
             return;
         }
 
-        $(document).on("buildGameWorld", function(event)
+        $(document).on("worldData", function(event)
         {
-            game.buildGameWorld(event.details.worldData);
+            console.log("Loading world data from network...");
+            game.loadWorld(event.details.worldData);
         });
 
         $(document).on("clientNextStage", function(event)
         {
-            socket.send(JSON.stringify({ command: "nextStage" }));
+            if (networked)
+                socket.send(JSON.stringify({ command: "nextStage" }));
         });
 
         $(document).on("nextTurn", function(event)
@@ -68,19 +81,14 @@ export class Game
             game.setStage(event.detail.stageId);
         });
 
-        $(document).on("netClientJoin", function(event)
+        $(document).on("clientJoin", function(event)
         {
             addClient(event.detail.clientId);
         });
 
-        $(document).on("netClientLeave", function(event)
+        $(document).on("clientLeave", function(event)
         {
             removeClient(event.detail.clientId);
-        });
-
-        $(document).on("netGameStart", function(event)
-        {
-            startGame();
         });
     }
 
@@ -98,26 +106,36 @@ export class Game
         console.log(`Client ${clientId} left.`);
     }
 
-    setTurn(clientId)
+    // uses an underscore because clientId is a global value
+    // which refers to the id of the local player
+    setTurn(_clientId)
     {
-        console.log(`${clientId}'s turn.`);
+        console.log(`${_clientId}'s turn.`);
 
-        this.currentTurnClientId = clientId;
-        $("#playerName").text(clientId);
+        // set currentTurnClientId to whatever client is next
+        this.currentTurnClientId = _clientId;
+
+        $("#playerName").text(this.currentTurnClientId);
+        $("#debug-turnClientId").text(this.currentTurnClientId);
         this.setStage(0);
 
-        if (this.networked)
+        // check if currentTurnClientId matches the local client id
+        if (this.currentTurnClientId == clientId)
         {
-            if (this.currentTurnClientId == this.clientId)
-            {
-                $("#nextStateButton").attr("data-visibility", null);
-            }
-            else
-                $("#nextStateButton").attr("data-visibility", "hidden");
+            console.log(`Our turn! Us: ${this.currentTurnClientId}`);
+
+            $("#nextStateButton").attr("data-visibility", null);
         }
         else
         {
-            // actually do something offline
+            console.log("Someone else's turn.");
+
+            $("#nextStateButton").attr("data-visibility", "hidden");
+
+            if (networked)
+                stateManager.changeState(new NetworkClientState());
+            else
+                stateManager.changeState(new BotTurnState());
         }
 
         $("#debug-turn").text(this.currentTurnClientId);
@@ -134,14 +152,14 @@ export class Game
 
         this.stageId = stageId;
 
-        if (this.currentTurnClientId == this.clientId)
+        if (this.currentTurnClientId == clientId)
         {
             if (stageId == 0) // DropUnitState
-                stateManager.changeState(new DropUnitState());
+                stateManager.changeState(new UnitDropState());
             else if (stageId == 0) // DropUnitState
                 stateManager.changeState(new AttackState());
             else if (stageId == 0) // DropUnitState
-                stateManager.changeState(new MoveUnitState());
+                stateManager.changeState(new UnitMoveState());
         }
 
         $("#debug-stage").text(this.stageId);

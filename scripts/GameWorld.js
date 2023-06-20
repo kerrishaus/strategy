@@ -9,7 +9,7 @@ export class GameWorld extends Group
     constructor()
     {
         super();
-        
+
         // a list of 
         //this.territoryOwnership = new Array(clientCount);
         
@@ -20,8 +20,9 @@ export class GameWorld extends Group
     
     update(deltaTime)
     {
-        for (const tile of this.tiles)
-            tile.update(deltaTime);
+        for (const tile of this.children)
+            if (tile instanceof WorldObject)
+                tile.update(deltaTime);
     }
     
     add(object)
@@ -30,15 +31,15 @@ export class GameWorld extends Group
         super.add(object);
     }
 
-    generateWorld(width, height, clientCount)
+    generateWorld(width, height)
     {
-        const tiles = new Array(this.width * this.height);
+        const tiles = new Array(width * height);
 
-        for (let y = 0; y < this.height; y++)
+        for (let y = 0; y < height; y++)
         {
-            for (let x = 0; x < this.width; x++)
+            for (let x = 0; x < width; x++)
             {
-                const arrayPosition = x + y * this.width;
+                const arrayPosition = x + y * width;
                 
                 const object = new WorldObject(2, 2, "#000000");
                 
@@ -58,36 +59,56 @@ export class GameWorld extends Group
             }
         }
 
-        return tiles;
+        return { width: width, height: height, tiles: tiles };
+    }
+
+    calculateTerritories(clientCount)
+    {
+        const territories = new Array(this.tiles.length);
+
+        const territoryOwnerCount = new Array(clientCount);
+
+        for (const tile in this.tiles)
+        {
+            const owner = getRandomInt(clientCount);
+
+            if (territoryOwnerCount[owner] > 4)
+                continue;
+
+            territoryOwnerCount[owner]++;
+
+            territories[tile] = owner;
+        }
+
+        return territories;
     }
 
     loadWorld(world)
     {
-        for (const object of world)
+        for (const object of world.tiles)
             this.add(object);
         
-        this.tiles = world;
+        this.tiles = world.tiles;
+
+        this.calculateTerritories();
 
         this.calculateInvadeableTerritories();
 
-        const floorGeometry = new PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
+        const floorGeometry = new PlaneGeometry(world.width + world.width * 1.3 + 3, world.height + world.height * 1.3 + 3);
         const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
         const floor = new Mesh(floorGeometry, floorMaterial);
-        floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
-        floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
+        floor.position.x = world.width / 2 + 1.1 * world.width / 2 - 0.7;
+        floor.position.y = world.height / 2 + 1.1 * world.height / 2 - 0.7;
         this.add(floor);
     }
     
     calculateInvadeableTerritories()
     {
-        // TODO: if the tile is invadeable, set its color to red
-
         // calculate invadeable neighbors
         for (const tile of this.tiles)
         {
             const id = tile.userData.territoryId;
             
-            delete tile.invadeableNeighbors;
             tile.invadeableNeighbors = new Array(4);
             
             if (id - 1 >= 0)

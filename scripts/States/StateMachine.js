@@ -41,8 +41,6 @@ export class StateMachine
     {
         const state = this.states[this.states.length - 1];
 
-        console.log(state);
-
         console.log("StateMachine: Cleaning up " + state.constructor.name + "...");
         state.cleanup();
         console.log("StateMachine: Cleaned up " + state.constructor.name + ".");

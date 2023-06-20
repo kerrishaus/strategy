@@ -30,7 +30,12 @@ export class NetworkLobbyWaitingState extends State
 
 		$(document).on("startGame", { lobby: this.lobby }, (event) =>
 		{
-			stateManager.changeState(new GameSetupState({ networked: true, lobby: event.data.lobby }));
+			const lobby2 = event.data.lobby;
+
+			lobby2.width = event.detail.width;
+			lobby2.height = event.detail.height;
+
+			stateManager.changeState(new GameSetupState({ networked: true, lobby: lobby2 }));
 		});
 
 		// TODO: send this when click ready checkbox socket.send(JSON.stringify({ command: "lobbyReady" }));

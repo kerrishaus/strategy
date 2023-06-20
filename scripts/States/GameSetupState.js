@@ -130,6 +130,8 @@ export class GameSetupState extends State
 		//document.addEventListener('mouseup', onMouseUp);
 		document.addEventListener('mousemove', onPointerMove);
 
+		console.log(this.lobby);
+
 		window.game = new Game(this.networked, this.lobby);
 
 		scene.add(game.world);
@@ -214,8 +216,7 @@ export class GameSetupState extends State
 
 		animate();
 
-		socket.send(JSON.stringify({ command: "gameReady" }));
-
-		stateManager.pushState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
+		if (networked)
+			socket.send(JSON.stringify({ command: "gameReady" }));
 	}
 }
