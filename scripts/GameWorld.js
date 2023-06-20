@@ -90,10 +90,6 @@ export class GameWorld extends Group
         
         this.tiles = world.tiles;
 
-        this.calculateTerritories();
-
-        this.calculateInvadeableTerritories();
-
         const floorGeometry = new PlaneGeometry(world.width + world.width * 1.3 + 3, world.height + world.height * 1.3 + 3);
         const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
         const floor = new Mesh(floorGeometry, floorMaterial);

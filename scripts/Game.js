@@ -31,11 +31,17 @@ export class Game
 
         const world = this.world.generateWorld(lobby.width, lobby.height);
 
-        if (clientId == this.ownerId && networked)
-            socket.send(JSON.stringify({ command: "worldData", width: lobby.width, height: lobby.height, territories: this.world.territories }));
-
         this.world.loadWorld(world);
 
+        if (clientId == this.ownerId)
+        {
+            this.world.territories = this.world.calculateTerritories();
+
+            this.world.calculateInvadeableTerritories();
+
+            socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
+        }
+        
         // if we are not the owner of this lobby, we wait until we receive the world data
 
         this.setTurn(this.ownerId);
@@ -60,7 +66,7 @@ export class Game
         $(document).on("worldData", function(event)
         {
             console.log("Loading world data from network...");
-            game.loadWorld(event.details.worldData);
+            game.world.territories = event.details.worldData.territories;
         });
 
         $(document).on("clientNextStage", function(event)
