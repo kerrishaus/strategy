@@ -8,7 +8,7 @@ export class UnitMoveState extends State
     constructor()
     {
         super();
-        
+
         this.startTerritory = null;
         this.endTerritory = null;
     }

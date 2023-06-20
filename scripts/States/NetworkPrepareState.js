@@ -23,7 +23,7 @@ export class NetworkLobbyPrepareState extends State
 
         $(document).on("networkClientReady", () => {
             console.log("Server connection is ready, switching to lobby finder.");
-			console.log(network.clientId);
+			console.log(clientId);
             this.stateMachine.changeState(new NetworkLobbyFindState());
         });
 

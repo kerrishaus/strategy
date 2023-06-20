@@ -9,6 +9,8 @@ export class UnitDropState extends State
 	{
 		super();
 
+		this.name = "UnitDropState";
+
 		this.availableUnits = availableUnits;
 
 		this.selectedTerritory = null;

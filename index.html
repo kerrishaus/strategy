@@ -14,17 +14,33 @@
 		
 		<script src="https://kerrishaus.com/assets/scripts/jquery-3.6.0.min.js"></script>
 		
+		<link rel='stylesheet' id="gameStyles" href='./assets/styles/game.css' />
 		<link rel='stylesheet' id="interfaceStyles" href='./assets/styles/interface.css' />
-
 		<link rel='stylesheet' id="loadingStyles" href='./assets/styles/loading.css' />
 		
 		<script>
             const params = new URLSearchParams(window.location.search);
             
-            if (params.has("debug"))
+			window.gameDebug = params.has("debug");
+
+            //if (gameDebug)
             {
-                $("head").append("<script src='https://portal.kerrishaus.com/assets/javascript/messages.js'><\/script>");
-                $("head").append("<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />");
+				$(document).ready(function() {
+					$("head").append("<script src='https://portal.kerrishaus.com/assets/javascript/messages.js'><\/script>");
+					$("head").append("<link rel='stylesheet' href='https://portal.kerrishaus.com/assets/styles/messages.css' />");
+
+					$("body").append(`
+						<div id='debug'>
+							<div>clientId: <span id="debug-clientId"></span></div>
+							<div>networked <span id="debug-networked"></span></div>
+							<div>lobbyId <span id="debug-lobbyId"></span></div>
+							<div>clientCount <span id="debug-clientCount"></span></div>
+							<div>state <span id="debug-state"></span></div>
+							<div>turn <span id="debug-turn"></span></div>
+							<div>stage <span id="debug-stage"></span></div>
+						</div>
+					`);
+				});
             }
         </script>
 	</head>
@@ -48,6 +64,10 @@
 			import { MainMenuState } from "./scripts/states/MainMenuState.js";
 
 			const stateManager = new StateMachine();
+
+			window.clientId = 0;
+
+			$("#debug-clientId").text(clientId);
 			
 			setTimeout(() => {
 				// load the new state first so that all the assets are loaded

@@ -10,7 +10,7 @@ export class NetworkLobbyWaitingState extends State
 
         this.lobby = lobby;
 
-        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${window.network.clientId}`);
+        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`);
 	}
 
 	init(stateMachine)
@@ -23,7 +23,7 @@ export class NetworkLobbyWaitingState extends State
 
         $("body").append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
 
-        if (this.lobby.ownerId == network.clientId)
+        if (this.lobby.ownerId == clientId)
         {
             $("body").append(`<button id="startGame">start game</button>`);
 

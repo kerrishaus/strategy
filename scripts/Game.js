@@ -9,6 +9,7 @@ export class Game
         this.clients = [];
 
         this.ownerId             = lobby.ownerId;
+        this.clientId            = -1;
 
         this.currentTurnClientId = -1;
         this.currentTurnStage    = -1;
@@ -19,7 +20,12 @@ export class Game
             "unitMoveState"
         ]
 
-        this.world = new GameWorld(10, 10);
+        this.world = new GameWorld();
+
+        if (clientId == this.ownerId)
+            this.world.
+
+        socket.send(JSON.stringify({ command: "worldData", worldData: this.world.toJSON() }));
 
         this.setTurn(this.ownerId);
         this.setStage(0);
@@ -31,6 +37,8 @@ export class Game
             return;
 
         this.networked = networked;
+
+        $("#debug-networked").text(this.networked);
 
         if (this.networked && !networked)
         {
@@ -100,13 +108,19 @@ export class Game
 
         if (this.networked)
         {
-            if (this.currentTurnClientId == network.clientId)
+            if (this.currentTurnClientId == this.clientId)
+            {
                 $("#nextStateButton").attr("data-visibility", null);
+            }
             else
                 $("#nextStateButton").attr("data-visibility", "hidden");
         }
         else
-            return // TODO: actually do something here waaa
+        {
+            // actually do something offline
+        }
+
+        $("#debug-turn").text(this.currentTurnClientId);
     }
 
     setStage(stageId)
@@ -119,9 +133,21 @@ export class Game
         $(".gameStatus").attr("data-state", stageId);
 
         this.stageId = stageId;
+
+        if (this.currentTurnClientId == this.clientId)
+        {
+            if (stageId == 0) // DropUnitState
+                stateManager.changeState(new DropUnitState());
+            else if (stageId == 0) // DropUnitState
+                stateManager.changeState(new AttackState());
+            else if (stageId == 0) // DropUnitState
+                stateManager.changeState(new MoveUnitState());
+        }
+
+        $("#debug-stage").text(this.stageId);
     }
 
-    dropUnits(clientId, territoryId)
+    dropUnits(clientId, territoryId, amount)
     {
         if (this.currentTurnClientId != clientId)
         {
@@ -130,7 +156,7 @@ export class Game
         }
     }
 
-    attack(forClientId, againstClientId)
+    attack(forClientId, againstClientId, fromTerritoryId, toTerritoryId, unitCount)
     {
         if (this.currentTurnClientId != clientId)
         {
@@ -139,7 +165,7 @@ export class Game
         }
     }
 
-    moveUnits(clientId, fromTerritoryId, toTerritoryId)
+    moveUnits(clientId, fromTerritoryId, toTerritoryId, amount)
     {
         if (this.currentTurnClientId != clientId)
         {

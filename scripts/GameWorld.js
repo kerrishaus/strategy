@@ -2,32 +2,20 @@ import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh } from "https:
 			
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
-import * as Colors from "./Colors.js";
 import { WorldObject } from "./WorldObject.js";
 
 export class GameWorld extends Group
 {
-    constructor(width, height)
+    constructor()
     {
         super();
         
-        this.height = height;
-        this.width = width;
+        // a list of 
+        //this.territoryOwnership = new Array(clientCount);
         
-        this.tiles = new Array(this.width * this.height);
+        //this.loadWorld(this.generateWorld(clientCount));
         
-        this.ownedTerritories = 0;
-        
-        this.loadWorld(this.generateWorld());
-        
-        this.calculateInvadeableTerritories();
-        
-        const floorGeometry = new PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
-        const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
-        const floor = new Mesh(floorGeometry, floorMaterial);
-        floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
-        floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
-        this.add(floor);
+        //this.calculateInvadeableTerritories();
     }
     
     update(deltaTime)
@@ -42,38 +30,29 @@ export class GameWorld extends Group
         super.add(object);
     }
 
-    generateWorld()
+    generateWorld(width, height, clientCount)
     {
-        const tiles = [];
+        const tiles = new Array(this.width * this.height);
 
         for (let y = 0; y < this.height; y++)
         {
             for (let x = 0; x < this.width; x++)
             {
-                let chance = getRandomInt(2);
-                
-                let color = Colors.enemyColor;
-                if (chance > 0)
-                {
-                    color = Colors.ownedColor;
-                    this.ownedTerritories += 1;
-                }
-                
                 const arrayPosition = x + y * this.width;
                 
-                const object = new WorldObject(2, 2, color);
+                const object = new WorldObject(2, 2, "#000000");
                 
                 object.targetPosition.x = x + 1.0 * x;
                 object.targetPosition.y = y + 1.0 * y;
                 object.targetPosition.z = 0;
                 
-                object.unitCount = getRandomInt(4) + 1;
-                
-                object.userData.team = chance > 0 ? 1 : 2;
-                object.userData.invadeable = false;
                 object.userData.territoryId = arrayPosition;
                 
+                /*
+                object.userData.owner = ;
+                object.unitCount = getRandomInt(4) + 1;
                 object.label.element.innerHTML = object.unitCount;
+                */
                 
                 tiles[arrayPosition] = object;
             }
@@ -86,12 +65,23 @@ export class GameWorld extends Group
     {
         for (const object of world)
             this.add(object);
-
+        
         this.tiles = world;
+
+        this.calculateInvadeableTerritories();
+
+        const floorGeometry = new PlaneGeometry(width + width * 1.3 + 3, height + height * 1.3 + 3);
+        const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
+        const floor = new Mesh(floorGeometry, floorMaterial);
+        floor.position.x = width / 2 + 1.1 * width / 2 - 0.7;
+        floor.position.y = height / 2 + 1.1 * height / 2 - 0.7;
+        this.add(floor);
     }
     
     calculateInvadeableTerritories()
     {
+        // TODO: if the tile is invadeable, set its color to red
+
         // calculate invadeable neighbors
         for (const tile of this.tiles)
         {

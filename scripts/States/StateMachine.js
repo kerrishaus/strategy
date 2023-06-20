@@ -27,6 +27,8 @@ export class StateMachine
             
         this.states.push(state);
         this.states[this.states.length - 1].init(this);
+
+        $("#debug-state").text(state.constructor.name);
         
         console.log("Pushed new state.");
     }
@@ -52,22 +54,22 @@ export class StateMachine
     
     onHover(object)
     {
-        this.states[this.states.length - 1].onHover(object);
+        //this.states[this.states.length - 1].onHover(object);
     }
     
     onStopHover(object)
     {
-        this.states[this.states.length - 1].onStopHover(object);
+        //this.states[this.states.length - 1].onStopHover(object);
     }
     
     onMouseDown(event, object)
     {
-        this.states[this.states.length - 1].onMouseDown(event, object);
+        //this.states[this.states.length - 1].onMouseDown(event, object);
     }
     
     onKeyDown(event)
     {
-        this.states[this.states.length - 1].onKeyDown(event);
+        //this.states[this.states.length - 1].onKeyDown(event);
     }
     
     update(deltaTime)

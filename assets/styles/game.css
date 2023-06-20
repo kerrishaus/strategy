@@ -1,0 +1,20 @@
+#debug
+{
+    box-sizing: border-box;
+
+    pointer-events: none;
+    color: white;
+
+    position: absolute;
+    z-index: 10000;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    color: yellow;
+
+    text-align: right;
+}
