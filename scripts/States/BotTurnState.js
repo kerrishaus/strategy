@@ -14,12 +14,9 @@ export class BotTurnState extends State
         super();
     }
     
-    init(stateMachine)
+    init()
     {
-        this.stateMachine = stateMachine;
-
         this.stateMachine.setInterfaceState("botTurnState");
-        this.stateMachine.stateName = "botTurnState";
         
         $("#playerName").html("Enemy AI");    
         $("#nextStateButton").attr("data-visibility", "hidden");

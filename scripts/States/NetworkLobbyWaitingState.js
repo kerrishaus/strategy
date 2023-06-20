@@ -13,11 +13,9 @@ export class NetworkLobbyWaitingState extends State
         console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`);
 	}
 
-	init(stateMachine)
+	init()
 	{
         console.log("Initialising NetworkLobbyFindState...");
-
-		this.stateMachine = stateMachine;
 
 		console.log("NetworkLobbyFindState is ready.");
 
@@ -38,6 +36,8 @@ export class NetworkLobbyWaitingState extends State
 		{
 			this.stateMachine.changeState(new GameSetupState({ networked: true, lobby: event.data.lobby }));
 		});
+
+		// TODO: send this when click ready checkbox socket.send(JSON.stringify({ command: "lobbyReady" }));
 	}
 
 	cleanup()

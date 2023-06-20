@@ -18,10 +18,8 @@ export class GameSetupState extends State
 		this.lobby     = data.lobby;
 	}
 
-	init(stateMachine)
+	init()
 	{
-		this.stateMachine = stateMachine;
-
 		$(document).on("serverDisconnected", () =>
 		{
 			this.stateMachine.changeState(new MainMenuState());
@@ -217,6 +215,8 @@ export class GameSetupState extends State
 		};
 
 		animate();
+
+		socket.send(JSON.stringify({ command: "gameReady" }));
 
 		stateManager.pushState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
 	}

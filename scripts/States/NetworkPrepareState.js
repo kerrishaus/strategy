@@ -11,19 +11,14 @@ export class NetworkLobbyPrepareState extends State
 		super();
 	}
 
-	init(stateMachine)
+	init()
 	{
         console.log("Initialising NetworkLobbyPrepareState...");
-
-		this.stateMachine = stateMachine;
-
-		console.log("NetworkLobbyPrepareState is ready.");
         
         window.network = new Network();
 
         $(document).on("networkClientReady", () => {
             console.log("Server connection is ready, switching to lobby finder.");
-			console.log(clientId);
             this.stateMachine.changeState(new NetworkLobbyFindState());
         });
 
@@ -33,6 +28,8 @@ export class NetworkLobbyPrepareState extends State
         });
 
         network.attemptConnection();
+		
+		console.log("NetworkLobbyPrepareState is ready.");
 	}
 
 	cleanup()

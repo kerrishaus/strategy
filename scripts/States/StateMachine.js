@@ -26,7 +26,8 @@ export class StateMachine
             this.states[this.states.length - 1].pause();
             
         this.states.push(state);
-        this.states[this.states.length - 1].init(this);
+        state.stateMachine = this;
+        this.states[this.states.length - 1].init();
 
         $("#debug-state").text(state.constructor.name);
         

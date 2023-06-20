@@ -9,11 +9,9 @@ export class NetworkLobbyFindState extends State
 		super();
 	}
 
-	init(stateMachine)
+	init()
 	{
         console.log("Initialising NetworkLobbyFindState...");
-
-		this.stateMachine = stateMachine;
 
 		console.log("NetworkLobbyFindState is ready.");
 
@@ -44,8 +42,6 @@ export class NetworkLobbyFindState extends State
 
 		$(document).on("joinedLobby", (event) =>
 		{
-			this.stateMachine.networked = true;
-
 			this.stateMachine.changeState(new NetworkLobbyWaitingState(event.detail));
 		});
 

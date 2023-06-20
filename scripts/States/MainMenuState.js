@@ -11,13 +11,9 @@ export class MainMenuState extends State
 		super();
 	}
 
-	init(stateMachine)
+	init()
 	{
         console.log("Initialising MainMenuState...");
-
-		this.stateMachine = stateMachine;
-
-		console.log("MainMenuState is ready.");
 
         $("head").append(`<link rel='stylesheet' id="mainMenuStyles" href='./assets/styles/mainMenu.css' />`);
 
@@ -26,6 +22,8 @@ export class MainMenuState extends State
 
 		$("#playLocal")[0].onclick = () => { this.stateMachine.changeState(new GameSetupState(false)) };
 		$("#playNetworked")[0].onclick = () => { this.stateMachine.changeState(new NetworkLobbyPrepareState()) };
+
+		console.log("MainMenuState is ready.");
 	}
 
 	cleanup()

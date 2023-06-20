@@ -16,10 +16,9 @@ export class AttackState extends State
         this.attackTerritory = null;
     }
 
-    init(stateMachine)
+    init()
     {
-        this.stateMachine = stateMachine;
-
+        console.log("Initialising AttackState...");
         console.log("AttackState is ready.");
     }
 

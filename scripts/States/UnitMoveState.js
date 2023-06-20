@@ -13,10 +13,8 @@ export class UnitMoveState extends State
         this.endTerritory = null;
     }
     
-    init(stateMachine)
+    init()
     {
-        this.stateMachine = stateMachine;
-
         $(htmlRenderer.domElement).on("click", "#moveUnitButton", callback =>
         {
             if (this.startTerritory === null)

@@ -16,10 +16,8 @@ export class UnitDropState extends State
 		this.selectedTerritory = null;
 	}
 
-	init(stateMachine)
+	init()
 	{
-		this.stateMachine = stateMachine;
-
 		console.log("UnitDropState ready.");
 
 		this.selectedTerritory = null;
