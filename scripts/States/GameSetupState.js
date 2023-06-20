@@ -4,9 +4,7 @@ import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/js
 
 import { Game      } from "../Game.js";
 import { State          } from "./State.js";
-import { StateMachine   } from "./StateMachine.js";
 import { MainMenuState  } from "./MainMenuState.js";
-import { UnitDropState  } from "./UnitDropState.js";
 
 export class GameSetupState extends State
 {
@@ -14,17 +12,14 @@ export class GameSetupState extends State
 	{
 		super();
 
+		// don't get rid of this.networked because it is set
+		// to false in MainMenuState to create local sessions
 		this.networked = data.networked;
 		this.lobby     = data.lobby;
 	}
 
 	init()
 	{
-		$(document).on("serverDisconnected", () =>
-		{
-			stateManager.changeState(new MainMenuState());
-		});
-
 		$("body").append(
 		`<div class='gameInterfaceContainer transition-quick'>
 	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
@@ -187,20 +182,23 @@ export class GameSetupState extends State
 				{
 					if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
 					{
-						stateManager.onStopHover(INTERSECTED);
+						//stateManager.onStopHover(INTERSECTED);
+						document.dispatchEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
 						INTERSECTED = null;
 					}
 
 					if (intersects[0].object.userData.hasOwnProperty("canClick")) // the object is now hovered
 					{
 						INTERSECTED = intersects[0].object;
-						stateManager.onHover(INTERSECTED);
+						//stateManager.onHover(INTERSECTED);
+						document.dispatchEvent(new CustomEvent("objectHover", { detail: { object: INTERSECTED } }));
 					}
 				}
 			}
 			else if (INTERSECTED !== null)// the object is no longer hovered, and no object is hovered
 			{
-				stateManager.onStopHover(INTERSECTED);
+				document.dispatchEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
+				//stateManager.onStopHover(INTERSECTED);
 				INTERSECTED = null;
 			}
 			

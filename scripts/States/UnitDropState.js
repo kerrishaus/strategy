@@ -20,7 +20,7 @@ export class UnitDropState extends State
 
 		$("#count").html(this.availableUnits);
 
-		$(htmlRenderer.domElement).on("click", "#dropUnitButton", callback =>
+		$(htmlRenderer.domElement).on("click", "#dropUnitButton", () =>
 		{
 			if (this.selectedTerritory === null)
 			{

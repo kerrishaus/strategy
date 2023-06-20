@@ -5,6 +5,7 @@ import { UnitMoveState      } from "./states/UnitMoveState.js";
 import { AttackState        } from "./states/AttackState.js";
 import { UnitDropState      } from "./states/UnitDropState.js";
 import { BotTurnState } from "./states/BotTurnState.js";
+import { MainMenuState } from "./states/MainMenuState.js";
 
 export class Game
 {
@@ -62,6 +63,11 @@ export class Game
             // TODO: remove all network event listeners. i don't know how though lol
             return;
         }
+
+        $(document).on("serverDisconnected", function(event)
+        {
+            stateManager.changeState(new MainMenuState());
+        });
 
         $(document).on("worldData", function(event)
         {
@@ -196,5 +202,29 @@ export class Game
             console.error("currentTurnClientId does match clientId that requested action.");
             return;
         }
+
+        // TODO: make sure this.currentTurnClientId matches fromTerritory's owner
+
+        if (amount <= 0)
+        {
+            console.error("0 units chosen to move.");
+            return;
+        }
+
+        const fromTerritory = this.world.tiles[fromTerritoryId];
+        const toTerritory = this.world.tiles[toTerritoryId];
+        
+        // 1 unit must stay behind to maintain ownership of territory
+        if (amount > fromTerritory.unitCount - 1)
+        {
+            console.error("Requested to move too many units.");
+            return;
+        }
+
+        fromTerritory.unitCount -= amount;
+        toTerritory.unitCount += amount;
+        
+        fromTerritory.label.element.innerHTML = fromTerritory.unitCount;
+        toTerritory.label.element.innerHTML = toTerritory.unitCount;
     }
 }
