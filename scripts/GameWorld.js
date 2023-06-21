@@ -2,6 +2,8 @@ import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh } from "https:
 			
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
+import * as ObjectColors from "./Colors.js";
+
 import { WorldObject } from "./WorldObject.js";
 
 export class GameWorld extends Group
@@ -41,7 +43,7 @@ export class GameWorld extends Group
             {
                 const arrayPosition = x + y * width;
                 
-                const object = new WorldObject(2, 2, "#000000");
+                const object = new WorldObject(2, 2, ObjectColors.unownedColor);
                 
                 object.targetPosition.x = x + 1.0 * x;
                 object.targetPosition.y = y + 1.0 * y;
@@ -52,9 +54,9 @@ export class GameWorld extends Group
                 /*
                 object.userData.owner = ;
                 object.unitCount = getRandomInt(4) + 1;
+                object.label.element.innerHTML = owner;
                 */
 
-                object.label.element.innerHTML = object.userData.territoryId;
                 
                 tiles[arrayPosition] = object;
             }
@@ -76,9 +78,13 @@ export class GameWorld extends Group
             if (territoryOwnerCount[owner] > 4)
                 continue;
 
+            console.log(`${tile} is now owned by ${owner}`);
+
             territoryOwnerCount[owner]++;
 
             territories[tile] = owner;
+            
+            this.tiles[tile].label.element.innerHTML = owner;
         }
 
         return territories;

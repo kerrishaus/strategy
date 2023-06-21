@@ -15,7 +15,7 @@ export class Game
 
         this.setNetworked(networked);
 
-        this.clients = [];
+        this.clients = [0, 1];
 
         this.ownerId             = lobby.ownerId;
 
@@ -36,7 +36,7 @@ export class Game
 
         if (clientId == this.ownerId)
         {
-            this.world.territories = this.world.calculateTerritories();
+            this.world.territories = this.world.calculateTerritories(this.clients.length);
 
             this.world.calculateInvadeableTerritories();
 
