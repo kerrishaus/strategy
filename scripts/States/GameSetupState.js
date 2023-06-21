@@ -127,6 +127,7 @@ export class GameSetupState extends State
 
 		console.log(this.lobby);
 
+		console.warn("Creating a new game instance.");
 		window.game = new Game(this.networked, this.lobby);
 
 		scene.add(game.world);

@@ -78,16 +78,25 @@ export class GameWorld extends Group
             if (territoryOwnerCount[owner] > 4)
                 continue;
 
-            console.log(`${tile} is now owned by ${owner}`);
-
             territoryOwnerCount[owner]++;
 
             territories[tile] = owner;
-            
-            this.tiles[tile].label.element.innerHTML = owner;
         }
 
         return territories;
+    }
+
+    applyTerritories(territories)
+    {
+        console.log("Applying territories to world", territories);
+
+        for (const territory in territories)
+        {
+            //console.log(this.tiles[territory], territory, territories[territory])
+            this.tiles[territory].label.element.innerHTML = territories[territory];
+        }
+
+        this.territories = territories;
     }
 
     loadWorld(world)

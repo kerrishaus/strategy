@@ -36,12 +36,16 @@ export class Game
 
         if (clientId == this.ownerId)
         {
-            this.world.territories = this.world.calculateTerritories(this.clients.length);
+            this.world.applyTerritories(this.world.calculateTerritories(this.clients.length));
+
+            console.log(this.world.territories);
 
             this.world.calculateInvadeableTerritories();
 
-            if (this.networked)
+            if (networked)
+            {
                 socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
+            }
         }
         
         // if we are not the owner of this lobby, we wait until we receive the world data
@@ -72,8 +76,15 @@ export class Game
 
         $(document).on("worldData", function(event)
         {
-            console.log("Loading world data from network...");
-            game.world.territories = event.details.worldData.territories;
+            // ignore incoming world data if we're the host
+            if (game.ownerId == clientId)
+            {
+                console.log("Ignoring networked world data.");
+                return;
+            }
+
+            console.log("Loading world data from network...", event.detail);
+            game.world.applyTerritories(event.detail.territories);
         });
 
         $(document).on("clientNextStage", function(event)
