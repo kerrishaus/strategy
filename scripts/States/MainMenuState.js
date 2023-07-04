@@ -1,7 +1,7 @@
 import { State } from "./State.js";
 
 import { GameSetupState } from "./GameSetupState.js";
-import { NetworkLobbyPrepareState } from "./NetworkLobbyPrepareState.js";
+import { NetworkPrepareState } from "./NetworkPrepareState.js";
 
 export class MainMenuState extends State
 {
@@ -18,7 +18,7 @@ export class MainMenuState extends State
         $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
 
 		$("#playLocal")[0].onclick = () => { stateManager.changeState(new GameSetupState({ networked: false, lobby: { width: 10, height: 10, clientId: clientId, ownerId: clientId } })) };
-		$("#playNetworked")[0].onclick = () => { stateManager.changeState(new NetworkLobbyPrepareState()) };
+		$("#playNetworked")[0].onclick = () => { stateManager.changeState(new NetworkPrepareState()) };
 	}
 
 	cleanup()

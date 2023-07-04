@@ -4,7 +4,7 @@ import { Network } from "../Network.js";
 import { NetworkLobbyFindState } from "./NetworkLobbyFindState.js";
 import { MainMenuState } from "./MainMenuState.js";
 
-export class NetworkLobbyPrepareState extends State
+export class NetworkPrepareState extends State
 {
 	constructor()
 	{

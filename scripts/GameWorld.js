@@ -65,8 +65,10 @@ export class GameWorld extends Group
         return { width: width, height: height, tiles: tiles };
     }
 
-    calculateTerritories(clientCount)
+    distributeTerritories(clientCount)
     {
+        console.log(`Distributing ${this.tiles.length} territories to ${clientCount} clients.`);
+
         const territories = new Array(this.tiles.length);
 
         const territoryOwnerCount = new Array(clientCount);

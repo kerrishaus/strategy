@@ -15,7 +15,7 @@ export class Game
 
         this.setNetworked(networked);
 
-        this.clients = [0, 1];
+        this.clients = lobby.clients;
 
         this.ownerId             = lobby.ownerId;
 
@@ -36,7 +36,7 @@ export class Game
 
         if (clientId == this.ownerId)
         {
-            this.world.applyTerritories(this.world.calculateTerritories(this.clients.length));
+            this.world.applyTerritories(this.world.distributeTerritories(this.clients.length));
 
             console.log(this.world.territories);
 
@@ -105,20 +105,26 @@ export class Game
             game.setStage(event.detail.stageId);
         });
 
+        // this is a mid-game client join, not when a client joins a lobby.
         $(document).on("clientJoin", function(event)
         {
-            addClient(event.detail.clientId);
+            console.log("clientJoin event, adding client.");
+
+            game.addClient(event.detail.clientId);
         });
 
+        // this is a mid-game client leave, not when a client leaves a lobby.
         $(document).on("clientLeave", function(event)
         {
-            removeClient(event.detail.clientId);
+            console.log("clientLeave event, removing client.");
+
+            game.removeClient(event.detail.clientId);
         });
     }
 
-    addClient(clientId, client)
+    addClient(clientId)
     {
-        this.clients.push(clientId, client);
+        this.clients.push(clientId);
 
         console.log(`Client ${clientId} joined.`);
     }
