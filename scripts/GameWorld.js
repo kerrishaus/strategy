@@ -2,7 +2,7 @@ import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh } from "https:
 			
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
-import * as ObjectColors from "./Colors.js";
+import * as Colors from "./Colors.js";
 
 import { WorldObject } from "./WorldObject.js";
 
@@ -43,7 +43,7 @@ export class GameWorld extends Group
             {
                 const arrayPosition = x + y * width;
                 
-                const object = new WorldObject(2, 2, ObjectColors.unownedColor, arrayPosition);
+                const object = new WorldObject(2, 2, Colors.unownedColor, arrayPosition);
                 
                 object.targetPosition.x = x + 1.0 * x;
                 object.targetPosition.y = y + 1.0 * y;
@@ -87,9 +87,15 @@ export class GameWorld extends Group
         for (const territory in territories)
         {
             //this.tiles[territory].label.element.innerHTML = territories[territory];
+
             this.tiles[territory].userData.ownerId        = territories[territory];
             this.tiles[territory].userData.territoryId    = territory;
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
+
+            if (this.tiles[territory].userData.ownerId == clientId)
+                this.tiles[territory].material.color.setHex(Colors.ownedColor);
+            else
+                this.tiles[territory].material.color.setHex(Colors.enemyColor);
         }
 
         this.territories = territories;

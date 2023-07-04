@@ -85,6 +85,7 @@ export class Game
 
             console.log("Loading world data from network...", event.detail);
             game.world.applyTerritories(event.detail.territories);
+            game.world.calculateInvadeableTerritories();
         });
 
         $(document).on("clientNextStage", function(event)

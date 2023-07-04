@@ -117,7 +117,7 @@ export class UnitDropState extends State
 				
 			if (this.availableUnits <= 0)
 			{
-				console.error("You have no more deployable units.");
+				console.error("No more deployable units.");
 				return;
 			}
 			
