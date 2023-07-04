@@ -12,7 +12,9 @@ export class WorldObject extends Mesh
         super(geometry, material);
 
         this.territoryId = territoryId;
-        
+
+        console.log(this);
+
         this.hovered = false;
         
         this.unitCount = 1;

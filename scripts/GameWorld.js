@@ -48,9 +48,9 @@ export class GameWorld extends Group
             for (let x = 0; x < width; x++)
             {
                 const arrayPosition = x + y * width;
-                
+
                 const object = new WorldObject(2, 2, Colors.unownedColor, arrayPosition);
-                
+
                 object.targetPosition.x = x + 1.0 * x;
                 object.targetPosition.y = y + 1.0 * y;
                 object.targetPosition.z = 0;
@@ -94,8 +94,11 @@ export class GameWorld extends Group
         {
             //this.tiles[territory].label.element.innerHTML = territories[territory];
 
+            // TODO: I don't know if the assignment below is necessary, but it was causing
+            // some problems because it was setting the territoryId to a string.
+            // I've commented it out and everything seems to be working fine without it.
+            //this.tiles[territory].territoryId             = territory;
             this.tiles[territory].userData.ownerId        = territories[territory];
-            this.tiles[territory].territoryId             = territory;
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
 
             if (this.tiles[territory].userData.ownerId == clientId)
@@ -128,9 +131,7 @@ export class GameWorld extends Group
 
         for (const tile of this.tiles)
         {
-            const id = parseInt(tile.territoryId);
-
-            console.log(id - 1, id + 1, id - this.width, id + this.width);
+            const id = tile.territoryId;
 
             if (id - 1 >= 0)
                 if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
