@@ -12,12 +12,9 @@ export class WorldObject extends Mesh
         super(geometry, material);
 
         this.territoryId = territoryId;
-        // TODO: remove this and only use territoryId
-        this.userData.territoryId = territoryId;
         
         this.hovered = false;
         
-        this.objectOwner = -1;
         this.unitCount = 1;
         
         const labelDiv = document.createElement("div");

@@ -18,6 +18,9 @@ export class GameWorld extends Group
         //this.loadWorld(this.generateWorld(clientCount));
         
         //this.calculateInvadeableTerritories();
+
+        this.width = 0;
+        this.height = 0;
     }
     
     update(deltaTime)
@@ -35,6 +38,9 @@ export class GameWorld extends Group
 
     generateWorld(width, height)
     {
+        this.width  = width;
+        this.height = height;
+
         const tiles = new Array(width * height);
 
         for (let y = 0; y < height; y++)
@@ -89,7 +95,7 @@ export class GameWorld extends Group
             //this.tiles[territory].label.element.innerHTML = territories[territory];
 
             this.tiles[territory].userData.ownerId        = territories[territory];
-            this.tiles[territory].userData.territoryId    = territory;
+            this.tiles[territory].territoryId             = territory;
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
 
             if (this.tiles[territory].userData.ownerId == clientId)
@@ -118,28 +124,29 @@ export class GameWorld extends Group
     
     calculateInvadeableTerritories()
     {
-        // calculate invadeable neighbors
+        console.log("Calculating invadeable territories");
+
         for (const tile of this.tiles)
         {
-            const id = tile.userData.territoryId;
-            
-            tile.invadeableNeighbors = new Array(4);
-            
+            const id = parseInt(tile.territoryId);
+
+            console.log(id - 1, id + 1, id - this.width, id + this.width);
+
             if (id - 1 >= 0)
                 if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
-                    tile.invadeableNeighbors[0] = this.tiles[id - 1].userData.team != tile.userData.team ? this.tiles[id - 1] : null;
-                
+                    tile.invadeableNeighbors[0] = this.tiles[id - 1].userData.ownerId != tile.userData.ownerId ? this.tiles[id - 1] : null;
+
             if (id + 1 < this.tiles.length)
                 if (Math.trunc((id + 1) / this.width) == Math.trunc(id / this.width))
-                    tile.invadeableNeighbors[1] = this.tiles[id + 1].userData.team != tile.userData.team ? this.tiles[id + 1] : null;
+                    tile.invadeableNeighbors[1] = this.tiles[id + 1].userData.ownerId != tile.userData.ownerId ? this.tiles[id + 1] : null;
                 
             if (id - this.width >= 0)
-                tile.invadeableNeighbors[2]     = this.tiles[id - this.width].userData.team != tile.userData.team ? this.tiles[id - this.width] : null;
+                tile.invadeableNeighbors[2]     = this.tiles[id - this.width].userData.ownerId != tile.userData.ownerId ? this.tiles[id - this.width] : null;
             else
                 tile.invadeableNeighbors[2]     = null
                 
             if (id + this.width < this.tiles.length)
-                tile.invadeableNeighbors[3]     = this.tiles[id + this.width].userData.team != tile.userData.team ? this.tiles[id + this.width] : null;
+                tile.invadeableNeighbors[3]     = this.tiles[id + this.width].userData.ownerId != tile.userData.ownerId ? this.tiles[id + this.width] : null;
             else
                 tile.invadeableNeighbors[3]     = null
                 
@@ -151,6 +158,8 @@ export class GameWorld extends Group
                     tile.invadeableNeighbors = null;
                     console.log(id + " has no invadeable neighbors.");
                 }
+            else
+                console.log(`${id} can invade ${tile.invadeableNeighbors[0]}, ${tile.invadeableNeighbors[1]}, ${tile.invadeableNeighbors[2]}, and ${tile.invadeableNeighbors[3]}.`);
         }
     }
 };

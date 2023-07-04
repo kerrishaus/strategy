@@ -18,6 +18,9 @@ export class AttackState extends State
 
     init()
     {
+        $(this).on("objectHover",     this.onHover);
+		$(this).on("objectHoverStop", this.onStopHover);
+		$(this).on("objectClick",     this.onMouseDown);
     }
 
     cleanup()
@@ -27,13 +30,19 @@ export class AttackState extends State
         
         if (this.selectedTerritory !== null)
             this.clearAttackingTerritory();
+
+        $(this).off("objectHover",     this.onHover);
+		$(this).off("objectHoverStop", this.onStopHover);
+		$(this).off("objectClick",     this.onMouseDown);
     }
 
-    onHover(object)
+    onHover(event)
     {
+        const object = event.detail.object;
+
         if (this.selectedTerritory === null)
         {
-            if (object.userData.team != 1)
+            if (object.userData.ownerId != clientId)
                 return;
                 
             if (object.invadeableNeighbors === null)
@@ -45,7 +54,7 @@ export class AttackState extends State
 
         if (this.attackTerritory === null)
         {
-            if (object.userData.team == 1)
+            if (object.userData.ownerId == clientId)
                 return;
 
             if (!object.userData.invadeable)
@@ -56,14 +65,16 @@ export class AttackState extends State
         }
     }
 
-    onStopHover(object)
+    onStopHover(event)
     {
+        const object = event.detail.object;
+
         if (object !== this.selectedTerritory &&
             object !== this.attackTerritory)
             {
                 object.lower();
                 
-                if (object.userData.team == 1)
+                if (object.userData.ownerId == clientId)
                     object.material.color.setHex(Colors.ownedColor);
                 else
                     if (object.userData.invadeable)
@@ -76,11 +87,13 @@ export class AttackState extends State
             }
     }
 
-    onMouseDown(event, object)
+    onMouseDown(event)
     {
-        if (this.attackTerritory === null && object.userData.team == 1)
+        const object = event.detail.object;
+
+        if (this.attackTerritory === null && object.userData.ownerId == clientId)
             this.setAttackingTerritory(object);
-        else if (this.attackTerritory === null && object.userData.team != 1)
+        else if (this.attackTerritory === null && object.userData.ownerId != clientId)
             this.setDefendingTerritory(object);
         else
             console.error("Invalid object clicked during AttackState.");
@@ -124,6 +137,8 @@ export class AttackState extends State
         if (this.selectedTerritory.invadeableNeighbors !== null)
             for (const tile of this.selectedTerritory.getInvadeableNeighbors())
             {
+                console.log(`${object.territoryId} can invade ${tile}`);
+
                 if (!(tile instanceof WorldObject))
                     continue;
 
@@ -297,7 +312,7 @@ export class AttackState extends State
             {
                 console.log("attackers won");
                 
-                this.attackTerritory.userData.team = 1;
+                this.attackTerritory.userData.ownerId = clientId;
                 this.attackTerritory.material.color.setHex(Colors.ownedColor);
                 this.attackTerritory.unitCount = this.selectedTerritory.unitCount - 1;
                 this.selectedTerritory.unitCount = 1;
@@ -351,7 +366,7 @@ export class AttackState extends State
             tile.material.color.setHex(Colors.enemyColor);
         }
         
-        if (this.attackTerritory.userData.team == 1)
+        if (this.attackTerritory.userData.ownerId == clientId)
             this.attackTerritory.material.color.setHex(Colors.ownedColor);
         else
             this.attackTerritory.material.color.setHex(Colors.enemyColor);
