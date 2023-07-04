@@ -65,17 +65,18 @@ export class GameWorld extends Group
         return { width: width, height: height, tiles: tiles };
     }
 
-    distributeTerritories(clientCount)
+    distributeTerritories(clients)
     {
-        console.log(`Distributing ${this.tiles.length} territories to ${clientCount} clients.`);
+        console.log(`Distributing ${this.tiles.length} territories to ${clients.length} clients.`);
 
         const territories = new Array(this.tiles.length);
 
-        const territoryOwnerCount = new Array(clientCount);
+        const territoryOwnerCount = new Array(clients.length);
 
         for (const tile in this.tiles)
         {
-            const owner = getRandomInt(clientCount);
+            // TODO: this might be too high by 1
+            const owner = clients[getRandomInt(clients.length)];
 
             if (territoryOwnerCount[owner] > 4)
                 continue;
@@ -96,6 +97,7 @@ export class GameWorld extends Group
         {
             //console.log(this.tiles[territory], territory, territories[territory])
             this.tiles[territory].label.element.innerHTML = territories[territory];
+            this.tiles[territory].userData.ownerId        = territories[territory];
         }
 
         this.territories = territories;

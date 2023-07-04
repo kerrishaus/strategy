@@ -36,7 +36,7 @@ export class Game
 
         if (clientId == this.ownerId)
         {
-            this.world.applyTerritories(this.world.distributeTerritories(this.clients.length));
+            this.world.applyTerritories(this.world.distributeTerritories(this.clients));
 
             console.log(this.world.territories);
 

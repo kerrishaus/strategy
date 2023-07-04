@@ -56,16 +56,26 @@ export class UnitDropState extends State
 
 			$("#count").html(this.availableUnits);
 		});
+
+		$(this).on("objectHover",     this.onHover);
+		$(this).on("objectHoverStop", this.onStopHover);
+		$(this).on("objectClick",     this.onMouseDown);
 	}
 
 	cleanup()
 	{
 		$(htmlRenderer).off("click", "#dropUnitButton");
+
+		$(this).off("objectHover",     this.onHover);
+		$(this).off("objectHoverStop", this.onStopHover);
+		$(this).off("objectClick",     this.onMouseDown);
 	}
 	
-	onHover(object)
+	onHover(event)
 	{
-		if (object.userData.team != 1)
+		const object = event.detail.object;
+
+		if (object.userData.ownerId != clientId)
 			return;
 		
 		if (this.selectedTerritory !== object)
@@ -78,9 +88,11 @@ export class UnitDropState extends State
 		}
 	}
 	
-	onStopHover(object)
+	onStopHover(event)
 	{
-		if (object.userData.team != 1)
+		const object = event.detail.object;
+
+		if (object.userData.ownerId != clientId)
 			return;
 			
 		if (object == this.selectedTerritory)
@@ -90,9 +102,11 @@ export class UnitDropState extends State
 		object.material.color.setHex(Colors.ownedColor);
 	}
 	
-	onMouseDown(event, object)
+	onMouseDown(event)
 	{
-		if (object.userData.team == 1)
+		const object = event.detail.object;
+
+		if (object.userData.ownerId == clientId)
 		{
 			if (object == this.selectedTerritory)
 				return;

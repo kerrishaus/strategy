@@ -1,7 +1,8 @@
-export class State
+export class State extends EventTarget
 {
     constructor()
     {
+        super();
     }
     
     init()
@@ -19,26 +20,6 @@ export class State
     }
     
     resume()
-    {
-        
-    }
-    
-    onHover(object)
-    {
-        
-    }
-    
-    onStopHover(object)
-    {
-        
-    }
-    
-    onMouseDown(event, object)
-    {
-        
-    }
-    
-    onKeyDown(event)
     {
         
     }
