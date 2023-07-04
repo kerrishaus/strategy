@@ -49,13 +49,6 @@ export class GameWorld extends Group
                 object.targetPosition.y = y + 1.0 * y;
                 object.targetPosition.z = 0;
                 
-                /*
-                object.userData.owner = ;
-                object.unitCount = getRandomInt(4) + 1;
-                object.label.element.innerHTML = owner;
-                */
-
-                
                 tiles[arrayPosition] = object;
             }
         }
@@ -93,10 +86,10 @@ export class GameWorld extends Group
 
         for (const territory in territories)
         {
-            //console.log(this.tiles[territory], territory, territories[territory])
-            this.tiles[territory].label.element.innerHTML = territories[territory];
+            //this.tiles[territory].label.element.innerHTML = territories[territory];
             this.tiles[territory].userData.ownerId        = territories[territory];
             this.tiles[territory].userData.territoryId    = territory;
+            this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
         }
 
         this.territories = territories;

@@ -120,6 +120,22 @@ export class Game
 
             game.removeClient(event.detail.clientId);
         });
+
+        // this is a mid-game client leave, not when a client leaves a lobby.
+        $(document).on("dropUnits", function(event)
+        {
+            // skip our own unit drop
+            if (event.detail.clientId == clientId)
+                return;
+
+            const territoryId = event.detail.territoryId;
+            const amount      = event.detail.amount;
+
+            console.log(game.world.tiles);
+            console.log(game.world.tiles[territoryId]);
+
+            game.world.tiles[territoryId].addUnits(amount);
+        });
     }
 
     addClient(clientId)
@@ -208,15 +224,6 @@ export class Game
             object.material.color.setHex(Colors.ownedColor);
 
             //object.destroyUnitPlaceDialog();
-        }
-    }
-
-    dropUnits(clientId, territoryId, amount)
-    {
-        if (this.currentTurnClientId != clientId)
-        {
-            console.error("currentTurnClientId does match clientId that requested action.");
-            return;
         }
     }
 
