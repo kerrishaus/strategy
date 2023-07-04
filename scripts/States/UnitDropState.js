@@ -32,29 +32,33 @@ export class UnitDropState extends State
 
 			if (this.availableUnits <= 0)
 			{
-				console.error("No available units to drop.");
+				console.warn("No available units to drop.");
 				return;
 			}
 
 			if (amount > this.availableUnits)
 			{
-				console.error("Requested to drop too many units.");
+				console.error("Requested to drop more units than are available. This should not be possible.");
 				return;
 			}
 
 			this.availableUnits -= amount;
 			this.selectedTerritory.addUnits(amount);
-			//socket.send(JSON.stringify({ command: "dropUnits", territory: this.selectedTerritory.territoryId, unitCount: this.selectedTerritory.unitCount }));
+
+			socket.send(JSON.stringify({ command: "dropUnits", territoryId: this.selectedTerritory.territoryId, amount: this.selectedTerritory.unitCount }));
 
 			this.selectedTerritory.destroyUnitPlaceDialog();
 			this.selectedTerritory.lower();
 			this.selectedTerritory.material.color.setHex(Colors.ownedColor);
 			this.selectedTerritory = null;
 
-			if (this.availableUnits <= 0)
-				stateManager.changeState(new AttackState());
-
 			$("#count").html(this.availableUnits);
+
+			if (this.availableUnits <= 0)
+			{
+				console.log("No more available units, moving to next stage.");
+				$("#nextStateButton").click();
+			}
 		});
 
 		$(this).on("objectHover",     this.onHover);

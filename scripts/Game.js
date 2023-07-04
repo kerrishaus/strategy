@@ -175,6 +175,8 @@ export class Game
     {
         console.log(`Stage ${stageId}.`);
 
+        // TODO: some checks to make sure the stage is valid.
+
         // TODO: change "round" in roundType and roundSpace to "turn"
         $(".roundSpace.active").removeClass("active");
         $("#roundType").children()[stageId].classList.add("active");
@@ -185,7 +187,9 @@ export class Game
         if (this.currentTurnClientId == clientId)
         {
             if (stageId == 0)
-                stateManager.changeState(new UnitDropState());
+            {
+                stateManager.changeState(new UnitDropState(10));
+            }
             else if (stageId == 1)
                 stateManager.changeState(new AttackState());
             else if (stageId == 2)

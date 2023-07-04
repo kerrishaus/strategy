@@ -43,13 +43,11 @@ export class GameWorld extends Group
             {
                 const arrayPosition = x + y * width;
                 
-                const object = new WorldObject(2, 2, ObjectColors.unownedColor);
+                const object = new WorldObject(2, 2, ObjectColors.unownedColor, arrayPosition);
                 
                 object.targetPosition.x = x + 1.0 * x;
                 object.targetPosition.y = y + 1.0 * y;
                 object.targetPosition.z = 0;
-                
-                object.userData.territoryId = arrayPosition;
                 
                 /*
                 object.userData.owner = ;
@@ -75,7 +73,7 @@ export class GameWorld extends Group
 
         for (const tile in this.tiles)
         {
-            // TODO: this might be too high by 1
+            // getRandomInt returns between 0 and client length, which is okay *i think*
             const owner = clients[getRandomInt(clients.length)];
 
             if (territoryOwnerCount[owner] > 4)
@@ -98,6 +96,7 @@ export class GameWorld extends Group
             //console.log(this.tiles[territory], territory, territories[territory])
             this.tiles[territory].label.element.innerHTML = territories[territory];
             this.tiles[territory].userData.ownerId        = territories[territory];
+            this.tiles[territory].userData.territoryId    = territory;
         }
 
         this.territories = territories;

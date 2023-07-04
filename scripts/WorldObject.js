@@ -12,6 +12,8 @@ export class WorldObject extends Mesh
         super(geometry, material);
 
         this.territoryId = territoryId;
+        // TODO: remove this and only use territoryId
+        this.userData.territoryId = territoryId;
         
         this.hovered = false;
         
@@ -150,18 +152,6 @@ export class WorldObject extends Mesh
         this.dialog = null;
     }
     
-    /*
-    onHover()
-    {
-        this.raise();
-    }
-    
-    onStopHover()
-    {
-        this.lower();
-    }
-    */
-    
     raise()
     {
         this.targetPosition.z = 0.4;
@@ -172,12 +162,15 @@ export class WorldObject extends Mesh
         this.targetPosition.z = 0;
     }
     
+    // TODO: remove default value, but first make sure this behaviour is not used anywhere
     addUnits(amount = 1)
     {
+        console.log(this);
         this.unitCount += amount;
         $("#" + this.uuid).html(this.unitCount);
     }
     
+    // TODO: remove default value, but first make sure this behaviour is not used anywhere
     removeUnits(amount = 1)
     {
         this.unitCount -= amount;
