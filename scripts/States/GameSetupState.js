@@ -144,7 +144,7 @@ export class GameSetupState extends State
 			if (INTERSECTED == null)
 				return;
 				
-			stateManager.dispatchCustomEvent(new CustomEvent("objectClick", { detail: INTERSECTED }));
+			stateManager.dispatchCustomEvent(new CustomEvent("objectClick", { detail: { object: INTERSECTED } }));
 		}
 
 		function onKeyDown(event)
