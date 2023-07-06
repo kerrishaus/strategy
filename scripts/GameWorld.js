@@ -133,6 +133,11 @@ export class GameWorld extends Group
         {
             const id = tile.territoryId;
 
+            // TODO: I'm not sure why we have to reset this, I figured we would just be
+            // able to access the first four elements and overwrite them but apparently
+            // if they're null we can't assign them??
+            tile.invadeableNeighbors = new Array(4);
+
             if (id - 1 >= 0)
                 if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
                     tile.invadeableNeighbors[0] = this.tiles[id - 1].userData.ownerId != tile.userData.ownerId ? this.tiles[id - 1] : null;
