@@ -96,7 +96,7 @@ export class AttackState extends State
         else if (this.attackTerritory === null && object.userData.ownerId != clientId)
             this.setDefendingTerritory(object);
         else
-            console.error("Invalid object clicked during AttackState.");
+            console.warn("Invalid object clicked during AttackState.");
     }
 
     onKeyDown(event)
@@ -123,7 +123,7 @@ export class AttackState extends State
     {
         if (object.invadeableNeighbors === null)
         {
-            console.error("This tile cannot invade any of its neighbors.");
+            console.warn("This tile cannot invade any of its neighbors.");
             return;
         }
         
@@ -189,7 +189,7 @@ export class AttackState extends State
         
         if (!object.userData.invadeable)
         {
-            console.error("This tile is not invadeable.");
+            console.warn("This tile is not invadeable.");
             return;
         }
         
@@ -259,8 +259,6 @@ export class AttackState extends State
     
     runAttack()
     {
-        console.log("What are you doing stepbro");
-        
         if (this.selectedTerritory === null)
         {
             console.error("selectedTerritory is null in runAttack()");
@@ -273,58 +271,70 @@ export class AttackState extends State
             return;
         }
         
-        console.log("Attacking!!!");
-        
-        while (this.attackTerritory.unitCount > 0 && this.selectedTerritory.unitCount > 1)
+        let attackingPopulation = this.selectedTerritory.unitCount;
+        let defendingPopulation = this.attackTerritory.unitCount;
+
+        console.log(`Attacking ${this.attackTerritory.territoryId} (${attackingPopulation} troops) from ${this.selectedTerritory.territoryId} (${defendingPopulation} troops.)`);
+
+        while (defendingPopulation > 0 && attackingPopulation > 1)
         {
             const attackerRoll = getRandomInt(5) + 1; // 1-6
             const defenderRoll = getRandomInt(5) + 1; // 1-6
             
             if (attackerRoll > defenderRoll)
             {
-                this.attackTerritory.unitCount -= 1;
-                console.log("Defenders lost a unit, now at: " + this.attackTerritory.unitCount + ".");
+                defendingPopulation = defendingPopulation - 1;
+                console.log("Defenders lost a unit, now at: " + defendingPopulation + ".");
             }
             else
             {
-                this.selectedTerritory.unitCount -= 1;
-                console.log("Attackers lost a unit, now at: " + this.selectedTerritory.unitCount + ".");
+                attackingPopulation = attackingPopulation - 1;
+                console.log("Attackers lost a unit, now at: " + attackingPopulation + ".");
             }
-                
-            this.selectedTerritory.label.element.innerHTML = this.selectedTerritory.unitCount;
-            this.attackTerritory.label.element.innerHTML = this.attackTerritory.unitCount;
         }
         
-        console.log(`Final score: Attacker: ${this.selectedTerritory.unitCount}, Defender: ${this.attackTerritory.unitCount}`);
+        console.log(`Final score: Attacker: ${attackingPopulation}, Defender: ${defendingPopulation}`);
         
-        if (this.attackTerritory.unitCount > 0 && this.selectedTerritory.unitCount > 0)
+        let attackResult;
+
+        // if they both have units left, it's a draw
+        if (attackingPopulation > 0 && defendingPopulation > 0)
         {
             console.log("match was a draw");
+
+            attackResult = "draw";
         }
         else
         {
-            if (this.attackTerritory.unitCount > 0)
+            // if the defender has units left, they won
+            if (defendingPopulation > 0)
             {
                 console.log("defenders won");
+
+                attackResult = "lost";
             }
             
-            if (this.selectedTerritory.unitCount > 0)
+            // if the attacker has units left, they won
+            if (attackingPopulation > 0)
             {
                 console.log("attackers won");
                 
-                this.attackTerritory.userData.ownerId = clientId;
-                this.attackTerritory.material.color.setHex(Colors.ownedColor);
-                this.attackTerritory.unitCount = this.selectedTerritory.unitCount - 1;
-                this.selectedTerritory.unitCount = 1;
-                
-                this.selectedTerritory.label.element.innerHTML = this.selectedTerritory.unitCount;
-                this.attackTerritory.label.element.innerHTML = this.attackTerritory.unitCount;
-                
-                game.world.ownedTerritories += 1;
-                
-                console.log(`New unit allocation: Attacker: ${this.selectedTerritory.unitCount}, Defender: ${this.attackTerritory.unitCount}`);
+                // when an attack is won, all but one attacking
+                // units are moved to the newly conquered territory
+                defendingPopulation = attackingPopulation - 1;
+                attackingPopulation = 1;
+
+                attackResult = "won";
             }
         }
+
+        document.dispatchEvent(new CustomEvent("attack", { detail: {
+            result: attackResult,
+            attacker: this.selectedTerritory.territoryId,
+            defender: this.attackTerritory.territoryId,
+            attackerPopulation: attackingPopulation,
+            defenderPopulation: defendingPopulation
+        } }));
         
         this.finaliseAttack();
     }

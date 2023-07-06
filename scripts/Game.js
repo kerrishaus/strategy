@@ -7,6 +7,8 @@ import { UnitDropState      } from "./states/UnitDropState.js";
 import { BotTurnState } from "./states/BotTurnState.js";
 import { MainMenuState } from "./states/MainMenuState.js";
 
+import * as Colors from "./Colors.js";
+
 export class Game
 {
     constructor(networked = false, lobby)
@@ -122,7 +124,6 @@ export class Game
             game.removeClient(event.detail.clientId);
         });
 
-        // this is a mid-game client leave, not when a client leaves a lobby.
         $(document).on("dropUnits", function(event)
         {
             // skip our own unit drop
@@ -136,6 +137,50 @@ export class Game
             console.log(game.world.tiles[territoryId]);
 
             game.world.tiles[territoryId].addUnits(amount);
+        });
+        
+        if (networked)
+        {
+            $(document).on("attack", function(event) {
+                socket.send(JSON.stringify({ command: "attack", ...event.detail }));
+            });
+        }
+        else
+        {
+            $(document).on("attack", function(event) {
+                document.dispatchEvent(new CustomEvent("attackResult", { detail: event.detail }));
+            });
+        }
+
+        $(document).on("attackResult", function(event)
+        {
+            const attackingTerritory = game.world.tiles[event.detail.attacker];
+            const defendingTerritory = game.world.tiles[event.detail.defender];
+
+            attackingTerritory.unitCount = event.detail.attackerPopulation;
+            attackingTerritory.unitCount = event.detail.defenderPopulation;
+
+            if (event.detail.result == "won")
+            {
+                console.log(`${event.detail.clientId} now owns ${defendingTerritory.territoryId}.`);
+
+                defendingTerritory.userData.ownerId = event.detail.clientId;
+                
+                if (event.detail.clientId == clientId)
+                {
+                    game.world.ownedTerritories += 1;
+                    defendingTerritory.material.color.setHex(Colors.ownedColor);
+                }
+                else
+                    defendingTerritory.material.color.setHex(Colors.enemyColor);
+
+                game.world.calculateInvadeableTerritories();
+            }
+
+            attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
+            defendingTerritory.label.element.innerHTML = defendingTerritory.unitCount;
+
+            console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
         });
     }
 
@@ -214,15 +259,19 @@ export class Game
         }
 
         $("#debug-stage").text(this.stageId);
+
+        this.resetTerritoryGraphics();
     }
 
     // moves all territories back down and applies their idle colours
     resetTerritoryGraphics()
     {
+        console.debug("Resetting territory graphcis.");
+
         for (const object of this.world.tiles)
         {
             object.lower();
-            object.material.color.setHex(Colors.ownedColor);
+            object.material.color.setHex(object.userData.ownerId == clientId ? Colors.ownedColor : Colors.enemyColor);
 
             //object.destroyUnitPlaceDialog();
         }

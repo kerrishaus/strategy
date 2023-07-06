@@ -21,6 +21,8 @@ export class GameWorld extends Group
 
         this.width = 0;
         this.height = 0;
+
+        this.ownedTerritories = 0;
     }
     
     update(deltaTime)
@@ -162,10 +164,10 @@ export class GameWorld extends Group
                 tile.invadeableNeighbors[3] === null)
                 {
                     tile.invadeableNeighbors = null;
-                    console.log(id + " has no invadeable neighbors.");
+                    //console.debug(id + " has no invadeable neighbors.");
                 }
-            else
-                console.log(`${id} can invade ${tile.invadeableNeighbors[0]}, ${tile.invadeableNeighbors[1]}, ${tile.invadeableNeighbors[2]}, and ${tile.invadeableNeighbors[3]}.`);
+            //else
+                //console.debug(`${id} can invade ${tile.invadeableNeighbors[0]}, ${tile.invadeableNeighbors[1]}, ${tile.invadeableNeighbors[2]}, and ${tile.invadeableNeighbors[3]}.`);
         }
     }
 };
