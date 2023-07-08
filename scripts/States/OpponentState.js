@@ -1,6 +1,6 @@
 import { State } from "./State.js";
 
-export class NetworkClientState extends State
+export class OpponentState extends State
 {
     constructor()
     {

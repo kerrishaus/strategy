@@ -4,7 +4,6 @@ import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/js
 
 import { Game      } from "../Game.js";
 import { State          } from "./State.js";
-import { MainMenuState  } from "./MainMenuState.js";
 
 export class GameSetupState extends State
 {
@@ -136,7 +135,7 @@ export class GameSetupState extends State
 		{
 			event.preventDefault();
 			
-			document.dispatchEvent(new CustomEvent("clientNextStage"));
+			document.dispatchEvent(new CustomEvent("requestNextStage"));
 		});
 
 		function onMouseDown(event)

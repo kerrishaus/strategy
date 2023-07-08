@@ -52,6 +52,10 @@ export class UnitMoveState extends State
 
             // TODO: nextStageButton.click()
         });
+
+        $(this).on("objectHover",     this.onHover);
+		$(this).on("objectHoverStop", this.onStopHover);
+		$(this).on("objectClick",     this.onMouseDown);
     }
 
     cleanup()
@@ -61,6 +65,10 @@ export class UnitMoveState extends State
 
         if (this.endTerritory !== null)
             this.clearEndPoint();
+
+        $(this).off("objectHover",     this.onHover);
+        $(this).off("objectHoverStop", this.onStopHover);
+        $(this).off("objectClick",     this.onMouseDown);
     }
 
     pause()

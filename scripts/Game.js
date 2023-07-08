@@ -1,6 +1,6 @@
 import { GameWorld } from "./GameWorld.js";
 
-import { NetworkClientState } from "./states/NetworkClientState.js";
+import { OpponentState } from "./states/OpponentState.js";
 import { UnitMoveState      } from "./states/UnitMoveState.js";
 import { AttackState        } from "./states/AttackState.js";
 import { UnitDropState      } from "./states/UnitDropState.js";
@@ -19,10 +19,11 @@ export class Game
 
         this.clients = lobby.clients;
 
+        $("#debug-clientCount").text(this.clients.length);
+
         this.ownerId             = lobby.ownerId;
 
-        this.currentTurnClientId = -1;
-        this.currentTurnStage    = -1;
+        $("#debug-lobbyOwnerId").text(this.ownerId);
 
         this.turnStages = [
             "unitDropState",
@@ -52,7 +53,14 @@ export class Game
         
         // if we are not the owner of this lobby, we wait until we receive the world data
 
-        this.setTurn(this.ownerId);
+        // always starts with the first client, which SHOULD be the lobby host
+        this.currentTurnClientIndex = 0;
+        this.currentTurnClientId    = this.clients[this.currentTurnClientIndex];
+        this.currentTurnStage       = -1;
+        
+        console.log(this.clients, this.currentTurnClientIndex, this.currentTurnClientId);
+
+        this.setTurn(this.currentTurnClientId);
         this.setStage(0);
     }
 
@@ -90,22 +98,29 @@ export class Game
             game.world.calculateInvadeableTerritories();
         });
 
-        $(document).on("clientNextStage", function(event)
+        $(document).on("requestNextStage", function(event)
         {
+            if (game.currentTurnClientId != clientId)
+            {
+                console.error(`Skipping request for next stage because it is not our turn. Current turn owner: ${game.currentTurnClientId}, us: ${clientId}`);
+                return;
+            }
+
             if (networked)
-                socket.send(JSON.stringify({ command: "nextStage" }));
+                socket.send(JSON.stringify({ command: "nextStage", clientId: clientId }));
+            else
+                document.dispatchEvent(new CustomEvent("nextStage", { detail: { clientId: clientId } }));
         });
 
-        $(document).on("nextTurn", function(event)
+        $(document).on("nextStage", function(event)
         {
-            game.setTurn(event.detail.clientId);
-            game.setStage(0);
-        });
+            if (event.detail.clientId != game.currentTurnClientId)
+            {
+                console.error("nextStage requested by invalid client. Can only be requested by the current turn client. Current turn client ID:" + game.currentTurnClientId + ", requester: " + event.detail.clientId);
+                return;
+            }
 
-        $(document).on("setStage", function(event)
-        {
-            console.log(event);
-            game.setStage(event.detail.stageId);
+            game.nextStage();
         });
 
         // this is a mid-game client join, not when a client joins a lobby.
@@ -188,6 +203,7 @@ export class Game
     {
         this.clients.push(clientId);
 
+        $("#debug-clientCount").text(this.clients.length);
         console.log(`Client ${clientId} joined.`);
     }
 
@@ -195,20 +211,41 @@ export class Game
     {
         // TODO: figure out how to remove something from an array again
 
+        $("#debug-clientCount").text(this.clients.length);
         console.log(`Client ${clientId} left.`);
+    }
+
+    nextStage()
+    {
+        if (this.currentTurnStage >= 2)
+        {
+            console.log(`Starting next turn. ${this.currentTurnStage} >= 2`);
+
+            if (this.currentTurnClientIndex >= this.clients.length - 1)
+                this.currentTurnClientIndex = 0;
+            else
+                this.currentTurnClientIndex += 1;
+
+            this.currentTurnClientId = this.clients[this.currentTurnClientIndex];
+    
+            console.log(`${this.currentTurnClientId}'s turn is starting. (${this.currentTurnClientIndex} index)`);
+    
+            game.setTurn(this.currentTurnClientId);
+            game.setStage(0);
+        }
+        else
+            game.setStage(this.currentTurnStage += 1);
     }
 
     // uses an underscore because clientId is a global value
     // which refers to the id of the local player
     setTurn(_clientId)
     {
-        console.log(`${_clientId}'s turn.`);
+        console.log(`Set to ${_clientId}'s turn.`);
 
         // set currentTurnClientId to whatever client is next
         this.currentTurnClientId = _clientId;
 
-        $("#playerName").text(this.currentTurnClientId);
-        $("#debug-turnClientId").text(this.currentTurnClientId);
         this.setStage(0);
 
         // check if currentTurnClientId matches the local client id
@@ -225,42 +262,44 @@ export class Game
             $("#nextStateButton").attr("data-visibility", "hidden");
 
             if (networked)
-                stateManager.changeState(new NetworkClientState());
+                stateManager.changeState(new OpponentState());
             else
                 stateManager.changeState(new BotTurnState());
         }
 
-        $("#debug-turn").text(this.currentTurnClientId);
+        $("#playerName").text(this.currentTurnClientId);
+        $("#debug-turn").text(this.currentTurnClientIndex);
+        $("#debug-turnClientId").text(this.currentTurnClientId);
     }
 
     setStage(stageId)
     {
         console.log(`Stage ${stageId}.`);
 
+        this.currentTurnStage = stageId;
+
         // TODO: some checks to make sure the stage is valid.
 
         // TODO: change "round" in roundType and roundSpace to "turn"
         $(".roundSpace.active").removeClass("active");
-        $("#roundType").children()[stageId].classList.add("active");
-        $(".gameStatus").attr("data-state", stageId);
-
-        this.stageId = stageId;
+        $("#roundType").children()[this.currentTurnStage].classList.add("active");
+        $(".gameStatus").attr("data-state", this.currentTurnStage);
 
         if (this.currentTurnClientId == clientId)
         {
-            if (stageId == 0)
-            {
+            if (this.currentTurnStage == 0)
                 stateManager.changeState(new UnitDropState(10));
-            }
-            else if (stageId == 1)
+            else if (this.currentTurnStage == 1)
                 stateManager.changeState(new AttackState());
-            else if (stageId == 2)
+            else if (this.currentTurnStage == 2)
                 stateManager.changeState(new UnitMoveState());
         }
-
-        $("#debug-stage").text(this.stageId);
+        else
+            stateManager.changeState(new OpponentState());
 
         this.resetTerritoryGraphics();
+
+        $("#debug-stage").text(this.currentTurnStage);
     }
 
     // moves all territories back down and applies their idle colours

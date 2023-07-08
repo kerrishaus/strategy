@@ -10,7 +10,9 @@ export class NetworkLobbyWaitingState extends State
 
         this.lobby = lobby;
 
-		this.lobby.clients = [ this.lobby.ownerId ];
+//		this.lobby.clients = [ this.lobby.ownerId ];
+
+		console.log(`Client list of lobby we just joined: ${this.lobby.clients}`);
 
         console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`);
 	}
