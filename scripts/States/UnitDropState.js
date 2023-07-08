@@ -43,19 +43,17 @@ export class UnitDropState extends State
 			}
 
 			this.availableUnits -= amount;
-			this.selectedTerritory.addUnits(amount);
 
-			if (networked)
-				socket.send(JSON.stringify({ command: "dropUnits", territoryId: this.selectedTerritory.territoryId, amount: amount }));
-			else
-				document.dispatchEvent(new CustomEvent("dropUnits", { detail: { territoryId: this.selectedTerritory.territoryId, amount: amount } }));
+			document.dispatchEvent(new CustomEvent("dropUnits", { detail: {
+                territoryId: this.selectedTerritory.territoryId,
+                amount: amount,
+                population: this.selectedTerritory.unitCount + amount,
+				unitsRemaining: this.availableUnits
+            } }));
 
-			this.selectedTerritory.destroyUnitPlaceDialog();
-			this.selectedTerritory.lower();
-			this.selectedTerritory.material.color.setHex(Colors.ownedColor);
-			this.selectedTerritory = null;
+			// TODO: don't do this stuff until after the units have been sucessfully dropped.
 
-			$("#count").html(this.availableUnits);
+			this.clearDropPoint();
 
 			if (this.availableUnits <= 0)
 			{
@@ -125,12 +123,7 @@ export class UnitDropState extends State
 			}
 			
 			if (this.selectedTerritory !== null)
-			{
-				this.selectedTerritory.lower();
-				this.selectedTerritory.material.color.setHex(Colors.ownedColor);
-				this.selectedTerritory.destroyUnitPlaceDialog();
-				this.selectedTerritory = null;
-			}
+				this.clearDropPoint();
 			
 			this.selectedTerritory = object;
 			this.selectedTerritory.raise();
@@ -143,16 +136,19 @@ export class UnitDropState extends State
 	{
 		if (event.code == "Escape")
 			if (this.selectedTerritory !== null)
-			{
-				this.selectedTerritory.lower();
-				this.selectedTerritory.material.color.setHex(Colors.ownedColor);
-				this.selectedTerritory.destroyUnitPlaceDialog();
-				this.selectedTerritory = null;
-			}
+				this.clearDropPoint();
 	}
 	
 	update(deltaTime)
 	{
 		
+	}
+
+	clearDropPoint()
+	{
+		this.selectedTerritory.lower();
+		this.selectedTerritory.material.color.setHex(Colors.ownedColor);
+		this.selectedTerritory.destroyUnitPlaceDialog();
+		this.selectedTerritory = null;
 	}
 };

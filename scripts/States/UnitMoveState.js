@@ -44,13 +44,18 @@ export class UnitMoveState extends State
                 return;
             }
 
-            this.startTerritory.unitCount -= amount;
-            this.endTerritory.unitCount += amount;
-            
-            this.startTerritory.label.element.innerHTML = this.startTerritory.unitCount;
-            this.endTerritory.label.element.innerHTML = this.endTerritory.unitCount;
+            document.dispatchEvent(new CustomEvent("moveUnits", { detail: {
+                origin: this.startTerritory.territoryId,
+                destination: this.endTerritory.territoryId,
+                amount: amount,
+                originPopulation: this.startTerritory.unitCount - amount,
+                destinationPopulation: this.endTerritory.unitCount + amount
+            } }));
 
             // TODO: nextStageButton.click()
+
+            this.clearStartPoint();
+            this.clearEndPoint();
         });
 
         $(this).on("objectHover",     this.onHover);
@@ -81,9 +86,11 @@ export class UnitMoveState extends State
         
     }
 
-    onHover(object)
+    onHover(event)
     {
-        if (object.userData.team != 1)
+        const object = event.detail.object;
+
+        if (object.userData.ownerId != clientId)
             return;
         
         if (this.startTerritory === null ||
@@ -94,9 +101,11 @@ export class UnitMoveState extends State
         }
     }
     
-    onStopHover(object)
+    onStopHover(event)
     {
-        if (object.userData.team != 1)
+        const object = event.detail.object;
+
+        if (object.userData.ownerId != clientId)
             return;
         
         if (this.startTerritory != object &&
@@ -107,9 +116,11 @@ export class UnitMoveState extends State
         }
     }
     
-    onMouseDown(event, object)
+    onMouseDown(event)
     {
-        if (object.userData.team != 1)
+        const object = event.detail.object;
+
+        if (object.userData.ownerId != clientId)
             return;
         
         if (this.startTerritory === null)
@@ -175,6 +186,9 @@ export class UnitMoveState extends State
     
     clearEndPoint()
     {
+        if (this.endTerritory === null)
+            return;
+
         this.endTerritory.lower();
         this.endTerritory.material.color.setHex(Colors.ownedColor);
         this.endTerritory.destroyUnitMoveDialog();

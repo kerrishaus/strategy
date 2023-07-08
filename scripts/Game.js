@@ -139,7 +139,20 @@ export class Game
             game.removeClient(event.detail.clientId);
         });
 
-        $(document).on("dropUnits", function(event)
+        if (networked)
+        {
+            $(document).on("dropUnits", function(event) {
+                socket.send(JSON.stringify({ command: "dropUnitsResult", ...event.detail }));
+            });
+        }
+        else
+        {
+            $(document).on("dropUnits", function(event) {
+                document.dispatchEvent(new CustomEvent("dropUnitsResult", { detail: event.detail }));
+            });
+        }
+
+        $(document).on("dropUnitsResult", function(event)
         {
             // skip our own unit drop
             if (event.detail.clientId == clientId)
@@ -152,12 +165,14 @@ export class Game
             console.log(game.world.tiles[territoryId]);
 
             game.world.tiles[territoryId].addUnits(amount);
+
+            $("#count").html(this.availableUnits);
         });
         
         if (networked)
         {
             $(document).on("attack", function(event) {
-                socket.send(JSON.stringify({ command: "attack", ...event.detail }));
+                socket.send(JSON.stringify({ command: "attackResult", ...event.detail }));
             });
         }
         else
@@ -196,6 +211,33 @@ export class Game
             defendingTerritory.label.element.innerHTML = defendingTerritory.unitCount;
 
             console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
+        });
+
+        if (networked)
+        {
+            $(document).on("moveUnits", function(event) {
+                socket.send(JSON.stringify({ command: "moveUnitsResult", ...event.detail }));
+            });
+        }
+        else
+        {
+            $(document).on("moveUnits", function(event) {
+                document.dispatchEvent(new CustomEvent("moveUnitsResult", { detail: event.detail }));
+            });
+        }
+
+        $(document).on("moveUnitsResult", function(event)
+        {
+            const originTerritory = game.world.tiles[event.detail.origin];
+            const destinationTerritory = game.world.tiles[event.detail.destination];
+
+            console.log(`Moving ${event.detail.amount} units from origin territory ${event.detail.origin} (${originTerritory.unitCount} -> ${event.detail.originPopulation}) to destination territory ${event.detail.destination} (${destinationTerritory.unitCount} -> ${event.detail.destinationPopulation})`);
+
+            originTerritory.unitCount = event.detail.originPopulation;
+            destinationTerritory.unitCount = event.detail.destinationPopulation;
+
+            originTerritory.label.element.innerHTML = originTerritory.unitCount;
+            destinationTerritory.label.element.innerHTML = destinationTerritory.unitCount;
         });
     }
 
