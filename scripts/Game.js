@@ -154,10 +154,6 @@ export class Game
 
         $(document).on("dropUnitsResult", function(event)
         {
-            // skip our own unit drop
-            if (event.detail.clientId == clientId)
-                return;
-
             const territoryId = event.detail.territoryId;
             const amount      = event.detail.amount;
 
