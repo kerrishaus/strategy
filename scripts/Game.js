@@ -336,8 +336,6 @@ export class Game
             else if (this.currentTurnStage == 2)
                 stateManager.changeState(new UnitMoveState());
         }
-        else
-            stateManager.changeState(new OpponentState());
 
         this.resetTerritoryGraphics();
 

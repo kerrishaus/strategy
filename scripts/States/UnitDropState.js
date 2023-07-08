@@ -65,6 +65,7 @@ export class UnitDropState extends State
 		$(this).on("objectHover",     this.onHover);
 		$(this).on("objectHoverStop", this.onStopHover);
 		$(this).on("objectClick",     this.onMouseDown);
+		$(this).on("keydown",         this.onKeyDown);
 	}
 
 	cleanup()
@@ -74,6 +75,7 @@ export class UnitDropState extends State
 		$(this).off("objectHover",     this.onHover);
 		$(this).off("objectHoverStop", this.onStopHover);
 		$(this).off("objectClick",     this.onMouseDown);
+		$(this).off("keydown",         this.onKeyDown);
 	}
 	
 	onHover(event)

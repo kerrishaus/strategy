@@ -17,7 +17,6 @@ export class BotTurnState extends State
     init()
     {
         $("#playerName").html("Enemy AI");
-        $("#nextStateButton").attr("data-visibility", "hidden");
         
         let enemyUnitPlaceCount = Math.round((game.world.tiles.length - game.world.ownedTerritories) / 3);
         $("#count").html(enemyUnitPlaceCount);
@@ -74,7 +73,7 @@ export class BotTurnState extends State
                     placeTile.material.color.setHex(Colors.enemyColor);
                     placeTile = null;
                     
-                    changeRoundIndicator(4);
+                    game.nextStage();
                     
                     setTimeout(func =>
                     {
@@ -198,8 +197,7 @@ export class BotTurnState extends State
                                 {
                                     console.log("move");
                                     
-                                    stateMachine.setInterfaceState("moveUnitState");
-                                    stateMachine.stateName = "botTurnState";
+                                    game.nextStage();
                                     
                                     let moveStart = null, moveEnd = null;
                                     
@@ -271,9 +269,7 @@ export class BotTurnState extends State
                                                     moveEnd.material.color.setHex(Colors.enemyColor);
                                                 }
                                                 
-                                                $("#playerName").html("Super Idiot");
-                                                $("#nextStateButton").attr("data-visibility", null);
-                                                stateManager.changeState(new UnitDropState(Math.round(game.world.ownedTerritories / 3)));
+                                                game.nextStage();
                                             }, aiDelay);
                                         }, aiDelay);
                                     }, aiDelay);

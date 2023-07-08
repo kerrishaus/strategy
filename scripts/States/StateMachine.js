@@ -69,9 +69,15 @@ export class StateMachine
             this.states[this.states.length - 1].update(deltaTime);
     }
 
-    dispatchCustomEvent(event)
+    forwardEvent(event)
     {
         if (this.states.length > 0)
             this.states[this.states.length - 1].dispatchEvent(event);
+    }
+
+    duplicateEvent(event)
+    {
+        if (this.states.length > 0)
+            this.states[this.states.length - 1].dispatchEvent(new event.constructor(event.type, event));
     }
 };

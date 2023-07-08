@@ -143,15 +143,18 @@ export class GameSetupState extends State
 			if (INTERSECTED == null)
 				return;
 				
-			stateManager.dispatchCustomEvent(new CustomEvent("objectClick", { detail: { object: INTERSECTED } }));
+			stateManager.forwardEvent(new CustomEvent("objectClick", { detail: { object: INTERSECTED } }));
 		}
 
 		function onKeyDown(event)
 		{
-			//stateManager.onKeyDown(event);
-			
 			if (event.code == "Space")
+			{
 				$("#nextStateButton").click();
+				return;
+			}
+
+			stateManager.duplicateEvent(event);
 		}
 
 		function onPointerMove(event)
@@ -182,20 +185,20 @@ export class GameSetupState extends State
 				{
 					if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
 					{
-						stateManager.dispatchCustomEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
+						stateManager.forwardEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
 						INTERSECTED = null;
 					}
 
 					if (intersects[0].object.userData.hasOwnProperty("canClick")) // the object is now hovered
 					{
 						INTERSECTED = intersects[0].object;
-						stateManager.dispatchCustomEvent(new CustomEvent("objectHover", { detail: { object: INTERSECTED } }));
+						stateManager.forwardEvent(new CustomEvent("objectHover", { detail: { object: INTERSECTED } }));
 					}
 				}
 			}
 			else if (INTERSECTED !== null)// the object is no longer hovered, and no object is hovered
 			{
-				stateManager.dispatchCustomEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
+				stateManager.forwardEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
 				INTERSECTED = null;
 			}
 			

@@ -104,7 +104,10 @@ export class GameWorld extends Group
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
 
             if (this.tiles[territory].userData.ownerId == clientId)
+            {
                 this.tiles[territory].material.color.setHex(Colors.ownedColor);
+                this.ownedTerritories += 1;
+            }
             else
                 this.tiles[territory].material.color.setHex(Colors.enemyColor);
         }
