@@ -28,7 +28,7 @@ export class NetworkLobbyWaitingState extends State
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
 			{
 				if (event.data.lobby.clients.length > 1)
-					socket.send(JSON.stringify({ command: "startGame" }));
+					socket.send(JSON.stringify({ command: "startGame", width: 10, height: 5 }));
 				else
 					console.warn("Skipping start game button press because there are not enough clients.");
 			});

@@ -107,7 +107,7 @@ export class Game
             }
 
             if (networked)
-                socket.send(JSON.stringify({ command: "nextStage", clientId: clientId }));
+                socket.send(JSON.stringify({ command: "nextStage" }));
             else
                 document.dispatchEvent(new CustomEvent("nextStage", { detail: { clientId: clientId } }));
         });
