@@ -184,7 +184,7 @@ export class Game
             const defendingTerritory = game.world.tiles[event.detail.defender];
 
             attackingTerritory.unitCount = event.detail.attackerPopulation;
-            attackingTerritory.unitCount = event.detail.defenderPopulation;
+            defendingTerritory.unitCount = event.detail.defenderPopulation;
 
             if (event.detail.result == "won")
             {
