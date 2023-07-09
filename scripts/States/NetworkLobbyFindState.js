@@ -12,11 +12,11 @@ export class NetworkLobbyFindState extends State
 	init()
 	{
         $("body").append(`<div id="mainMenu">`);
-        $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='play'>play</button><button id='create'>create</button>");
+        $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='join'>join</button><button id='create'>create</button>");
 
-        $("#play").click(() =>
+        $("#pjoinlay").click(() =>
         {
-			$("#lobbyCode, #play, #create").attr("disabled", true);
+			$("#lobbyCode, #join, #create").attr("disabled", true);
 			
 			const lobbyId = $("#lobbyCode").val();
 		
@@ -27,7 +27,7 @@ export class NetworkLobbyFindState extends State
 
         $("#create").click(() =>
         {
-			$("#lobbyCode, #play, #create").attr("disabled", true);
+			$("#lobbyCode, #join, #create").attr("disabled", true);
 			
 			const lobbyId = $("#lobbyCode").val();
 		
@@ -45,7 +45,7 @@ export class NetworkLobbyFindState extends State
 		{
 			console.error("LobbyId is invalid.");
 
-			$("#lobbyCode, #play, #create").attr("disabled", null);
+			$("#lobbyCode, #join, #create").attr("disabled", null);
 		});
 	}
 
