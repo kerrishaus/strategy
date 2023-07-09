@@ -14,7 +14,7 @@ export class NetworkLobbyFindState extends State
         $("body").append(`<div id="mainMenu">`);
         $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='join'>join</button><button id='create'>create</button>");
 
-        $("#pjoinlay").click(() =>
+        $("#join").click(() =>
         {
 			$("#lobbyCode, #join, #create").attr("disabled", true);
 			
