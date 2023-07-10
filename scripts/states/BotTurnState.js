@@ -44,7 +44,7 @@ export class BotTurnState extends State
                 
                 const tile = game.world.tiles[tileId];
                 
-                if (tile.userData.team != 1)
+                if (tile.userData.ownerId != clientId)
                 {
                     if (tile.invadeableNeighbors !== null || tile.unitCount <= 4)
                     {
@@ -87,7 +87,7 @@ export class BotTurnState extends State
                             
                             const tile = game.world.tiles[tileId];
                 
-                            if (tile.userData.team != 1)
+                            if (tile.userData.ownerId != clientId)
                             {
                                 if (tile.invadeableNeighbors !== null && tile.unitCount > 2)
                                 {
