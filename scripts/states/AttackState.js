@@ -331,6 +331,7 @@ export class AttackState extends State
         }
 
         document.dispatchEvent(new CustomEvent("attack", { detail: {
+            defenderOwnerId: this.attackTerritory.userData.ownerId,
             result: attackResult,
             attacker: this.selectedTerritory.territoryId,
             defender: this.attackTerritory.territoryId,

@@ -201,6 +201,11 @@ export class Game
                     defendingTerritory.material.color.setHex(Colors.enemyColor);
 
                 game.world.calculateInvadeableTerritories();
+
+                // TODO: this might be a problem if the defenderOwnerId is the same as the
+                // current player but how could a player lose their own territory to themselves?
+                if (event.detail.defenderOwnerId == clientId)
+                    game.world.ownedTerritories -= 1;
             }
 
             attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
