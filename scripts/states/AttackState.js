@@ -331,6 +331,7 @@ export class AttackState extends State
         }
 
         document.dispatchEvent(new CustomEvent("attack", { detail: {
+            clientId: clientId, // TODO: this is for local play to work. I need to find a way to always include this if there is no server to add it. I think this is fine here because the server overwrites this value when it is sent by any client
             defenderOwnerId: this.attackTerritory.userData.ownerId,
             result: attackResult,
             attacker: this.selectedTerritory.territoryId,
