@@ -98,7 +98,7 @@ export class GameSetupState extends State
 		window.scene = new THREE.Scene();
 		window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-		const cameraPosition = new THREE.Vector3(5 + 0.3 * 5, 5 + 0.3 * 5, 14);
+		window.cameraPosition = new THREE.Vector3(9, 2, 12);
 
 		window.renderer = new THREE.WebGLRenderer();
 		renderer.setSize(window.innerWidth, window.innerHeight);

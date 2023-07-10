@@ -1,4 +1,4 @@
-import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh, Box3, Vector3 } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
 			
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
@@ -11,13 +11,6 @@ export class GameWorld extends Group
     constructor()
     {
         super();
-
-        // a list of 
-        //this.territoryOwnership = new Array(clientCount);
-        
-        //this.loadWorld(this.generateWorld(clientCount));
-        
-        //this.calculateInvadeableTerritories();
 
         this.width = 0;
         this.height = 0;
@@ -53,9 +46,13 @@ export class GameWorld extends Group
 
                 const object = new WorldObject(2, 2, Colors.unownedColor, arrayPosition);
 
-                object.targetPosition.x = x + 1.0 * x;
-                object.targetPosition.y = y + 1.0 * y;
-                object.targetPosition.z = 0;
+                // this is just kinda cool will probably remove later
+                setTimeout(() =>
+                {
+                    object.targetPosition.x = x + 1.0 * x;
+                    object.targetPosition.y = y + 1.0 * y;
+                    object.targetPosition.z = 0;
+                }, 0 + (20 * arrayPosition));
                 
                 tiles[arrayPosition] = object;
             }
@@ -117,8 +114,14 @@ export class GameWorld extends Group
 
     loadWorld(world)
     {
+        const box = new Box3();
+        box.makeEmpty();
+
         for (const object of world.tiles)
+        {
             this.add(object);
+            box.expandByObject(object); // this doesn't seem to be working
+        }
         
         this.tiles = world.tiles;
 
@@ -128,6 +131,26 @@ export class GameWorld extends Group
         floor.position.x = world.width / 2 + 1.1 * world.width / 2 - 0.7;
         floor.position.y = world.height / 2 + 1.1 * world.height / 2 - 0.7;
         this.add(floor);
+
+        const size = new Vector3();
+		const center = new Vector3();
+
+        box.getSize(size);
+        box.getCenter(center);
+
+        console.log(box, size, center);
+
+        const maxSize = Math.max(size.x, size.y, size.z);
+        const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+        const fitWidthDistance = fitHeightDistance / camera.aspect;
+        const distance = 12 * Math.max(fitHeightDistance, fitWidthDistance);
+
+        window.cameraPosition.x = center.x;
+        window.cameraPosition.y = center.y;
+        window.cameraPosition.z = distance;
+        
+        window.cameraPosition.x = ((this.width / 2) * 2) - 1;
+        window.cameraPosition.y = ((this.height / 2) * 2) - 1;
     }
     
     calculateInvadeableTerritories()

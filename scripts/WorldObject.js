@@ -11,9 +11,9 @@ export class WorldObject extends Mesh
         
         super(geometry, material);
 
-        this.territoryId = territoryId;
+        this.geometry.computeBoundingBox();
 
-        console.log(this);
+        this.territoryId = territoryId;
 
         this.hovered = false;
         
