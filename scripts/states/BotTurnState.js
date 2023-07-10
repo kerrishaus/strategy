@@ -12,6 +12,8 @@ export class BotTurnState extends State
     constructor()
     {
         super();
+
+        this.botId = clientId + 1;
     }
     
     init()
@@ -32,11 +34,13 @@ export class BotTurnState extends State
             let placeTile = null;
             
             let placeIterations = 0;
+            // TODO: improve this loop and don't use while true
+            // tries to find a suitable location for the bot to drop their units
             while (true)
             {
                 if (placeIterations > 10)
                 {
-                    console.warn("Failed to find suitable place territory after 10 iterations, skipping.");
+                    console.warn("Failed to find suitable drop territory after 10 iterations, skipping stage.");
                     break;
                 }
                 
@@ -44,8 +48,10 @@ export class BotTurnState extends State
                 
                 const tile = game.world.tiles[tileId];
                 
-                if (tile.userData.ownerId != clientId)
+                // tile owned by the bot
+                if (tile.userData.ownerId == this.botId)
                 {
+                    // tile not invadable or has less than 4 units
                     if (tile.invadeableNeighbors !== null || tile.unitCount <= 4)
                     {
                         tile.raise();
@@ -81,13 +87,15 @@ export class BotTurnState extends State
                         
                         let attackingTerritory = null;
                         
+                        // TODO: not good!!!
+                        // find a territory owned by the bot to attack from
                         while (true)
                         {
                             const tileId = getRandomInt(game.world.tiles.length);
                             
                             const tile = game.world.tiles[tileId];
                 
-                            if (tile.userData.ownerId != clientId)
+                            if (tile.userData.ownerId == this.botId)
                             {
                                 if (tile.invadeableNeighbors !== null && tile.unitCount > 2)
                                 {
@@ -121,77 +129,72 @@ export class BotTurnState extends State
                             {
                                 console.log("attack");
 
-                                while (defendingTerritory.unitCount > 0 && attackingTerritory.unitCount > 1)
+                                let attackingPopulation = attackingTerritory.unitCount;
+                                let defendingPopulation = defendingTerritory.unitCount;
+
+                                console.log(`Attacking ${attackingTerritory.territoryId} (${attackingPopulation} troops) from ${defendingTerritory.territoryId} (${defendingPopulation} troops.)`);
+
+                                while (defendingPopulation > 0 && attackingPopulation > 1)
                                 {
                                     const attackerRoll = getRandomInt(5) + 1; // 1-6
                                     const defenderRoll = getRandomInt(5) + 1; // 1-6
-
+                                    
                                     if (attackerRoll > defenderRoll)
                                     {
-                                        defendingTerritory.unitCount -= 1;
-                                        console.log("Defenders lost a unit, now at: " + defendingTerritory.unitCount + ".");
+                                        defendingPopulation = defendingPopulation - 1;
+                                        console.log("Defenders lost a unit, now at: " + defendingPopulation + ".");
                                     }
                                     else
                                     {
-                                        attackingTerritory.unitCount -= 1;
-                                        console.log("Attackers lost a unit, now at: " + attackingTerritory.unitCount + ".");
+                                        attackingPopulation = attackingPopulation - 1;
+                                        console.log("Attackers lost a unit, now at: " + attackingPopulation + ".");
                                     }
-
-                                    attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
-                                    defendingTerritory.label.element.innerHTML = defendingTerritory.unitCount;
                                 }
                                 
-                                console.log(`Final score: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
+                                console.log(`Final score: Attacker: ${attackingPopulation}, Defender: ${defendingPopulation}`);
                                 
-                                // FIXME: this is some kind of logic bug.
-                                // in the end, it results in the same outcome, so i'm not going to fix it
-                                // but i'm sure it could do with some love
-                                if (defendingTerritory.unitCount > 0 && attackingTerritory.unitCount > 0)
+                                let attackResult;
+
+                                // if they both have units left, it's a draw
+                                if (attackingPopulation > 0 && defendingPopulation > 0)
                                 {
                                     console.log("match was a draw");
-                                    
-                                    defendingTerritory.lower();
-                                    defendingTerritory.material.color.setHex(Colors.ownedColor);
-                                    
-                                    attackingTerritory.lower();
-                                    attackingTerritory.material.color.setHex(Colors.enemyColor);
+
+                                    attackResult = "draw";
                                 }
                                 else
                                 {
-                                    if (defendingTerritory.unitCount > 0)
+                                    // if the defender has units left, they won
+                                    if (defendingPopulation > 0)
                                     {
                                         console.log("defenders won");
-                                        
-                                        defendingTerritory.lower();
-                                        defendingTerritory.material.color.setHex(Colors.ownedColor);
-                                        
-                                        attackingTerritory.lower();
-                                        attackingTerritory.material.color.setHex(Colors.enemyColor);
-                                    }
 
-                                    if (attackingTerritory.unitCount > 0)
-                                    {
-                                        console.log("attackers won");
-
-                                        defendingTerritory.userData.team = 2;
-                                        defendingTerritory.unitCount = attackingTerritory.unitCount - 1;
-                                        defendingTerritory.unitCount = 1;
-                                        defendingTerritory.lower();
-                                        defendingTerritory.material.color.setHex(Colors.enemyColor);
-
-                                        attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
-                                        defendingTerritory.label.element.innerHTML = defendingTerritory.unitCount;
-
-                                        attackingTerritory.lower();
-                                        attackingTerritory.material.color.setHex(Colors.enemyColor);
-
-                                        game.world.ownedTerritories -= 1;
-
-                                        console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
+                                        attackResult = "lost";
                                     }
                                     
-                                    game.world.calculateInvadeableTerritories();
+                                    // if the attacker has units left, they won
+                                    if (attackingPopulation > 0)
+                                    {
+                                        console.log("attackers won");
+                                        
+                                        // when an attack is won, all but one attacking
+                                        // units are moved to the newly conquered territory
+                                        defendingPopulation = attackingPopulation - 1;
+                                        attackingPopulation = 1;
+
+                                        attackResult = "won";
+                                    }
                                 }
+
+                                document.dispatchEvent(new CustomEvent("attack", { detail: {
+                                    clientId: this.botId, // TODO: this is for local play to work. I need to find a way to always include this if there is no server to add it. I think this is fine here because the server overwrites this value when it is sent by any client
+                                    defenderOwnerId: attackingTerritory.userData.ownerId,
+                                    result: attackResult,
+                                    attacker: attackingTerritory.territoryId,
+                                    defender: defendingTerritory.territoryId,
+                                    attackerPopulation: attackingPopulation,
+                                    defenderPopulation: defendingPopulation
+                                } }));
                                 
                                 setTimeout(func =>
                                 {
@@ -202,6 +205,8 @@ export class BotTurnState extends State
                                     let moveStart = null, moveEnd = null;
                                     
                                     let iterations = 0;
+                                    // TODO: improve this loop and don't use while true
+                                    // find a territory owned by the bot to move units out of
                                     while (true)
                                     {
                                         if (iterations > 20)
@@ -210,11 +215,16 @@ export class BotTurnState extends State
                                             break;
                                         }
                                         
+                                        // maybe make a copy of the tile array and shuffle it then iterate through the entire thing
+                                        // instead of generating a random number and trying it for every iteration
+                                        // that way we can check the entire board and not just 20 tiles and also
+                                        // have it be random enough and not biased towards the front or the back of the board
                                         const tileId = getRandomInt(game.world.tiles.length);
                                         
-                                        if (game.world.tiles[tileId].userData.team == 2)
+                                        if (game.world.tiles[tileId].userData.ownerId == this.botId)
                                             if (moveStart === null)
                                             {
+                                                // tries to move units out of territories that cannot currently be attacked
                                                 if (game.world.tiles[tileId].invadeableNeighbors === null)
                                                     if (game.world.tiles[tileId].unitCount > 1)
                                                     {
@@ -224,6 +234,7 @@ export class BotTurnState extends State
                                             }
                                             else
                                             {
+                                                // tries to move units into territories that can be attacked and have less than 15 units
                                                 if (game.world.tiles[tileId].invadeableNeighbors !== null)
                                                     if (game.world.tiles[tileId].unitCount < 15)
                                                     {
