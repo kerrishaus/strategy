@@ -1,3 +1,10 @@
+body
+{
+    margin: 0;
+    background: navy;
+    font-family: Tahoma;
+}
+
 #debug
 {
     box-sizing: border-box;
