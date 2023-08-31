@@ -196,4 +196,39 @@ export class GameWorld extends Group
                 //console.debug(`${id} can invade ${tile.invadeableNeighbors[0]}, ${tile.invadeableNeighbors[1]}, ${tile.invadeableNeighbors[2]}, and ${tile.invadeableNeighbors[3]}.`);
         }
     }
+
+    getTerritoriesOwnedBy(_clientId)
+    {
+        const invadeableTiles = [];
+
+        for (const tile of this.tiles)
+            if (tile.userData.ownerId == _clientId)
+                invadeableTiles.push(tile);
+
+        return invadeableTiles;
+    }
+
+    getTerritoriesInvadeableBy(_clientId)
+    {
+        const ownedTerritories = this.getTerritoriesOwnedBy(_clientId);
+
+        for (const tile of ownedTerritories)
+        {
+            if (tile.invadeableNeighbors !== null)
+            {
+
+            }
+        }
+    }
+
+    getTerritoriesNotOwnedBy(_clientId)
+    {
+        let invadeableTiles = [];
+
+        for (const tile of this.tiles)
+            if (tile.userData.ownerId != _clientId)
+                invadeableTiles.push(tile);
+
+        return invadeableTiles;
+    }
 };

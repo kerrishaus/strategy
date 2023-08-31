@@ -286,7 +286,6 @@ export class Game
     {
         console.log(`Set to ${_clientId}'s turn.`);
 
-        // set currentTurnClientId to whatever client is next
         this.currentTurnClientId = _clientId;
 
         this.setStage(0);
