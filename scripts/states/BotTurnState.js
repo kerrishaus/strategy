@@ -286,7 +286,7 @@ export class BotTurnState extends State
                 if (moveStart === null)
                 {
                     // tries to move units out of territories that cannot currently be attacked
-                    if (game.world.tiles[tileId].invadeableNeighbors === null)
+                    if (game.world.tiles[tileId].invadeableNeighbors.length > 0)
                         if (game.world.tiles[tileId].unitCount > 1)
                         {
                             moveStart = game.world.tiles[tileId];
@@ -296,7 +296,7 @@ export class BotTurnState extends State
                 else
                 {
                     // tries to move units into territories that can be attacked and have less than 15 units
-                    if (game.world.tiles[tileId].invadeableNeighbors !== null)
+                    if (game.world.tiles[tileId].invadeableNeighbors.length > 0)
                         if (game.world.tiles[tileId].unitCount < 15)
                         {
                             moveEnd = game.world.tiles[tileId];

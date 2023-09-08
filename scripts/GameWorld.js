@@ -31,7 +31,9 @@ export class GameWorld extends Group
         super.add(object);
     }
 
-    generateWorld(width, height)
+    // each client does this work on their own before
+    // territory information is sent
+    generateTerrain(width, height)
     {
         this.width  = width;
         this.height = height;
@@ -56,6 +58,41 @@ export class GameWorld extends Group
                 
                 tiles[arrayPosition] = object;
             }
+        }
+
+        // TODO: this can probably be calculated when the object is created, but I'm too
+        // tired to figure out the math for stuff like that right now, and this is better
+        // than recalculating all of it every time the ownership of territories is changed
+        for (let tile of tiles)
+        {
+            const id = tile.territoryId;
+
+            tile.userData.neighbors = {
+                leftNeighbor:   null,
+                rightNeighbor:  null,
+                topNeighbor:    null,
+                bottomNeighbor: null,
+            };
+
+            // left
+            // make sure the id doesn't go below zero so we don't access the array out of bounds
+            if (id - 1 >= 0)
+                // make sure both territories are on the same row
+                if (Math.trunc((id - 1) / width) == Math.trunc(id / width))
+                    tile.userData.neighbors.leftNeighbor = tiles[id - 1];
+
+            // right
+            if (id + 1 < tiles.length)
+                if (Math.trunc((id + 1) / width) == Math.trunc(id / width))
+                    tile.userData.neighbors.rightNeighbor = tiles[id + 1];
+                
+            // top
+            if (id - width >= 0)
+                tile.userData.neighbors.topNeighbor = tiles[id - width];
+                
+            // bottom
+            if (id + width < tiles.length)
+                tile.userData.neighbors.bottomNeighbor = tiles[id + width];
         }
 
         return { width: width, height: height, tiles: tiles };
@@ -91,12 +128,6 @@ export class GameWorld extends Group
 
         for (const territory in territories)
         {
-            //this.tiles[territory].label.element.innerHTML = territories[territory];
-
-            // TODO: I don't know if the assignment below is necessary, but it was causing
-            // some problems because it was setting the territoryId to a string.
-            // I've commented it out and everything seems to be working fine without it.
-            //this.tiles[territory].territoryId             = territory;
             this.tiles[territory].userData.ownerId        = territories[territory];
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
 
@@ -160,50 +191,16 @@ export class GameWorld extends Group
 
         for (const tile of this.tiles)
         {
-            const id = tile.territoryId;
+            tile.invadeableNeighbors = [];
 
-            // TODO: I'm not sure why we have to reset this, I figured we would just be
-            // able to access the first four elements and overwrite them but apparently
-            // if they're null we can't assign them??
-            tile.invadeableNeighbors = [ null, null, null, null ];
+            for (const [which, neighbor] of Object.entries(tile.userData.neighbors))
+            {
+                if (neighbor === null)
+                    continue;
 
-            // left
-            // make sure the id doesn't go below zero so we don't access the array out of bounds
-            if (id - 1 >= 0)
-                // make sure both territories are on the same row
-                // TODO: stuff like checking to make sure they're on the same row
-                // can probably be done in advance, when the world is generated.
-                if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
-                    // if the neighbor tile's ownerId does not match this tile's ownerId, it can invade it
-                    if (this.tiles[id - 1].userData.ownerId != tile.userData.ownerId)
-                        tile.invadeableNeighbors[0] = this.tiles[id - 1]
-
-            // right
-            if (id + 1 < this.tiles.length)
-                if (Math.trunc((id + 1) / this.width) == Math.trunc(id / this.width))
-                    if (this.tiles[id + 1].userData.ownerId != tile.userData.ownerId)
-                        tile.invadeableNeighbors[1] = this.tiles[id + 1];
-                
-            // top
-            if (id - this.width >= 0)
-                if (this.tiles[id - this.width].userData.ownerId != tile.userData.ownerId)
-                    tile.invadeableNeighbors[2] = this.tiles[id - this.width];
-                
-            // bottom
-            if (id + this.width < this.tiles.length)
-                if (this.tiles[id + this.width].userData.ownerId != tile.userData.ownerId)
-                    tile.invadeableNeighbors[3] = this.tiles[id + this.width];
-
-            if (tile.invadeableNeighbors[0] === null &&
-                tile.invadeableNeighbors[1] === null &&
-                tile.invadeableNeighbors[2] === null &&
-                tile.invadeableNeighbors[3] === null)
-                {
-                    tile.invadeableNeighbors = null;
-                    //console.debug(id + " has no invadeable neighbors.");
-                }
-            //else
-                //console.debug(`${id} can invade ${tile.invadeableNeighbors[0]}, ${tile.invadeableNeighbors[1]}, ${tile.invadeableNeighbors[2]}, and ${tile.invadeableNeighbors[3]}.`);
+                if (neighbor.userData.ownerId != tile.userData.ownerId)
+                    tile.invadeableNeighbors.push(neighbor);
+            }
         }
     }
 
@@ -224,10 +221,6 @@ export class GameWorld extends Group
 
         for (const tile of ownedTerritories)
         {
-            if (tile.invadeableNeighbors !== null)
-            {
-
-            }
         }
     }
 

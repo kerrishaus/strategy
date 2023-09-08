@@ -33,7 +33,7 @@ export class Game
 
         this.world = new GameWorld();
 
-        const world = this.world.generateWorld(lobby.width, lobby.height);
+        const world = this.world.generateTerrain(lobby.width, lobby.height);
 
         this.world.loadWorld(world);
 
@@ -46,9 +46,7 @@ export class Game
             this.world.calculateInvadeableTerritories();
 
             if (networked)
-            {
                 socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
-            }
         }
         
         // if we are not the owner of this lobby, we wait until we receive the world data

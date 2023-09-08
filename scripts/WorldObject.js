@@ -34,7 +34,7 @@ export class WorldObject extends Mesh
         
         this.dialog = null;
         this.world = null;
-        this.invadeableNeighbors = [ null, null, null, null ];
+        this.invadeableNeighbors = [];
     }
     
     update(deltaTime)
