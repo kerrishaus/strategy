@@ -12,8 +12,8 @@ export class AttackState extends State
     {
         super();
 
-        this.selectedTerritory = null;
-        this.attackTerritory = null;
+        this.attackOriginTerritory = null;
+        this.attackTargetTerritory = null;
     }
 
     init()
@@ -26,11 +26,11 @@ export class AttackState extends State
 
     cleanup()
     {
-        if (this.attackTerritory !== null)
-            this.clearDefendingTerritory();
+        if (this.attackTargetTerritory !== null)
+            this.clearAttackTargetTerritory();
         
-        if (this.selectedTerritory !== null)
-            this.clearAttackingTerritory();
+        if (this.attackOriginTerritory !== null)
+            this.clearAttackOriginTerritory();
 
         $(this).off("objectHover",     this.onHover);
 		$(this).off("objectHoverStop", this.onStopHover);
@@ -42,7 +42,7 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
-        if (this.selectedTerritory === null)
+        if (this.attackOriginTerritory === null)
         {
             if (object.userData.ownerId != clientId)
                 return;
@@ -54,7 +54,7 @@ export class AttackState extends State
             object.material.color.setHex(Colors.ownedHoverColor);
         }
 
-        if (this.attackTerritory === null)
+        if (this.attackTargetTerritory === null)
         {
             if (object.userData.ownerId == clientId)
                 return;
@@ -71,8 +71,8 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
-        if (object !== this.selectedTerritory &&
-            object !== this.attackTerritory)
+        if (object !== this.attackOriginTerritory &&
+            object !== this.attackTargetTerritory)
             {
                 object.lower();
                 
@@ -80,7 +80,7 @@ export class AttackState extends State
                     object.material.color.setHex(Colors.ownedColor);
                 else
                     if (object.userData.invadeable)
-                        if (this.attackTerritory !== null)
+                        if (this.attackTargetTerritory !== null)
                             object.material.color.setHex(Colors.enemyInvadeablePausedColor);
                         else
                             object.material.color.setHex(Colors.enemyInvadeableColor);
@@ -93,22 +93,26 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
-        if (this.attackTerritory === null && object.userData.ownerId == clientId)
-            this.setAttackingTerritory(object);
-        else if (this.attackTerritory === null && object.userData.ownerId != clientId)
-            this.setDefendingTerritory(object);
+        if (this.attackTargetTerritory === null && object.userData.ownerId == clientId)
+            this.setAttackOriginTerritory(object);
+        else if (this.attackTargetTerritory === null && object.userData.ownerId != clientId)
+            this.setAttackTargetTerritory(object);
         else
-            console.warn("Invalid object clicked during AttackState.");
+        {
+            console.log("Clearing selected territories.");
+            this.clearAttackTargetTerritory();
+            this.clearAttackOriginTerritory();
+        }
     }
 
     onKeyDown(event)
     {
         if (event.code == "Escape")
         {
-            if (this.attackTerritory !== null)
-                this.clearDefendingTerritory();
-            else if (this.selectedTerritory !== null)
-                this.clearAttackingTerritory();
+            if (this.attackTargetTerritory !== null)
+                this.clearAttackTargetTerritory();
+            else if (this.attackOriginTerritory !== null)
+                this.clearAttackOriginTerritory();
         }
         else if (event.code == "Enter")
         {
@@ -121,7 +125,7 @@ export class AttackState extends State
 
     }
 
-    setAttackingTerritory(object)
+    setAttackOriginTerritory(object)
     {
         if (object.invadeableNeighbors === null)
         {
@@ -129,15 +133,15 @@ export class AttackState extends State
             return;
         }
         
-        if (this.selectedTerritory !== null)
-            this.clearAttackingTerritory();
+        if (this.attackOriginTerritory !== null)
+            this.clearAttackOriginTerritory();
             
         object.raise();
         object.material.color.setHex(Colors.ownedSelectedColor);
-        this.selectedTerritory = object;
+        this.attackOriginTerritory = object;
 
-        if (this.selectedTerritory.invadeableNeighbors !== null)
-            for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+        if (this.attackOriginTerritory.invadeableNeighbors !== null)
+            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
             {
                 console.log(`${object.territoryId} can invade ${tile}`);
 
@@ -149,19 +153,19 @@ export class AttackState extends State
             }
     }
     
-    clearAttackingTerritory()
+    clearAttackOriginTerritory()
     {
-        if (this.selectedTerritory === null)
+        if (this.attackOriginTerritory === null)
         {
-            console.error("selectedTerritory is null in clearAttackingTerritory()");
+            console.error("selectedTerritory is null in clearAttackOriginTerritory()");
             return;
         }
 
-        if (this.attackTerritory !== null)
-            this.clearDefendingTerritory();
+        if (this.attackTargetTerritory !== null)
+            this.clearAttackTargetTerritory();
             
-        if (this.selectedTerritory.invadeableNeighbors !== null)
-            for (const tile of this.selectedTerritory.getInvadeableNeighbors())
+        if (this.attackOriginTerritory.invadeableNeighbors !== null)
+            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
             {
                 if (!(tile instanceof WorldObject))
                     continue;
@@ -170,20 +174,20 @@ export class AttackState extends State
                 tile.material.color.setHex(Colors.enemyColor);
             }
 
-        this.selectedTerritory.lower();
-        this.selectedTerritory.material.color.setHex(Colors.ownedColor);
-        this.selectedTerritory = null;
+        this.attackOriginTerritory.lower();
+        this.attackOriginTerritory.material.color.setHex(Colors.ownedColor);
+        this.attackOriginTerritory = null;
     }
     
-    setDefendingTerritory(object)
+    setAttackTargetTerritory(object)
     {
-        if (this.selectedTerritory === null)
+        if (this.attackOriginTerritory === null)
         {
             console.error("selectedTerritory must be set before attackTerritory can be set.");
             return;
         }
 
-        if (object == this.selectedTerritory)
+        if (object == this.attackOriginTerritory)
         {
             console.error("attackTerritory cannot be selectedTerritory.");
             return;
@@ -197,19 +201,20 @@ export class AttackState extends State
         
         object.raise();
         object.material.color.setHex(Colors.enemySelectedColor);
-        this.attackTerritory = object;
+        this.attackTargetTerritory = object;
         
-        for (const tile of this.selectedTerritory.getInvadeableNeighbors())
-        {
-            if (!(tile instanceof WorldObject))
-                continue;
-                
-            if (tile === this.attackTerritory)
-                continue;
-                
-            tile.userData.invadeable = true;
-            tile.material.color.setHex(Colors.enemyInvadeablePausedColor);
-        }
+        if (this.attackOriginTerritory.invadeableNeighbors !== null)
+            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
+            {
+                if (!(tile instanceof WorldObject))
+                    continue;
+                    
+                if (tile === this.attackTargetTerritory)
+                    continue;
+                    
+                tile.userData.invadeable = true;
+                tile.material.color.setHex(Colors.enemyInvadeablePausedColor);
+            }
         
         $("#attackPlannerCancelButton").click(function(event)
         {
@@ -222,36 +227,37 @@ export class AttackState extends State
             this.runAttack();
         });
         
-        $("#attackerCount").html(this.selectedTerritory.unitCount);
-        $("#defenderCount").html(this.attackTerritory.unitCount);
+        $("#attackerCount").html(this.attackOriginTerritory.unitCount);
+        $("#defenderCount").html(this.attackTargetTerritory.unitCount);
         $(".gameInterfaceContainer").attr("data-visibility", "hidden");
     }
     
-    clearDefendingTerritory()
+    clearAttackTargetTerritory()
     {
-        if (this.attackTerritory === null)
+        if (this.attackTargetTerritory === null)
         {
-            console.error("attackTerritory is null in clearDefendingTerritory()");
+            console.error("attackTerritory is null in clearAttackTargetTerritory()");
             return;
         }
         
-        this.attackTerritory.lower();
-        this.attackTerritory.material.color.setHex(Colors.enemyInvadeableColor);
-        this.attackTerritory = null;
+        this.attackTargetTerritory.lower();
+        this.attackTargetTerritory.material.color.setHex(Colors.enemyInvadeableColor);
+        this.attackTargetTerritory = null;
         
-        for (const tile of this.selectedTerritory.getInvadeableNeighbors())
-        {
-            if (!(tile instanceof WorldObject))
-                continue;
-                
-            if (tile === this.attackTerritory)
-                continue;
+        if (this.attackOriginTerritory.invadeableNeighbors !== null)
+            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
+            {
+                if (!(tile instanceof WorldObject))
+                    continue;
+                    
+                if (tile === this.attackTargetTerritory)
+                    continue;
 
-            console.log("tile is invadable");
+                console.log("tile is invadable");
 
-            tile.userData.invadeable = true;
-            tile.material.color.setHex(Colors.enemyInvadeableColor);
-        }
+                tile.userData.invadeable = true;
+                tile.material.color.setHex(Colors.enemyInvadeableColor);
+            }
         
         $("#attackPlannerCancelButton").off();
         $("#attackPlannerGoButton").off();
@@ -261,22 +267,22 @@ export class AttackState extends State
     
     runAttack()
     {
-        if (this.selectedTerritory === null)
+        if (this.attackOriginTerritory === null)
         {
             console.error("selectedTerritory is null in runAttack()");
             return;
         }
         
-        if (this.attackTerritory === null)
+        if (this.attackTargetTerritory === null)
         {
             console.error("attackTerritory is null in runAttack()");
             return;
         }
         
-        let attackingPopulation = this.selectedTerritory.unitCount;
-        let defendingPopulation = this.attackTerritory.unitCount;
+        let attackingPopulation = this.attackOriginTerritory.unitCount;
+        let defendingPopulation = this.attackTargetTerritory.unitCount;
 
-        console.log(`Attacking ${this.attackTerritory.territoryId} (${attackingPopulation} troops) from ${this.selectedTerritory.territoryId} (${defendingPopulation} troops.)`);
+        console.log(`Attacking ${this.attackTargetTerritory.territoryId} (${attackingPopulation} troops) from ${this.attackOriginTerritory.territoryId} (${defendingPopulation} troops.)`);
 
         while (defendingPopulation > 0 && attackingPopulation > 1)
         {
@@ -332,74 +338,38 @@ export class AttackState extends State
 
         document.dispatchEvent(new CustomEvent("attack", { detail: {
             clientId: clientId, // TODO: this is for local play to work. I need to find a way to always include this if there is no server to add it. I think this is fine here because the server overwrites this value when it is sent by any client
-            defenderOwnerId: this.attackTerritory.userData.ownerId,
+            defenderOwnerId: this.attackTargetTerritory.userData.ownerId,
             result: attackResult,
-            attacker: this.selectedTerritory.territoryId,
-            defender: this.attackTerritory.territoryId,
+            attacker: this.attackOriginTerritory.territoryId,
+            defender: this.attackTargetTerritory.territoryId,
             attackerPopulation: attackingPopulation,
             defenderPopulation: defendingPopulation
         } }));
-        
+
         this.finaliseAttack();
     }
     
     finaliseAttack()
     {
-        if (game.world.ownedTerritories == game.world.tiles.length)
-        {
-            $("#gameWin").attr("data-visibility", "shown");
+        if (this.attackTargetTerritory.userData.ownerId == clientId)
+            this.attackTargetTerritory.material.color.setHex(Colors.ownedColor);
+        else
+            this.attackTargetTerritory.material.color.setHex(Colors.enemyColor);
             
-            $("#replayGame").click(function(event)
+        this.clearAttackTargetTerritory();
+
+        if (this.attackOriginTerritory.invadeableNeighbors !== null)
+        {
+            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
             {
-                location.reload();
-            });
-            
-            return;
+                if (!(tile instanceof WorldObject))
+                    continue;
+                
+                tile.userData.invadeable = false;
+                tile.material.color.setHex(Colors.enemyColor);
+            }
         }
         else
-            console.log(`Owned Territories: ${game.world.ownedTerritories} out of ${game.world.tiles.length}`);
-        
-        if (this.attackTerritory === null)
-        {
-            console.error("attackTerritory is null in finaliseAttack()");
-            return;
-        }
-        
-        if (this.selectedTerritory === null)
-        {
-            console.error("selectedTerritory is null in finaliseAttack()");
-            return;
-        }
-        
-        for (const tile of this.selectedTerritory.getInvadeableNeighbors())
-        {
-            if (!(tile instanceof WorldObject))
-                continue;
-            
-            tile.userData.invadeable = false;
-            tile.material.color.setHex(Colors.enemyColor);
-        }
-        
-        if (this.attackTerritory.userData.ownerId == clientId)
-            this.attackTerritory.material.color.setHex(Colors.ownedColor);
-        else
-            this.attackTerritory.material.color.setHex(Colors.enemyColor);
-            
-        this.attackTerritory.lower();
-        this.attackTerritory = null;
-        
-        this.selectedTerritory.lower();
-        this.selectedTerritory.material.color.setHex(Colors.ownedColor);
-        this.selectedTerritory = null;
-        
-        // TODO: use the official methods to clear attacker and defender
-        
-        game.world.calculateInvadeableTerritories();
-        
-        // TODO: remove these when the above todo is implemented
-        $("#attackPlannerCancelButton").off();
-        $("#attackPlannerGoButton").off();
-        
-        $(".gameInterfaceContainer").attr("data-visibility", null);
+            this.clearAttackOriginTerritory();
     }
 };

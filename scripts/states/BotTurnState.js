@@ -34,22 +34,12 @@ export class BotTurnState extends State
         setTimeout(() => { game.nextStage() }, this.addToDelay());
         this.moveUnits();
         setTimeout(() => { game.nextStage() }, this.addToDelay());
-        
-        // while
-        // select random enemy territory
-        // if territory doesn't have invadeable neighrbors
-        //  set move start point
-     
-        // while
-        // select random enemy territory
-        // if enemy territory has invadeable neighbors
-        //  set end point
-        //  move units
     }
 
     getRandomDelay()
     {
         // TODO: kinda hacky, since getRandomInt does not support a lower threshold
+        // I want a random number anywhere between 400 and 1000
         return 400 + getRandomInt(500);
     }
 

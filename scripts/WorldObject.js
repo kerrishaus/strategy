@@ -34,7 +34,7 @@ export class WorldObject extends Mesh
         
         this.dialog = null;
         this.world = null;
-        this.invadeableNeighbors = new Array(4);
+        this.invadeableNeighbors = [ null, null, null, null ];
     }
     
     update(deltaTime)
@@ -42,6 +42,7 @@ export class WorldObject extends Mesh
         this.position.lerp(this.targetPosition, 0.3);
     }
     
+    // TODO: probably return an empty array if there are none, null causes crashes so easily
     getInvadeableNeighbors()
     {
         return this.invadeableNeighbors;

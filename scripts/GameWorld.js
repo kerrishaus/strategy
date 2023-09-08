@@ -123,6 +123,7 @@ export class GameWorld extends Group
             box.expandByObject(object); // this doesn't seem to be working
         }
         
+        // TODO: what is this doing?
         this.tiles = world.tiles;
 
         const floorGeometry = new PlaneGeometry(world.width + world.width * 1.3 + 3, world.height + world.height * 1.3 + 3);
@@ -164,26 +165,35 @@ export class GameWorld extends Group
             // TODO: I'm not sure why we have to reset this, I figured we would just be
             // able to access the first four elements and overwrite them but apparently
             // if they're null we can't assign them??
-            tile.invadeableNeighbors = new Array(4);
+            tile.invadeableNeighbors = [ null, null, null, null ];
 
+            // left
+            // make sure the id doesn't go below zero so we don't access the array out of bounds
             if (id - 1 >= 0)
+                // make sure both territories are on the same row
+                // TODO: stuff like checking to make sure they're on the same row
+                // can probably be done in advance, when the world is generated.
                 if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
-                    tile.invadeableNeighbors[0] = this.tiles[id - 1].userData.ownerId != tile.userData.ownerId ? this.tiles[id - 1] : null;
+                    // if the neighbor tile's ownerId does not match this tile's ownerId, it can invade it
+                    if (this.tiles[id - 1].userData.ownerId != tile.userData.ownerId)
+                        tile.invadeableNeighbors[0] = this.tiles[id - 1]
 
+            // right
             if (id + 1 < this.tiles.length)
                 if (Math.trunc((id + 1) / this.width) == Math.trunc(id / this.width))
-                    tile.invadeableNeighbors[1] = this.tiles[id + 1].userData.ownerId != tile.userData.ownerId ? this.tiles[id + 1] : null;
+                    if (this.tiles[id + 1].userData.ownerId != tile.userData.ownerId)
+                        tile.invadeableNeighbors[1] = this.tiles[id + 1];
                 
+            // top
             if (id - this.width >= 0)
-                tile.invadeableNeighbors[2]     = this.tiles[id - this.width].userData.ownerId != tile.userData.ownerId ? this.tiles[id - this.width] : null;
-            else
-                tile.invadeableNeighbors[2]     = null
+                if (this.tiles[id - this.width].userData.ownerId != tile.userData.ownerId)
+                    tile.invadeableNeighbors[2] = this.tiles[id - this.width];
                 
+            // bottom
             if (id + this.width < this.tiles.length)
-                tile.invadeableNeighbors[3]     = this.tiles[id + this.width].userData.ownerId != tile.userData.ownerId ? this.tiles[id + this.width] : null;
-            else
-                tile.invadeableNeighbors[3]     = null
-                
+                if (this.tiles[id + this.width].userData.ownerId != tile.userData.ownerId)
+                    tile.invadeableNeighbors[3] = this.tiles[id + this.width];
+
             if (tile.invadeableNeighbors[0] === null &&
                 tile.invadeableNeighbors[1] === null &&
                 tile.invadeableNeighbors[2] === null &&
