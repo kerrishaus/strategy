@@ -2,11 +2,16 @@ import * as THREE from "https://kerrishaus.com/assets/threejs/build/three.module
 			
 import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
-import { Game      } from "../Game.js";
-import { State          } from "./State.js";
+import { Game  } from "../Game.js";
+import { State } from "./State.js";
 
 export class GameSetupState extends State
 {
+	/*
+	data is an object
+	0. bool - networked
+	1. object - lobby info
+	*/
 	constructor(data)
 	{
 		super();
@@ -23,7 +28,7 @@ export class GameSetupState extends State
 		`<div class='gameInterfaceContainer transition-quick'>
 	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
 	            <div id='me'>
-	                <div id='playerPortrait'></div>
+	                <!--<div id='playerPortrait'></div>-->
 	            </div>
 	            <div id='roundStatus'>
 	                <div>
@@ -92,8 +97,8 @@ export class GameSetupState extends State
 				</div>
 			</div>
 			-->
-	    </div>`
-		);
+	    </div>
+		`);
 
 		window.scene = new THREE.Scene();
 		window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -159,8 +164,8 @@ export class GameSetupState extends State
 
 		function onPointerMove(event)
 		{
-			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+			pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
 		}
 
 		function onWindowResize()

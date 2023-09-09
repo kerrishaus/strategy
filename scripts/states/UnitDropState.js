@@ -84,14 +84,15 @@ export class UnitDropState extends State
 
 		if (object.userData.ownerId != clientId)
 			return;
+
+		if (this.availableUnits <= 0)
+			return;
 		
+		// raise suitable owned territories until we select a drop point
 		if (this.selectedTerritory !== object)
 		{
-			if (this.availableUnits > 0)
-			{
-				object.raise();
-				object.material.color.setHex(Colors.ownedHoverColor);
-			}
+			object.raise();
+			object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
 		}
 	}
 	
@@ -106,7 +107,7 @@ export class UnitDropState extends State
 			return
 			
 		object.lower();
-		object.material.color.setHex(Colors.ownedColor);
+		object.material.color.set(game.clients[object.userData.ownerId].color);
 	}
 	
 	onMouseDown(event)
@@ -129,7 +130,7 @@ export class UnitDropState extends State
 			
 			this.selectedTerritory = object;
 			this.selectedTerritory.raise();
-			this.selectedTerritory.material.color.setHex(Colors.ownedSelectedColor);
+			this.selectedTerritory.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -40));
 			this.selectedTerritory.createUnitPlaceDialog(this.availableUnits);
 		}
 	}
@@ -149,7 +150,7 @@ export class UnitDropState extends State
 	clearDropPoint()
 	{
 		this.selectedTerritory.lower();
-		this.selectedTerritory.material.color.setHex(Colors.ownedColor);
+		this.selectedTerritory.material.color.set(game.clients[this.selectedTerritory.userData.ownerId].color);
 		this.selectedTerritory.destroyUnitPlaceDialog();
 		this.selectedTerritory = null;
 	}

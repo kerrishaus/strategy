@@ -4,7 +4,7 @@ import { CSS2DObject } from "https://kerrishaus.com/assets/threejs/examples/jsm/
 
 export class WorldObject extends Mesh
 {
-    constructor(width, height, color, territoryId)
+    constructor(width, height, color, territoryId, startPosition)
     {
         const geometry = new BoxGeometry(width, height, 1);
         const material = new MeshBasicMaterial({ color: color });
@@ -13,11 +13,11 @@ export class WorldObject extends Mesh
 
         this.geometry.computeBoundingBox();
 
-        this.territoryId = territoryId;
+        this.position.copy(startPosition);
 
+        this.territoryId = territoryId;
         this.hovered = false;
-        
-        this.unitCount = 1;
+        this.unitCount = 0;
         
         const labelDiv = document.createElement("div");
         labelDiv.id = this.uuid;
@@ -30,7 +30,7 @@ export class WorldObject extends Mesh
         
         this.userData.canClick = true;
         
-        this.targetPosition = new Vector3(0, 0, 0);
+        this.targetPosition = startPosition.clone();
         
         this.dialog = null;
         this.world = null;

@@ -53,12 +53,12 @@ export class NetworkLobbyWaitingState extends State
 
 	startGame(event)
 	{
-		const lobby2 = event.data.lobby;
+		const lobby = event.data.lobby;
 
-		lobby2.width = event.detail.width;
-		lobby2.height = event.detail.height;
+		lobby.width = event.detail.width;
+		lobby.height = event.detail.height;
 
-		stateManager.changeState(new GameSetupState({ networked: true, lobby: lobby2 }));
+		stateManager.changeState(new GameSetupState({ networked: true, lobby: lobby }));
 	}
 
 	clientJoin(event)

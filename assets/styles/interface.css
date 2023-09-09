@@ -97,20 +97,23 @@
     width: 128px;
     height: 128px;
 
-    background-color: var(--primary);
+    background: url(https://avatars.githubusercontent.com/u/13459291?v=4) center center no-repeat;
+    background-size: contain;
 
     border-radius: 100%;
-    border: 10px solid var(--outline);
+    border: 10px solid var(--playerColor);
+
+    box-shadow: 0 0 4px 2px #00000046, 0 0 4px 4px #00000046 inset;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
 
-        position: relative;
-        left: 26px;
+    position: relative;
+    left: 26px;
 
-        transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
+    transition: background-color var(--color-fade-time), border-color var(--color-fade-time);
 }
 
 #playerPortrait
@@ -129,7 +132,7 @@
 
 #roundStatus
 {
-    background-color: #222222bb;
+    background-color: #222222aa;
     padding: 18px 40px;
     padding-bottom: 30px;
     text-align: center;

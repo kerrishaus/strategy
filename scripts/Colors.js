@@ -1,13 +1,31 @@
-export const ownedColor                 = 0x00aa00, 
-             ownedHoverColor            = 0x00cc00, 
-             ownedSelectedColor         = 0x00ff00, 
+export const unownedColor               = "#696969",
+             unownedHoverColor          = "#734d40",
+             unownedSelectColor         = "#8f6253";
 
-             enemyColor                 = 0xaa0000, 
-             enemyInvadeableColor       = 0xee0000,
-             enemyInvadeablePausedColor = 0x550000,
-             enemyInvadeableHoverColor  = 0xcc0000, 
-             enemySelectedColor         = 0xff0000,
+// https://stackoverflow.com/a/60880664/6745382
+export function shade(hexInput, percent)
+{
+    let hex = hexInput;
 
-             unownedColor               = 0x5e3c31,
-             unownedHoverColor          = 0x734d40,
-             unownedSelectColor         = 0x8f6253;
+    // strip the leading # if it's there
+    hex = hex.replace(/^\s*#|\s*$/g, "");
+
+    // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+    if (hex.length === 3) {
+        hex = hex.replace(/(.)/g, "$1$1");
+    }
+
+    let r = parseInt(hex.substr(0, 2), 16);
+    let g = parseInt(hex.substr(2, 2), 16);
+    let b = parseInt(hex.substr(4, 2), 16);
+
+    const calculatedPercent = (100 + percent) / 100;
+
+    r = Math.round(Math.min(255, Math.max(0, r * calculatedPercent)));
+    g = Math.round(Math.min(255, Math.max(0, g * calculatedPercent)));
+    b = Math.round(Math.min(255, Math.max(0, b * calculatedPercent)));
+
+    return `#${r.toString(16).toUpperCase()}${g.toString(16).toUpperCase()}${b
+        .toString(16)
+        .toUpperCase()}`;
+}

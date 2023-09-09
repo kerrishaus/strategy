@@ -42,28 +42,48 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
+        // first raise candidates for the attack origin
         if (this.attackOriginTerritory === null)
         {
+            // not if we don't own the territory
             if (object.userData.ownerId != clientId)
+            {
+                console.log("no a");
                 return;
+            }
                 
-            if (object.invadeableNeighbors.lower > 0)
+            // it has to have invadeableNeighbors
+            if (object.getInvadeableNeighbors().length > 0)
+            {
+                console.log("no b");
                 return;
+            }
+
+            // it has to have more than 1 unit
+            if (object.unitCount <= 1)
+            {
+                console.log("no c");
+                return;
+            }
+
+            console.log("pokay");
 
             object.raise();
-            object.material.color.setHex(Colors.ownedHoverColor);
+            object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
         }
-
-        if (this.attackTargetTerritory === null)
+        // if we already have an origin, then we'll be selecting candidates for the target
+        else if (this.attackTargetTerritory === null)
         {
+            // not if we own the territory
             if (object.userData.ownerId == clientId)
                 return;
 
+            // has to be invadeable
             if (!object.userData.invadeable)
                 return;
 
             object.raise();
-            object.material.color.setHex(Colors.enemyInvadeableHoverColor);
+            object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
         }
     }
 
@@ -73,20 +93,26 @@ export class AttackState extends State
 
         if (object !== this.attackOriginTerritory &&
             object !== this.attackTargetTerritory)
+        {
+            object.lower();
+
+            const objectOwnerColor = game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor;
+            
+            if (object.userData.ownerId == clientId)
+                object.material.color.set(objectOwnerColor);
+            else
             {
-                object.lower();
-                
-                if (object.userData.ownerId == clientId)
-                    object.material.color.setHex(Colors.ownedColor);
-                else
-                    if (object.userData.invadeable)
-                        if (this.attackTargetTerritory !== null)
-                            object.material.color.setHex(Colors.enemyInvadeablePausedColor);
-                        else
-                            object.material.color.setHex(Colors.enemyInvadeableColor);
+                if (object.userData.invadeable)
+                {
+                    if (this.attackTargetTerritory !== null)
+                        object.material.color.set(Colors.shade(objectOwnerColor, -40));
                     else
-                        object.material.color.setHex(Colors.enemyColor);
+                        object.material.color.set(Colors.shade(objectOwnerColor, -20));
+                }
+                else
+                    object.material.color.set(objectOwnerColor);
             }
+        }
     }
 
     onMouseDown(event)
@@ -133,11 +159,17 @@ export class AttackState extends State
             return;
         }
         
+        if (object.unitCount <= 1)
+        {
+            console.warn("This tile does not have enough units.");
+            return;
+        }
+
         if (this.attackOriginTerritory !== null)
             this.clearAttackOriginTerritory();
             
         object.raise();
-        object.material.color.setHex(Colors.ownedSelectedColor);
+        object.material.color.set(Colors.shade(game.clients[object.userData.ownerId].color, -40));
         this.attackOriginTerritory = object;
 
         // highlight invadeable neighbors
@@ -149,7 +181,7 @@ export class AttackState extends State
                 continue;
 
             tile.userData.invadeable = true;
-            tile.material.color.setHex(Colors.enemyInvadeableColor);
+            tile.material.color.set(Colors.shade(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor), -20);
         }
     }
     
@@ -170,11 +202,11 @@ export class AttackState extends State
                 continue;
 
             tile.userData.invadeable = false;
-            tile.material.color.setHex(Colors.enemyColor);
+            tile.material.color.set(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor);
         }
 
         this.attackOriginTerritory.lower();
-        this.attackOriginTerritory.material.color.setHex(Colors.ownedColor);
+        this.attackOriginTerritory.material.color.set(game.clients[this.attackOriginTerritory.userData.ownerId].color);
         this.attackOriginTerritory = null;
     }
     
@@ -199,7 +231,7 @@ export class AttackState extends State
         }
         
         object.raise();
-        object.material.color.setHex(Colors.enemySelectedColor);
+        object.material.color.set(Colors.enemySelectedColor);
         this.attackTargetTerritory = object;
         
         for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
@@ -211,7 +243,7 @@ export class AttackState extends State
                 continue;
                 
             tile.userData.invadeable = true;
-            tile.material.color.setHex(Colors.enemyInvadeablePausedColor);
+            tile.material.color.set(Colors.enemyInvadeablePausedColor);
         }
         
         $("#attackPlannerCancelButton").click(function(event)
@@ -241,9 +273,7 @@ export class AttackState extends State
         this.attackTargetTerritory.lower();
         // TODO: we should probably make a function,
         // that sets the color to match the current owner
-        this.attackTargetTerritory.material.color.setHex(
-            this.attackTargetTerritory.userData.ownerId == clientId ? Colors.ownedColor : Colors.enemyInvadeableColor
-        );
+        this.attackTargetTerritory.material.color.set(game.clients[this.attackTargetTerritory.userData.ownerId]?.color ?? Colors.unownedColor);
         this.attackTargetTerritory = null;
         
         for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
@@ -257,7 +287,7 @@ export class AttackState extends State
             console.log("tile is invadable");
 
             tile.userData.invadeable = true;
-            tile.material.color.setHex(Colors.enemyInvadeableColor);
+            tile.material.color.set(Colors.shade(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor, -20));
         }
         
         $("#attackPlannerCancelButton").off();
@@ -364,7 +394,7 @@ export class AttackState extends State
                     continue;
                 
                 tile.userData.invadeable = false;
-                tile.material.color.setHex(Colors.enemyColor);
+                tile.material.color.set(Colors.enemyColor);
             }
         }
         else

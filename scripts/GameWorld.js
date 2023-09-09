@@ -6,6 +6,8 @@ import * as Colors from "./Colors.js";
 
 import { WorldObject } from "./WorldObject.js";
 
+import { shuffleArray } from "./Utility.js";
+
 export class GameWorld extends Group
 {
     constructor()
@@ -14,8 +16,6 @@ export class GameWorld extends Group
 
         this.width = 0;
         this.height = 0;
-
-        this.ownedTerritories = 0;
     }
     
     update(deltaTime)
@@ -38,15 +38,18 @@ export class GameWorld extends Group
         this.width  = width;
         this.height = height;
 
-        const tiles = new Array(width * height);
+        // used to make the squares kind of spread out from the center of the map
+        const mapMidPoint = new Vector3(this.width, this.height, 0);
 
-        for (let y = 0; y < height; y++)
+        const tiles = new Array(this.width * this.height);
+
+        for (let y = 0; y < this.height; y++)
         {
-            for (let x = 0; x < width; x++)
+            for (let x = 0; x < this.width; x++)
             {
-                const arrayPosition = x + y * width;
+                const arrayPosition = x + y * this.width;
 
-                const object = new WorldObject(2, 2, Colors.unownedColor, arrayPosition);
+                const object = new WorldObject(2, 2, Colors.unownedColor, arrayPosition, mapMidPoint);
 
                 // this is just kinda cool will probably remove later
                 setTimeout(() =>
@@ -78,24 +81,24 @@ export class GameWorld extends Group
             // make sure the id doesn't go below zero so we don't access the array out of bounds
             if (id - 1 >= 0)
                 // make sure both territories are on the same row
-                if (Math.trunc((id - 1) / width) == Math.trunc(id / width))
+                if (Math.trunc((id - 1) / this.width) == Math.trunc(id / this.width))
                     tile.userData.neighbors.leftNeighbor = tiles[id - 1];
 
             // right
             if (id + 1 < tiles.length)
-                if (Math.trunc((id + 1) / width) == Math.trunc(id / width))
+                if (Math.trunc((id + 1) / this.width) == Math.trunc(id / this.width))
                     tile.userData.neighbors.rightNeighbor = tiles[id + 1];
                 
             // top
-            if (id - width >= 0)
-                tile.userData.neighbors.topNeighbor = tiles[id - width];
+            if (id - this.width >= 0)
+                tile.userData.neighbors.topNeighbor = tiles[id - this.width];
                 
             // bottom
-            if (id + width < tiles.length)
-                tile.userData.neighbors.bottomNeighbor = tiles[id + width];
+            if (id + this.width < tiles.length)
+                tile.userData.neighbors.bottomNeighbor = tiles[id + this.width];
         }
 
-        return { width: width, height: height, tiles: tiles };
+        return { width: this.width, height: this.height, tiles: tiles };
     }
 
     distributeTerritories(clients)
@@ -104,64 +107,68 @@ export class GameWorld extends Group
 
         const territories = new Array(this.tiles.length);
 
-        const territoryOwnerCount = new Array(clients.length);
-
         for (const tile in this.tiles)
         {
             // getRandomInt returns between 0 and client length, which is okay *i think*
-            const owner = clients[getRandomInt(clients.length)];
+            // TODO: clients are now stored with their ID as the index in the array,
+            // this might not work with non-consecutive client IDs! D:
+            const  owner = clients[getRandomInt(clients.length)];
 
-            if (territoryOwnerCount[owner] > 4)
+            // only assign clients some of the board, i don't know how to explain the math oof
+            if (owner.ownedTerritories <= ((this.tiles.length / clients.length) / 2))
+            {
+                owner.ownedTerritories++;
+                territories[tile] = owner.id;
+
                 continue;
+            }
 
-            territoryOwnerCount[owner]++;
-
-            territories[tile] = owner;
+            // unowned territories
+            territories[tile] = 0;
         }
+
+        shuffleArray(territories)
 
         return territories;
     }
 
-    applyTerritories(territories)
+    applyTerritories(territories, clients)
     {
         console.log("Applying territories to world", territories);
 
         for (const territory in territories)
         {
             this.tiles[territory].userData.ownerId        = territories[territory];
+
+            if (this.tiles[territory].userData.ownerId > 0)
+                this.tiles[territory].addUnits(1);
+
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
+            //this.tiles[territory].label.element.innerHTML = this.tiles[territory].userData.ownerId;
 
-            if (this.tiles[territory].userData.ownerId == clientId)
-            {
-                this.tiles[territory].material.color.setHex(Colors.ownedColor);
-                this.ownedTerritories += 1;
-            }
-            else
-                this.tiles[territory].material.color.setHex(Colors.enemyColor);
+            this.tiles[territory].material.color.set(clients[territories[territory]]?.color ?? Colors.unownedColor);
         }
-
-        this.territories = territories;
     }
 
-    loadWorld(world)
+    loadWorld(terrain)
     {
         const box = new Box3();
         box.makeEmpty();
 
-        for (const object of world.tiles)
+        for (const object of terrain.tiles)
         {
             this.add(object);
             box.expandByObject(object); // this doesn't seem to be working
         }
         
         // TODO: what is this doing?
-        this.tiles = world.tiles;
+        this.tiles = terrain.tiles;
 
-        const floorGeometry = new PlaneGeometry(world.width + world.width * 1.3 + 3, world.height + world.height * 1.3 + 3);
+        const floorGeometry = new PlaneGeometry(terrain.width + terrain.width * 1.3 + 3, terrain.height + terrain.height * 1.3 + 3);
         const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
         const floor = new Mesh(floorGeometry, floorMaterial);
-        floor.position.x = world.width / 2 + 1.1 * world.width / 2 - 0.7;
-        floor.position.y = world.height / 2 + 1.1 * world.height / 2 - 0.7;
+        floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
+        floor.position.y = terrain.height / 2 + 1.1 * terrain.height / 2 - 0.7;
         this.add(floor);
 
         const size = new Vector3();

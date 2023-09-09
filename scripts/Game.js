@@ -13,7 +13,7 @@ export class Game
 {
     constructor(networked = false, lobby)
     {
-        console.log(lobby);
+        console.log(`Starting game with lobby: `, lobby);
 
         this.setNetworked(networked);
 
@@ -21,7 +21,7 @@ export class Game
 
         $("#debug-clientCount").text(this.clients.length);
 
-        this.ownerId             = lobby.ownerId;
+        this.ownerId = lobby.ownerId;
 
         $("#debug-lobbyOwnerId").text(this.ownerId);
 
@@ -33,27 +33,27 @@ export class Game
 
         this.world = new GameWorld();
 
-        const world = this.world.generateTerrain(lobby.width, lobby.height);
+        const terrain = this.world.generateTerrain(lobby.width, lobby.height);
 
-        this.world.loadWorld(world);
+        this.world.loadWorld(terrain);
 
         if (clientId == this.ownerId)
         {
-            this.world.applyTerritories(this.world.distributeTerritories(this.clients));
-
-            console.log(this.world.territories);
-
-            this.world.calculateInvadeableTerritories();
+            const territories = this.world.distributeTerritories(this.clients);
 
             if (networked)
-                socket.send(JSON.stringify({ command: "worldData", territories: this.world.territories }));
+                socket.send(JSON.stringify({ command: "worldData", territories: territories }));
+
+            this.world.applyTerritories(territories, this.clients);
+
+            this.world.calculateInvadeableTerritories();
         }
         
         // if we are not the owner of this lobby, we wait until we receive the world data
 
         // always starts with the first client, which SHOULD be the lobby host
         this.currentTurnClientIndex = 0;
-        this.currentTurnClientId    = this.clients[this.currentTurnClientIndex];
+        this.currentTurnClientId    = this.clients[this.currentTurnClientIndex].id;
         this.currentTurnStage       = -1;
         
         console.log(this.clients, this.currentTurnClientIndex, this.currentTurnClientId);
@@ -92,7 +92,7 @@ export class Game
             }
 
             console.log("Loading world data from network...", event.detail);
-            game.world.applyTerritories(event.detail.territories);
+            game.world.applyTerritories(event.detail.territories, this.clients);
             game.world.calculateInvadeableTerritories();
         });
 
@@ -119,22 +119,6 @@ export class Game
             }
 
             game.nextStage();
-        });
-
-        // this is a mid-game client join, not when a client joins a lobby.
-        $(document).on("clientJoin", function(event)
-        {
-            console.log("clientJoin event, adding client.");
-
-            game.addClient(event.detail.clientId);
-        });
-
-        // this is a mid-game client leave, not when a client leaves a lobby.
-        $(document).on("clientLeave", function(event)
-        {
-            console.log("clientLeave event, removing client.");
-
-            game.removeClient(event.detail.clientId);
         });
 
         if (networked)
@@ -189,21 +173,12 @@ export class Game
                 console.log(`${event.detail.clientId} now owns ${defendingTerritory.territoryId}.`);
 
                 defendingTerritory.userData.ownerId = event.detail.clientId;
-                
-                if (event.detail.clientId == clientId)
-                {
-                    game.world.ownedTerritories += 1;
-                    defendingTerritory.material.color.setHex(Colors.ownedColor);
-                }
-                else
-                    defendingTerritory.material.color.setHex(Colors.enemyColor);
+                defendingTerritory.material.color.set(game.clients[defendingTerritory.userData.ownerId].color);
+
+                game.client[event.detail.clientId].ownedTerritories += 1;
+                game.client[event.detail.defenderOwnerId].ownedTerritories -= 1;
 
                 game.world.calculateInvadeableTerritories();
-
-                // TODO: this might be a problem if the defenderOwnerId is the same as the
-                // current player but how could a player lose their own territory to themselves?
-                if (event.detail.defenderOwnerId == clientId)
-                    game.world.ownedTerritories -= 1;
             }
 
             attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
@@ -240,22 +215,6 @@ export class Game
         });
     }
 
-    addClient(clientId)
-    {
-        this.clients.push(clientId);
-
-        $("#debug-clientCount").text(this.clients.length);
-        console.log(`Client ${clientId} joined.`);
-    }
-
-    removeClient(clientId)
-    {
-        // TODO: figure out how to remove something from an array again
-
-        $("#debug-clientCount").text(this.clients.length);
-        console.log(`Client ${clientId} left.`);
-    }
-
     nextStage()
     {
         if (this.currentTurnStage >= 2)
@@ -267,7 +226,7 @@ export class Game
             else
                 this.currentTurnClientIndex += 1;
 
-            this.currentTurnClientId = this.clients[this.currentTurnClientIndex];
+            this.currentTurnClientId = this.clients[this.currentTurnClientIndex].id;
     
             console.log(`${this.currentTurnClientId}'s turn is starting. (${this.currentTurnClientIndex} index)`);
     
@@ -307,7 +266,8 @@ export class Game
                 stateManager.changeState(new BotTurnState());
         }
 
-        $("#playerName").text(this.currentTurnClientId);
+        $("#playerName").text(this.clients[this.currentTurnClientId].name);
+        $(".gameStatus").css("--playerColor", this.clients[this.currentTurnClientId].color);
         $("#debug-turn").text(this.currentTurnClientIndex);
         $("#debug-turnClientId").text(this.currentTurnClientId);
     }
@@ -328,7 +288,7 @@ export class Game
         if (this.currentTurnClientId == clientId)
         {
             if (this.currentTurnStage == 0)
-                stateManager.changeState(new UnitDropState(10));
+                stateManager.changeState(new UnitDropState(Math.floor(this.clients[this.currentTurnClientId].ownedTerritories / 3)));
             else if (this.currentTurnStage == 1)
                 stateManager.changeState(new AttackState());
             else if (this.currentTurnStage == 2)
@@ -348,7 +308,7 @@ export class Game
         for (const object of this.world.tiles)
         {
             object.lower();
-            object.material.color.setHex(object.userData.ownerId == clientId ? Colors.ownedColor : Colors.enemyColor);
+            object.material.color.set(this.clients[object.userData.ownerId]?.color ?? Colors.unownedColor);
 
             //object.destroyUnitPlaceDialog();
         }

@@ -28,8 +28,20 @@ export class MainMenuState extends State
 					clientId: clientId,
 					ownerId: clientId,
 					clients: [
-						clientId,
-						clientId + 1 
+						{
+							id: clientId,
+							type: "player",
+							name: "Player",
+							ownedTerritories: 0,
+							color: "#1bcf1b"
+						},
+						{
+							id: clientId + 1,
+							type: "bot",
+							name: "Bot",
+							ownedTerritories: 0,
+							color: "#1583b3"
+						}
 					]
 				}
 			})) 
