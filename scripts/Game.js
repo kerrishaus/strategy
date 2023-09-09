@@ -1,13 +1,75 @@
 import { GameWorld } from "./GameWorld.js";
 
 import { OpponentState } from "./states/OpponentState.js";
-import { UnitMoveState      } from "./states/UnitMoveState.js";
-import { AttackState        } from "./states/AttackState.js";
-import { UnitDropState      } from "./states/UnitDropState.js";
-import { BotTurnState } from "./states/BotTurnState.js";
+import { UnitMoveState } from "./states/UnitMoveState.js";
+import { AttackState   } from "./states/AttackState.js";
+import { UnitDropState } from "./states/UnitDropState.js";
+import { BotTurnState  } from "./states/BotTurnState.js";
 import { MainMenuState } from "./states/MainMenuState.js";
 
 import * as Colors from "./Colors.js";
+
+import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
+
+export class ClientList
+{
+    constructor(clients)
+    {
+        this.clients = clients;
+
+        // an array of numerically ordered keys with the clientId as the value
+        this.clientIdToArrayPosition = new Map;
+        this.numericallyOrderedClientIds = [];
+
+        for (const clientId in this.clients)
+            if (this.clients[clientId] instanceof Object)
+            {
+                this.clientIdToArrayPosition.set(this.clients[clientId].id, clientId);
+                this.numericallyOrderedClientIds[clientId] = this.clients[clientId].id;
+            }
+
+        this.internalIterator = 0;
+
+        console.log("ClientList:", this.clients, this.clientIdToArrayPosition, this.numericallyOrderedClientIds);
+    }
+
+    advanceInternalIterator()
+    {
+        if (this.internalIterator >= this.clientIdToArrayPosition.size - 1)
+            this.internalIterator = 0;
+        else
+            this.internalIterator++;
+
+        console.log("ClientList internal iterator: " + this.internalIterator);
+        console.log("Client ID: " + this.current().id);
+    }
+
+    getById(clientId)
+    {
+        return this.clients[this.clientIdToArrayPosition.get(clientId)];
+    }
+
+    getRandom()
+    {
+        return this.clients[this.clientIdToArrayPosition.get(this.numericallyOrderedClientIds[getRandomInt(this.numericallyOrderedClientIds.length - 1)])];
+    }
+
+    current()
+    {
+        return this.clients[this.clientIdToArrayPosition.get(this.numericallyOrderedClientIds[this.internalIterator])];
+    }
+
+    // selects the next client
+    next()
+    {
+        return this.clients[this.clientIdToArrayPosition[this.advanceInternalIterator()]];
+    }
+
+    length()
+    {
+        return this.numericallyOrderedClientIds.length;
+    }
+}
 
 export class Game
 {
@@ -15,21 +77,14 @@ export class Game
     {
         console.log(`Starting game with lobby: `, lobby);
 
-        this.setNetworked(networked);
-
-        this.clients = lobby.clients;
-
-        $("#debug-clientCount").text(this.clients.length);
-
         this.ownerId = lobby.ownerId;
-
         $("#debug-lobbyOwnerId").text(this.ownerId);
 
-        this.turnStages = [
-            "unitDropState",
-            "attackState",
-            "unitMoveState"
-        ]
+        this.clients = new ClientList(lobby.clients);
+
+        this.setNetworked(networked);
+
+        $("#debug-clientCount").text(this.clients.length());
 
         this.world = new GameWorld();
 
@@ -51,14 +106,9 @@ export class Game
         
         // if we are not the owner of this lobby, we wait until we receive the world data
 
-        // always starts with the first client, which SHOULD be the lobby host
-        this.currentTurnClientIndex = 0;
-        this.currentTurnClientId    = this.clients[this.currentTurnClientIndex].id;
         this.currentTurnStage       = -1;
         
-        console.log(this.clients, this.currentTurnClientIndex, this.currentTurnClientId);
-
-        this.setTurn(this.currentTurnClientId);
+        this.setTurn(this.clients.current().id);
         this.setStage(0);
     }
 
@@ -98,9 +148,9 @@ export class Game
 
         $(document).on("requestNextStage", function(event)
         {
-            if (game.currentTurnClientId != clientId)
+            if (game.clients.current().id != clientId)
             {
-                console.error(`Skipping request for next stage because it is not our turn. Current turn owner: ${game.currentTurnClientId}, us: ${clientId}`);
+                console.error(`Skipping request for next stage because it is not our turn. Current turn owner: ${game.clients.current().id}, us: ${clientId}`);
                 return;
             }
 
@@ -112,9 +162,9 @@ export class Game
 
         $(document).on("nextStage", function(event)
         {
-            if (event.detail.clientId != game.currentTurnClientId)
+            if (event.detail.clientId != game.clients.current().id)
             {
-                console.error("nextStage requested by invalid client. Can only be requested by the current turn client. Current turn client ID:" + game.currentTurnClientId + ", requester: " + event.detail.clientId);
+                console.error("nextStage requested by invalid client. Can only be requested by the current turn client. Current turn client ID:" + game.clients.current().id + ", requester: " + event.detail.clientId);
                 return;
             }
 
@@ -173,10 +223,13 @@ export class Game
                 console.log(`${event.detail.clientId} now owns ${defendingTerritory.territoryId}.`);
 
                 defendingTerritory.userData.ownerId = event.detail.clientId;
-                defendingTerritory.material.color.set(game.clients[defendingTerritory.userData.ownerId].color);
+                defendingTerritory.material.color.set(game.clients[defendingTerritory.userData.ownerId]?.color ?? Colors.unownedColor);
 
-                game.client[event.detail.clientId].ownedTerritories += 1;
-                game.client[event.detail.defenderOwnerId].ownedTerritories -= 1;
+                if (event.detail.clientId in game.clients)
+                    game.clients[event.detail.clientId].ownedTerritories += 1;
+
+                if (event.detail.defenderOwnerId in game.clients``)
+                    game.clients[event.detail.defenderOwnerId].ownedTerritories -= 1;
 
                 game.world.calculateInvadeableTerritories();
             }
@@ -221,16 +274,11 @@ export class Game
         {
             console.log(`Starting next turn. ${this.currentTurnStage} >= 2`);
 
-            if (this.currentTurnClientIndex >= this.clients.length - 1)
-                this.currentTurnClientIndex = 0;
-            else
-                this.currentTurnClientIndex += 1;
-
-            this.currentTurnClientId = this.clients[this.currentTurnClientIndex].id;
+            this.clients.next();
     
-            console.log(`${this.currentTurnClientId}'s turn is starting. (${this.currentTurnClientIndex} index)`);
+            console.log(`${this.clients.current().id}'s turn is starting.`);
     
-            game.setTurn(this.currentTurnClientId);
+            game.setTurn(this.clients.current().id);
             game.setStage(0);
         }
         else
@@ -243,14 +291,12 @@ export class Game
     {
         console.log(`Set to ${_clientId}'s turn.`);
 
-        this.currentTurnClientId = _clientId;
-
         this.setStage(0);
 
-        // check if currentTurnClientId matches the local client id
-        if (this.currentTurnClientId == clientId)
+        // check if clients.current().id matches the local client id
+        if (this.clients.current().id == clientId)
         {
-            console.log(`Our turn! Us: ${this.currentTurnClientId}`);
+            console.log(`Our turn!`);
 
             $("#nextStateButton").attr("data-visibility", null);
         }
@@ -266,10 +312,11 @@ export class Game
                 stateManager.changeState(new BotTurnState());
         }
 
-        $("#playerName").text(this.clients[this.currentTurnClientId].name);
-        $(".gameStatus").css("--playerColor", this.clients[this.currentTurnClientId].color);
-        $("#debug-turn").text(this.currentTurnClientIndex);
-        $("#debug-turnClientId").text(this.currentTurnClientId);
+        $("#playerName").text(this.clients.current().name);
+        $(".gameStatus").css("--playerColor", this.clients.current().color);
+
+        $("#debug-turn").text(this.clients.internalIterator);
+        $("#debug-turnClientId").text(this.clients.current().id);
     }
 
     setStage(stageId)
@@ -285,10 +332,10 @@ export class Game
         $("#roundType").children()[this.currentTurnStage].classList.add("active");
         $(".gameStatus").attr("data-state", this.currentTurnStage);
 
-        if (this.currentTurnClientId == clientId)
+        if (this.clients.current().id == clientId)
         {
             if (this.currentTurnStage == 0)
-                stateManager.changeState(new UnitDropState(Math.floor(this.clients[this.currentTurnClientId].ownedTerritories / 3)));
+                stateManager.changeState(new UnitDropState(Math.floor(this.clients.current().ownedTerritories / 3)));
             else if (this.currentTurnStage == 1)
                 stateManager.changeState(new AttackState());
             else if (this.currentTurnStage == 2)
@@ -310,28 +357,31 @@ export class Game
             object.lower();
             object.material.color.set(this.clients[object.userData.ownerId]?.color ?? Colors.unownedColor);
 
+            object.label.element.innerHTML = object.unitCount;
+
             //object.destroyUnitPlaceDialog();
         }
     }
 
     attack(forClientId, againstClientId, fromTerritoryId, toTerritoryId, unitCount)
     {
-        if (this.currentTurnClientId != clientId)
+        if (this.clients.current().id != clientId)
         {
-            console.error("currentTurnClientId does match clientId that requested action.");
+            console.error("clients.current().id does match clientId that requested action.");
             return;
         }
     }
 
+    // TODO: is this used anywhere in the code?
     moveUnits(clientId, fromTerritoryId, toTerritoryId, amount)
     {
-        if (this.currentTurnClientId != clientId)
+        if (this.clients.current().id != clientId)
         {
-            console.error("currentTurnClientId does match clientId that requested action.");
+            console.error("Current clientId does match clientId that requested action.");
             return;
         }
 
-        // TODO: make sure this.currentTurnClientId matches fromTerritory's owner
+        // TODO: make sure this.clients.current().id matches fromTerritory's owner
 
         if (amount <= 0)
         {

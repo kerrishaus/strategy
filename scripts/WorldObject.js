@@ -165,7 +165,6 @@ export class WorldObject extends Mesh
     // TODO: remove default value, but first make sure this behaviour is not used anywhere
     addUnits(amount = 1)
     {
-        console.log(`${this.unitCount} + ${amount} = ` + (this.unitCount + amount));
         this.unitCount += amount;
         $("#" + this.uuid).html(this.unitCount);
     }

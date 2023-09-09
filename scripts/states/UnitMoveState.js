@@ -99,7 +99,7 @@ export class UnitMoveState extends State
             (object !== this.startTerritory && this.endTerritory === null))
         {
             object.raise();
-            object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+            object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
     }
     
@@ -114,7 +114,7 @@ export class UnitMoveState extends State
             this.endTerritory != object)
         {
             object.lower();
-            object.material.color.set(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor);
+            object.material.color.set(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor);
         }
     }
     
@@ -154,7 +154,7 @@ export class UnitMoveState extends State
         }
         
         object.raise();
-        object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -40));
+        object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -40));
         this.startTerritory = object;
     }
     
@@ -165,7 +165,7 @@ export class UnitMoveState extends State
             this.clearEndPoint();
         
         this.startTerritory.lower();
-        this.startTerritory.material.color.set(game.clients[this.startTerritory.userData.ownerId]?.color ?? Colors.unownedColor);
+        this.startTerritory.material.color.set(game.clients.getById(this.startTerritory.userData.ownerId)?.color ?? Colors.unownedColor);
         this.startTerritory = null;
     }
     
@@ -181,7 +181,7 @@ export class UnitMoveState extends State
             this.clearEndPoint();
         
         object.raise();
-        object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -40));
+        object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -40));
         object.createUnitMoveDialog(this.startTerritory.unitCount - 1);
         this.endTerritory = object;
     }
@@ -192,7 +192,7 @@ export class UnitMoveState extends State
             return;
 
         this.endTerritory.lower();
-        this.endTerritory.material.color.set(game.clients[this.endTerritory.userData.ownerId].color);
+        this.endTerritory.material.color.set(game.clients.getById(this.endTerritory.userData.ownerId).color);
         this.endTerritory.destroyUnitMoveDialog();
         this.endTerritory = null;
     }

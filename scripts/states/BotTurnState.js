@@ -25,7 +25,6 @@ export class BotTurnState extends State
 
         console.log("Starting AI turn with " + this.enemyUnitPlaceCount + " units.");
 
-        $("#playerName").html("Enemy AI");
         $("#count").html(this.enemyUnitPlaceCount);
         
         this.dropUnits();
@@ -144,7 +143,7 @@ export class BotTurnState extends State
             {
                 if (tile.userData.ownerId == this.botId)
                 {
-                    if (tile.invadeableNeighbors !== null && tile.unitCount > 2)
+                    if (tile.invadeableNeighbors.length > 0 && tile.unitCount > 2)
                     {
                         tile.raise();
                         tile.material.color.set(Colors.enemySelectedColor);
@@ -182,6 +181,10 @@ export class BotTurnState extends State
                 else if (tile !== null)
                     console.warn(tile);
             }
+
+            $("#attackerCount").html(attackingTerritory.unitCount);
+            $("#defenderCount").html(defendingTerritory.unitCount);
+            $(".gameInterfaceContainer").attr("data-visibility", "hidden");
         }, this.addToDelay());
 
         setTimeout(func =>
@@ -258,6 +261,8 @@ export class BotTurnState extends State
                 attackerPopulation: attackingPopulation,
                 defenderPopulation: defendingPopulation
             } }));
+
+            $(".gameInterfaceContainer").attr("data-visibility", null);
         }, this.addToDelay());
     }
 
@@ -312,7 +317,7 @@ export class BotTurnState extends State
             if (moveStart !== null && moveEnd !== null)
             {
                 moveStart.raise();
-                moveStart.material.color.set(Colors.shade(game.clients[moveStart.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+                moveStart.material.color.set(Colors.shade(game.clients.getById(moveStart.userData.ownerId)?.color ?? Colors.unownedColor, -20));
             }
         }, this.addToDelay());
             
@@ -321,7 +326,7 @@ export class BotTurnState extends State
             if (moveStart !== null && moveEnd !== null)
             {
                 moveEnd.raise();
-                moveEnd.material.color.set(Colors.shade(game.clients[moveEnd.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+                moveEnd.material.color.set(Colors.shade(game.clients.getById(moveEnd.userData.ownerId)?.color ?? Colors.unownedColor, -20));
             }
             else
                 console.log("skipping move 2");
@@ -337,10 +342,10 @@ export class BotTurnState extends State
                 moveStart.addUnits(-(moveEnd.unitCount - 1));
                 
                 moveStart.lower();
-                moveStart.material.color.set(game.clients[moveEnd.userData.ownerId]?.color ?? Colors.unownedColor);
+                moveStart.material.color.set(game.clients.getById(moveEnd.userData.ownerId)?.color ?? Colors.unownedColor);
                 
                 moveEnd.lower();
-                moveEnd.material.color.set(game.clients[moveEnd.userData.ownerId]?.color ?? Colors.unownedColor);
+                moveEnd.material.color.set(game.clients.getById(moveEnd.userData.ownerId)?.color ?? Colors.unownedColor);
             }
         }, this.addToDelay());
     }

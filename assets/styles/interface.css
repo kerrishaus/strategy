@@ -87,7 +87,7 @@
     bottom: 0px;
 }
 
-.gameInterfaceContainer[data-visibility="hidden"] > .gameStatus
+.gameInterfaceContainer[data-visibility='hidden'] > .gameStatus
 {
     bottom: -200px;
 }
@@ -224,7 +224,7 @@
     text-decoration: none;
 }
 
-#nextStateButton[data-visibility="hidden"]
+#nextStateButton[data-visibility='hidden']
 {
     top: 110%;
 }

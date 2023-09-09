@@ -47,29 +47,18 @@ export class AttackState extends State
         {
             // not if we don't own the territory
             if (object.userData.ownerId != clientId)
-            {
-                console.log("no a");
                 return;
-            }
                 
             // it has to have invadeableNeighbors
-            if (object.getInvadeableNeighbors().length > 0)
-            {
-                console.log("no b");
+            if (object.getInvadeableNeighbors().length <= 0)
                 return;
-            }
 
             // it has to have more than 1 unit
             if (object.unitCount <= 1)
-            {
-                console.log("no c");
                 return;
-            }
-
-            console.log("pokay");
 
             object.raise();
-            object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+            object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
         // if we already have an origin, then we'll be selecting candidates for the target
         else if (this.attackTargetTerritory === null)
@@ -83,7 +72,7 @@ export class AttackState extends State
                 return;
 
             object.raise();
-            object.material.color.set(Colors.shade(game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+            object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
     }
 
@@ -169,7 +158,7 @@ export class AttackState extends State
             this.clearAttackOriginTerritory();
             
         object.raise();
-        object.material.color.set(Colors.shade(game.clients[object.userData.ownerId].color, -40));
+        object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId).color, -40));
         this.attackOriginTerritory = object;
 
         // highlight invadeable neighbors
@@ -181,7 +170,7 @@ export class AttackState extends State
                 continue;
 
             tile.userData.invadeable = true;
-            tile.material.color.set(Colors.shade(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor), -20);
+            tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor), -20);
         }
     }
     
@@ -202,11 +191,11 @@ export class AttackState extends State
                 continue;
 
             tile.userData.invadeable = false;
-            tile.material.color.set(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor);
+            tile.material.color.set(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor);
         }
 
         this.attackOriginTerritory.lower();
-        this.attackOriginTerritory.material.color.set(game.clients[this.attackOriginTerritory.userData.ownerId].color);
+        this.attackOriginTerritory.material.color.set(game.clients.getById(this.attackOriginTerritory.userData.ownerId).color);
         this.attackOriginTerritory = null;
     }
     
@@ -273,7 +262,7 @@ export class AttackState extends State
         this.attackTargetTerritory.lower();
         // TODO: we should probably make a function,
         // that sets the color to match the current owner
-        this.attackTargetTerritory.material.color.set(game.clients[this.attackTargetTerritory.userData.ownerId]?.color ?? Colors.unownedColor);
+        this.attackTargetTerritory.material.color.set(game.clients.getById(this.attackTargetTerritory.userData.ownerId)?.color ?? Colors.unownedColor);
         this.attackTargetTerritory = null;
         
         for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
@@ -287,7 +276,7 @@ export class AttackState extends State
             console.log("tile is invadable");
 
             tile.userData.invadeable = true;
-            tile.material.color.set(Colors.shade(game.clients[tile.userData.ownerId]?.color ?? Colors.unownedColor, -20));
+            tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
         
         $("#attackPlannerCancelButton").off();

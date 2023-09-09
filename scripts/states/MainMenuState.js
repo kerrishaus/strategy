@@ -3,6 +3,8 @@ import { State } from "./State.js";
 import { GameSetupState } from "./GameSetupState.js";
 import { NetworkPrepareState } from "./NetworkPrepareState.js";
 
+import { randomHex } from "../Colors.js";
+
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
 export class MainMenuState extends State
@@ -33,14 +35,28 @@ export class MainMenuState extends State
 							type: "player",
 							name: "Player",
 							ownedTerritories: 0,
-							color: "#1bcf1b"
+							color: randomHex()
 						},
 						{
-							id: clientId + 1,
+							id: clientId + 2,
 							type: "bot",
 							name: "Bot",
 							ownedTerritories: 0,
-							color: "#1583b3"
+							color: randomHex()
+						},
+						{
+							id: clientId + 4,
+							type: "bot",
+							name: "Bot",
+							ownedTerritories: 0,
+							color: randomHex()
+						},
+						{
+							id: clientId + 6,
+							type: "bot",
+							name: "Bot",
+							ownedTerritories: 0,
+							color: randomHex()
 						}
 					]
 				}

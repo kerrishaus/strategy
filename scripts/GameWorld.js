@@ -1,7 +1,5 @@
 import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh, Box3, Vector3 } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
 			
-import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
-
 import * as Colors from "./Colors.js";
 
 import { WorldObject } from "./WorldObject.js";
@@ -103,7 +101,7 @@ export class GameWorld extends Group
 
     distributeTerritories(clients)
     {
-        console.log(`Distributing ${this.tiles.length} territories to ${clients.length} clients.`);
+        console.log(`Distributing ${this.tiles.length} territories to ${clients.length()} clients.`);
 
         const territories = new Array(this.tiles.length);
 
@@ -112,10 +110,11 @@ export class GameWorld extends Group
             // getRandomInt returns between 0 and client length, which is okay *i think*
             // TODO: clients are now stored with their ID as the index in the array,
             // this might not work with non-consecutive client IDs! D:
-            const  owner = clients[getRandomInt(clients.length)];
+
+            const  owner = clients.getRandom();
 
             // only assign clients some of the board, i don't know how to explain the math oof
-            if (owner.ownedTerritories <= ((this.tiles.length / clients.length) / 2))
+            if (owner.ownedTerritories <= ((this.tiles.length / clients.length()) / 2))
             {
                 owner.ownedTerritories++;
                 territories[tile] = owner.id;
@@ -138,13 +137,12 @@ export class GameWorld extends Group
 
         for (const territory in territories)
         {
-            this.tiles[territory].userData.ownerId        = territories[territory];
+            this.tiles[territory].userData.ownerId = territories[territory];
 
             if (this.tiles[territory].userData.ownerId > 0)
                 this.tiles[territory].addUnits(1);
 
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
-            //this.tiles[territory].label.element.innerHTML = this.tiles[territory].userData.ownerId;
 
             this.tiles[territory].material.color.set(clients[territories[territory]]?.color ?? Colors.unownedColor);
         }
@@ -200,7 +198,7 @@ export class GameWorld extends Group
         {
             tile.invadeableNeighbors = [];
 
-            for (const [which, neighbor] of Object.entries(tile.userData.neighbors))
+            for (const [position, neighbor] of Object.entries(tile.userData.neighbors))
             {
                 if (neighbor === null)
                     continue;

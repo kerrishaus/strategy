@@ -65,7 +65,13 @@ export class NetworkLobbyWaitingState extends State
 	{
 		console.log(`Client ${event.detail.clientId} has joined the lobby.`);
 
-		event.data.lobby.clients.push(event.detail.clientId);
+		event.data.lobby.clients.push({
+			id: event.detail.clientId,
+			type: "player",
+			name: "Player",
+			ownedTerritories: 0,
+			color: randomHex()
+		});
 
 		console.log("New client list: ", event.data.lobby.clients);
 	}
@@ -74,7 +80,7 @@ export class NetworkLobbyWaitingState extends State
 	{
 		console.log(`Client ${event.detail.clientId} has left the lobby.`);
 
-		event.data.lobby.clients.filter(clientId => clientId !== event.detail.clientId);
+		event.data.lobby.clients.filter(client => client.id !== event.detail.clientId);
 
 		console.log("New lobby client list: ", event.data.lobby.clients);
 	}
