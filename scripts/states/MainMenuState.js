@@ -22,6 +22,9 @@ export class MainMenuState extends State
         $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
 
 		$("#playLocal")[0].onclick = () => {
+			window.clientId = 1;
+			$("#debug-clientId").text(clientId);
+
 			stateManager.changeState(new GameSetupState({
 				networked: false,
 				 lobby: { 
