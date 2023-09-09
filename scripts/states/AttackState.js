@@ -239,7 +239,11 @@ export class AttackState extends State
         }
         
         this.attackTargetTerritory.lower();
-        this.attackTargetTerritory.material.color.setHex(Colors.enemyInvadeableColor);
+        // TODO: we should probably make a function,
+        // that sets the color to match the current owner
+        this.attackTargetTerritory.material.color.setHex(
+            this.attackTargetTerritory.userData.ownerId == clientId ? Colors.ownedColor : Colors.enemyInvadeableColor
+        );
         this.attackTargetTerritory = null;
         
         for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
@@ -348,11 +352,6 @@ export class AttackState extends State
     
     finaliseAttack()
     {
-        if (this.attackTargetTerritory.userData.ownerId == clientId)
-            this.attackTargetTerritory.material.color.setHex(Colors.ownedColor);
-        else
-            this.attackTargetTerritory.material.color.setHex(Colors.enemyColor);
-            
         this.clearAttackTargetTerritory();
 
         // if we can still attack other territories from this territory, highlight them
