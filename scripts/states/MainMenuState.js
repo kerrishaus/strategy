@@ -41,26 +41,12 @@ export class MainMenuState extends State
 							color: randomHex()
 						},
 						{
-							id: clientId + 2,
+							id: clientId + 1,
 							type: "bot",
 							name: "Bot",
 							ownedTerritories: 0,
 							color: randomHex()
 						},
-						{
-							id: clientId + 4,
-							type: "bot",
-							name: "Bot",
-							ownedTerritories: 0,
-							color: randomHex()
-						},
-						{
-							id: clientId + 6,
-							type: "bot",
-							name: "Bot",
-							ownedTerritories: 0,
-							color: randomHex()
-						}
 					]
 				}
 			})) 

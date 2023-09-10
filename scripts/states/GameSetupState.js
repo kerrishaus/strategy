@@ -6,6 +6,7 @@ import { Game  } from "../Game.js";
 import { State } from "./State.js";
 
 import * as Colors from "../Colors.js";
+import { ControllableCamera } from "../ControllableCamera.js";
 
 export class GameSetupState extends State
 {
@@ -103,7 +104,7 @@ export class GameSetupState extends State
 		`);
 
 		window.scene = new THREE.Scene();
-		window.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		window.camera = new ControllableCamera();
 
 		window.cameraPosition = new THREE.Vector3(9, 2, 12);
 

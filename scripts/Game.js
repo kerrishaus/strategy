@@ -56,7 +56,7 @@ export class ClientList
 
     getRandom()
     {
-        return this.clients[this.clientIdToArrayPosition.get(this.numericallyOrderedClientIds[getRandomInt(this.numericallyOrderedClientIds.length - 1)])];
+        return this.clients[this.clientIdToArrayPosition.get(this.numericallyOrderedClientIds[getRandomInt(this.numericallyOrderedClientIds.length)])];
     }
 
     current()
@@ -360,7 +360,7 @@ export class Game
         for (const object of this.world.tiles)
         {
             object.lower();
-            object.material.color.set(this.clients[object.userData.ownerId]?.color ?? Colors.unownedColor);
+            object.material.color.set(this.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor);
 
             object.label.element.innerHTML = object.unitCount;
 

@@ -111,6 +111,7 @@ export class GameWorld extends Group
             // TODO: clients are now stored with their ID as the index in the array,
             // this might not work with non-consecutive client IDs! D:
 
+            // TODO: this needs to be improved, it doesn't give every client enough territory
             const  owner = clients.getRandom();
 
             // only assign clients some of the board, i don't know how to explain the math oof
