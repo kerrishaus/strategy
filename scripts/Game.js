@@ -146,8 +146,8 @@ export class Game
                 return;
             }
 
-            console.log("Loading world data from network...", event.detail);
-            game.world.applyTerritories(event.detail.territories, this.clients);
+            console.log("Loading world data from network...", event.detail, game.clients);
+            game.world.applyTerritories(event.detail.territories, game.clients);
             game.world.calculateInvadeableTerritories();
         });
 
@@ -233,7 +233,7 @@ export class Game
                 if (event.detail.clientId in game.clients)
                     game.clients[event.detail.clientId].ownedTerritories += 1;
 
-                if (event.detail.defenderOwnerId in game.clients``)
+                if (event.detail.defenderOwnerId in game.clients)
                     game.clients[event.detail.defenderOwnerId].ownedTerritories -= 1;
 
                 game.world.calculateInvadeableTerritories();
