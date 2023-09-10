@@ -2,6 +2,8 @@ import { State } from "./State.js";
 
 import { NetworkLobbyWaitingState } from "./NetworkLobbyWaitingState.js";
 
+import { randomHex } from "../Colors.js";
+
 export class NetworkLobbyFindState extends State
 {
 	constructor()
@@ -17,7 +19,7 @@ export class NetworkLobbyFindState extends State
 		// TODO: set a timeout so that after a few seconds if the request is not accepted we can try again
         $("#join").click(() =>
         {
-			this.disableButtons();
+			$("#lobbyCode, #join, #create").attr("disabled", true);
 			
 			const lobbyId = $("#lobbyCode").val();
 		
@@ -30,11 +32,13 @@ export class NetworkLobbyFindState extends State
 
         $("#create").click(() =>
         {
-			this.disableButtons();
+			$("#lobbyCode, #join, #create").attr("disabled", true);
 			
 			const lobbyId = $("#lobbyCode").val();
 		
-			const response = JSON.stringify({ command: "createLobby", lobbyId: lobbyId });
+			// TODO: I'd like to not specify client attributes here, but it has to be done
+			// because this is where the first client connects.
+			const response = JSON.stringify({ command: "createLobby", lobbyId: lobbyId, type: "player", name: "player", color: randomHex() });
 
 			socket.send(response);
         });
@@ -53,16 +57,6 @@ export class NetworkLobbyFindState extends State
 		$(document).off("invalidLobbyId",  this.invalidLobbyId);
 	}
 
-	disableButtons()
-	{
-		$("#lobbyCode, #join, #create").attr("disabled", true);
-	}
-
-	enableButtons()
-	{
-		$("#lobbyCode, #join, #create").attr("disabled", null);
-	}
-
 	joinLobbyAccept(event)
 	{
 		stateManager.changeState(new NetworkLobbyWaitingState(event.detail));
@@ -72,13 +66,13 @@ export class NetworkLobbyFindState extends State
 	{
 		console.error("Our request to join the lobby was denied.");
 
-		this.enableButtons();
+		$("#lobbyCode, #join, #create").attr("disabled", null);
 	};
 
 	invalidLobbyId()
 	{
 		console.error("LobbyId is invalid.");
 
-		this.enableButtons();
+		$("#lobbyCode, #join, #create").attr("disabled", null);
 	}
 };

@@ -68,7 +68,7 @@ export class NetworkLobbyWaitingState extends State
 		if (event.data.lobby.ownerId == clientId)
 		{
 			console.log("sending joinLobbyAccept for client " + event.detail.requesterId);
-			socket.send(JSON.stringify({ command: "joinLobbyAccept", requesterId: event.detail.requesterId }));
+			socket.send(JSON.stringify({ command: "joinLobbyAccept", requesterId: event.detail.requesterId, type: "player", name: "player", color: randomHex() }));
 		}
 	}
 
@@ -76,12 +76,14 @@ export class NetworkLobbyWaitingState extends State
 	{
 		console.log(`Client ${event.detail.clientId} has joined the lobby.`);
 
+		console.log(event.detail);
+
 		event.data.lobby.clients.push({
 			id: event.detail.clientId,
-			type: "player",
-			name: "Player",
+			type: event.detail.type,
+			name: event.detail.name,
 			ownedTerritories: 0,
-			color: randomHex()
+			color: event.detail.color
 		});
 
 		console.log("New client list: ", event.data.lobby.clients);

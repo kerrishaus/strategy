@@ -144,7 +144,7 @@ export class GameWorld extends Group
 
             this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
 
-            this.tiles[territory].material.color.set(clients[territories[territory]]?.color ?? Colors.unownedColor);
+            this.tiles[territory].material.color.set(clients.getById(territories[territory])?.color ?? Colors.unownedColor);
         }
     }
 
