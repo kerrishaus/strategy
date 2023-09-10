@@ -17,6 +17,11 @@ export class ClientList
     {
         this.clients = clients;
 
+        // TODO: eventually I'd like the host to be the one who goes first, but this is fine for now.
+        this.clients.sort((a, b) => {
+            return a.id > b.id;
+        });
+
         // an array of numerically ordered keys with the clientId as the value
         this.clientIdToArrayPosition = new Map;
         this.numericallyOrderedClientIds = [];
