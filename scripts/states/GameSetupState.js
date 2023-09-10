@@ -5,6 +5,8 @@ import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/js
 import { Game  } from "../Game.js";
 import { State } from "./State.js";
 
+import * as Colors from "../Colors.js";
+
 export class GameSetupState extends State
 {
 	/*
@@ -198,6 +200,10 @@ export class GameSetupState extends State
 					{
 						INTERSECTED = intersects[0].object;
 						stateManager.forwardEvent(new CustomEvent("objectHover", { detail: { object: INTERSECTED } }));
+
+						$("#debug-lastHover").text(INTERSECTED.territoryId);
+						$("#debug-lastHoverOwner").text(INTERSECTED.userData.ownerId);
+						$("#debug-lastHoverOwnerColor").text(game.clients.getById(INTERSECTED.userData.ownerId)?.color ?? Colors.unownedColor);
 					}
 				}
 			}
