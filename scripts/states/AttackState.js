@@ -367,7 +367,7 @@ export class AttackState extends State
             }
         }
 
-        document.dispatchEvent(new CustomEvent("attack", { detail: {
+        if (document.dispatchEvent(new CustomEvent("attack", { detail: {
             clientId: clientId, // TODO: this is for local play to work. I need to find a way to always include this if there is no server to add it. I think this is fine here because the server overwrites this value when it is sent by any client
             defenderOwnerId: this.attackTargetTerritory.userData.ownerId,
             result: attackResult,
@@ -375,29 +375,10 @@ export class AttackState extends State
             defender: this.attackTargetTerritory.territoryId,
             attackerPopulation: attackingPopulation,
             defenderPopulation: defendingPopulation
-        } }));
-
-        this.finaliseAttack();
-    }
-    
-    finaliseAttack()
-    {
-        this.clearAttackTargetTerritory();
-
-        // if we can still attack other territories from this territory, highlight them
-        // otherwise, clear this territory
-        if (this.attackOriginTerritory.invadeableNeighbors.length > 0)
+        } })))
         {
-            for (const tile of this.attackOriginTerritory.getInvadeableNeighbors())
-            {
-                if (!(tile instanceof WorldObject))
-                    continue;
-                
-                tile.userData.invadeable = false;
-                tile.material.color.set(Colors.enemyColor);
-            }
-        }
-        else
+            this.clearAttackTargetTerritory();
             this.clearAttackOriginTerritory();
+        }
     }
 };
