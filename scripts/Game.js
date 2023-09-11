@@ -228,13 +228,13 @@ export class Game
                 console.log(`${event.detail.clientId} now owns ${defendingTerritory.territoryId}.`);
 
                 defendingTerritory.userData.ownerId = event.detail.clientId;
-                defendingTerritory.material.color.set(game.clients[defendingTerritory.userData.ownerId]?.color ?? Colors.unownedColor);
+                defendingTerritory.material.color.set(game.client.getById(defendingTerritory.userData.ownerId?.color ?? Colors.unownedColor);
 
                 if (event.detail.clientId in game.clients)
-                    game.clients[event.detail.clientId].ownedTerritories += 1;
+                    game.clients.getById(event.detail.clientId).ownedTerritories += 1;
 
                 if (event.detail.defenderOwnerId in game.clients)
-                    game.clients[event.detail.defenderOwnerId].ownedTerritories -= 1;
+                    game.clients.getById(event.detail.defenderOwnerId).ownedTerritories -= 1;
 
                 game.world.calculateInvadeableTerritories();
             }
