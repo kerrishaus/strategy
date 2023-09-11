@@ -99,6 +99,7 @@ export class GameWorld extends Group
         return { width: this.width, height: this.height, tiles: tiles };
     }
 
+    // FIXME: game distributes properly to clients - 1
     distributeTerritories(clients)
     {
         console.log(`Distributing ${this.tiles.length} territories to ${clients.length()} clients.`);

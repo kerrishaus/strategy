@@ -1,7 +1,6 @@
 import  * as Colors from "../Colors.js";
 
 import { State } from "./State.js";
-import { AttackState } from "./AttackState.js";
 
 export class UnitDropState extends State
 {
@@ -93,7 +92,7 @@ export class UnitDropState extends State
 		if (this.selectedTerritory !== object)
 		{
 			object.raise();
-			object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId).color));
+			object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId).color, -20));
 		}
 	}
 	

@@ -42,37 +42,38 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
-        // first raise candidates for the attack origin
+        // highlight territories eligible for being the attack origin first
         if (this.attackOriginTerritory === null)
         {
-            // not if we don't own the territory
+            // we own the territory
             if (object.userData.ownerId != clientId)
                 return;
                 
-            // it has to have invadeableNeighbors
+            // it has neighbors that can be invaded
             if (object.getInvadeableNeighbors().length <= 0)
                 return;
 
-            // it has to have more than 1 unit
+            // it has more than 1 unit
             if (object.unitCount <= 1)
                 return;
 
             object.raise();
             object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
-        // if we already have an origin, then we'll be selecting candidates for the target
+        // we already have an attack origin
+        // now highlight territories eligible to be attacked from it
         else if (this.attackTargetTerritory === null)
         {
             // not if we own the territory
             if (object.userData.ownerId == clientId)
                 return;
 
-            // has to be invadeable
+            // has to be invadeable, this is set to applicable neighbors when the attack origin is set
             if (!object.userData.invadeable)
                 return;
 
             object.raise();
-            object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -20));
+            object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -40));
         }
     }
 
@@ -80,25 +81,35 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
+        // the object is not the attack origin, or the attack target
         if (object !== this.attackOriginTerritory &&
             object !== this.attackTargetTerritory)
         {
             object.lower();
 
-            const objectOwnerColor = game.clients[object.userData.ownerId]?.color ?? Colors.unownedColor;
+            const objectOwnerColor = game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor;
             
+            // our own territory can be set to its default color
+            // because it isn't the origin or the target
             if (object.userData.ownerId == clientId)
                 object.material.color.set(objectOwnerColor);
             else
             {
                 if (object.userData.invadeable)
                 {
+                    console.log("object is invadeable");
+
                     if (this.attackTargetTerritory !== null)
+                        // if we don't own the object, and it's invadeable,
+                        // and we already have an attack target, this is probably the target, so keep it at 40
                         object.material.color.set(Colors.shade(objectOwnerColor, -40));
                     else
+                        // if we don't have an attack target, the object is probably
+                        // an inavdeable territory that we are unhovering, so drop it back to 20
                         object.material.color.set(Colors.shade(objectOwnerColor, -20));
                 }
                 else
+                    // it can be its default if it's not invadeable, and it's not ours
                     object.material.color.set(objectOwnerColor);
             }
         }
@@ -170,7 +181,7 @@ export class AttackState extends State
                 continue;
 
             tile.userData.invadeable = true;
-            tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor), -20);
+            tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
         }
     }
     
