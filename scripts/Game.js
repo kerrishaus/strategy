@@ -228,7 +228,7 @@ export class Game
                 console.log(`${event.detail.clientId} now owns ${defendingTerritory.territoryId}.`);
 
                 defendingTerritory.userData.ownerId = event.detail.clientId;
-                defendingTerritory.material.color.set(game.client.getById(defendingTerritory.userData.ownerId)?.color ?? Colors.unownedColor);
+                defendingTerritory.material.color.set(game.clients.getById(defendingTerritory.userData.ownerId)?.color ?? Colors.unownedColor);
 
                 if (event.detail.clientId in game.clients)
                     game.clients.getById(event.detail.clientId).ownedTerritories += 1;
