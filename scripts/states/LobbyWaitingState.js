@@ -4,7 +4,7 @@ import { GameSetupState } from "./GameSetupState.js";
 
 import { randomHex } from "../Colors.js";
 
-export class NetworkLobbyWaitingState extends State
+export class LobbyWaitingState extends State
 {
 	constructor(lobby)
 	{
@@ -28,7 +28,10 @@ export class NetworkLobbyWaitingState extends State
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
 			{
 				if (event.data.lobby.clients.length > 1)
-					socket.send(JSON.stringify({ command: "startGame", width: 10, height: 5 }));
+					if (event.data.lobby.networked)
+						socket.send(JSON.stringify({ command: "startGame", width: 10, height: 5 }));
+					else
+						document.dispatchEvent(new CustomEvent("startGame", { detail: { width: 10, height: 5 } }));
 				else
 					console.warn("Skipping start game button press because there are not enough clients.");
 			});
@@ -60,7 +63,7 @@ export class NetworkLobbyWaitingState extends State
 		lobby.width = event.detail.width;
 		lobby.height = event.detail.height;
 
-		stateManager.changeState(new GameSetupState({ networked: true, lobby: lobby }));
+		stateManager.changeState(new GameSetupState(lobby));
 	}
 
 	joinLobbyRequest(event)

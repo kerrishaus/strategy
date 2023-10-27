@@ -6,6 +6,7 @@ import { NetworkPrepareState } from "./NetworkPrepareState.js";
 import { randomHex } from "../Colors.js";
 
 import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
+import { LobbyWaitingState } from "./LobbyWaitingState.js";
 
 export class MainMenuState extends State
 {
@@ -25,30 +26,28 @@ export class MainMenuState extends State
 			window.clientId = 1;
 			$("#debug-clientId").text(clientId);
 
-			stateManager.changeState(new GameSetupState({
+			stateManager.changeState(new LobbyWaitingState({
+				width: 5 + getRandomInt(5),
+				height: 5 + getRandomInt(5),
+				clientId: clientId,
+				ownerId: clientId,
 				networked: false,
-				 lobby: { 
-					width: 5 + getRandomInt(5),
-					height: 5 + getRandomInt(5),
-					clientId: clientId,
-					ownerId: clientId,
-					clients: [
-						{
-							id: clientId,
-							type: "player",
-							name: "Player",
-							ownedTerritories: 0,
-							color: randomHex()
-						},
-						{
-							id: clientId + 1,
-							type: "bot",
-							name: "Bot",
-							ownedTerritories: 0,
-							color: randomHex()
-						},
-					]
-				}
+				clients: [
+					{
+						id: clientId,
+						type: "player",
+						name: "Player",
+						ownedTerritories: 0,
+						color: randomHex()
+					},
+					{
+						id: clientId + 1,
+						type: "bot",
+						name: "Bot",
+						ownedTerritories: 0,
+						color: randomHex()
+					}
+				]
 			})) 
 		};
 

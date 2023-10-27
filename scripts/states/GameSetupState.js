@@ -10,19 +10,11 @@ import { ControllableCamera } from "../ControllableCamera.js";
 
 export class GameSetupState extends State
 {
-	/*
-	data is an object
-	0. bool - networked
-	1. object - lobby info
-	*/
-	constructor(data)
+	constructor(lobby)
 	{
 		super();
 
-		// don't get rid of this.networked because it is set
-		// to false in MainMenuState to create local sessions
-		this.networked = data.networked;
-		this.lobby     = data.lobby;
+		this.lobby = lobby;
 	}
 
 	init()
@@ -135,7 +127,7 @@ export class GameSetupState extends State
 		console.log(this.lobby);
 
 		console.warn("Creating a new game instance.");
-		window.game = new Game(this.networked, this.lobby);
+		window.game = new Game(this.lobby);
 
 		scene.add(game.world);
 

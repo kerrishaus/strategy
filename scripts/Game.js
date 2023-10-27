@@ -12,7 +12,7 @@ import * as Colors from "./Colors.js";
 
 export class Game
 {
-    constructor(networked = false, lobby)
+    constructor(lobby)
     {
         console.log(`Starting game with lobby: `, lobby);
 
@@ -21,7 +21,7 @@ export class Game
 
         this.clients = new ClientList(lobby.clients);
 
-        this.setNetworked(networked);
+        this.setNetworked(lobby.networked);
 
         $("#debug-clientCount").text(this.clients.length());
 

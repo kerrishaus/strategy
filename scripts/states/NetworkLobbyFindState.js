@@ -1,6 +1,6 @@
 import { State } from "./State.js";
 
-import { NetworkLobbyWaitingState } from "./NetworkLobbyWaitingState.js";
+import { LobbyWaitingState } from "./LobbyWaitingState.js";
 
 import { randomHex } from "../Colors.js";
 
@@ -59,7 +59,7 @@ export class NetworkLobbyFindState extends State
 
 	joinLobbyAccept(event)
 	{
-		stateManager.changeState(new NetworkLobbyWaitingState(event.detail));
+		stateManager.changeState(new LobbyWaitingState(event.detail));
 	}
 
 	joinLobbyDeny()
