@@ -21,6 +21,9 @@ export class LobbyWaitingState extends State
 	{
         $("body").append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
 
+		$("body").append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
+		$("body").append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
+
         if (this.lobby.ownerId == clientId)
         {
             $("body").append(`<button id="startGame">start game</button>`);
@@ -29,9 +32,16 @@ export class LobbyWaitingState extends State
 			{
 				if (event.data.lobby.clients.length > 1)
 					if (event.data.lobby.networked)
-						socket.send(JSON.stringify({ command: "startGame", width: 10, height: 5 }));
+						socket.send(JSON.stringify({ 
+							command: "startGame", 
+							width: parseInt($("#mapSizeX").val()),
+							height: parseInt($("#mapSizeY").val()) 
+						}));
 					else
-						document.dispatchEvent(new CustomEvent("startGame", { detail: { width: 10, height: 5 } }));
+						document.dispatchEvent(new CustomEvent("startGame", { detail: { 
+							width: parseInt($("#mapSizeX").val()),
+							height: parseInt($("#mapSizeY").val()) 
+						} }));
 				else
 					console.warn("Skipping start game button press because there are not enough clients.");
 			});
@@ -48,7 +58,7 @@ export class LobbyWaitingState extends State
 
 	cleanup()
 	{
-		$("#lobbyWaitText, #startGame").remove();
+		$("#lobbyWaitText, #startGame, #mapSizeX, #mapSizeY").remove();
 
 		$(document).off("startGame",   		 this.startGame);
 		$(document).off("joinLobbyRequest",  this.joinLobbyRequest);
