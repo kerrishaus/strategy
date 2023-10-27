@@ -21,11 +21,11 @@ export class LobbyWaitingState extends State
 	{
         $("body").append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
 
-		$("body").append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
-		$("body").append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
-
         if (this.lobby.ownerId == clientId)
         {
+			$("body").append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
+			$("body").append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
+
             $("body").append(`<button id="startGame">start game</button>`);
 
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
