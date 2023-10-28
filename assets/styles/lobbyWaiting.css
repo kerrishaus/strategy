@@ -1,0 +1,20 @@
+#waitingContainer
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#lobbyWaitText
+{
+    margin: 0;
+}
+
+#gameSettings
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

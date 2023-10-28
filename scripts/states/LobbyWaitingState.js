@@ -1,6 +1,7 @@
 import { State } from "./State.js";
 
 import { GameSetupState } from "./GameSetupState.js";
+import { MainMenuState  } from "./MainMenuState.js";
 
 import { randomHex } from "../Colors.js";
 
@@ -17,6 +18,8 @@ export class LobbyWaitingState extends State
 
 	init()
 	{
+		$("head").append(`<link rel='stylesheet' id="lobbyWaitingStyles" href='./assets/styles/lobbyWaiting.css' />`);
+
 		let waitingContainer = $("<div id='waitingContainer' class='beforeGameMenuContainer'>").appendTo($("body"));
 
         waitingContainer.append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
@@ -26,12 +29,14 @@ export class LobbyWaitingState extends State
 
         if (this.lobby.ownerId == clientId)
         {
-			gameSettingsContainer.append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
-			gameSettingsContainer.append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
+			gameSettingsContainer.append(`<label>Width</label><input id="mapSizeX" value="5" inputmode="numeric" required />`);
+			gameSettingsContainer.append(`<label>Height</label><input id="mapSizeY" value="5" inputmode="numeric" required />`);
 
 			//clientListContainer.append("<button id='addBot'>Add bot</button>");
 
             waitingContainer.append(`<button id="startGame">start game</button>`);
+
+			waitingContainer.append(`<button id="back">Back to main menu</button>`);
 
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
 			{
@@ -52,7 +57,14 @@ export class LobbyWaitingState extends State
 			});
         }
 
-		// this is a lobby client join, not when a client joins mid game
+		// TODO: I think work needs to be done to allow this for a networked lobby,
+		// because once you are in a lobby waiting state you're connected to the websocket server.
+		// we will need to shutdown the connection to the websocket server for this event.
+		if (!this.lobby.networked)
+			$("#back").click(() => {
+				stateManager.changeState(new MainMenuState);
+			});
+
 		$(document).on("startGame",   	   { lobby: this.lobby }, this.startGame);
 		$(document).on("joinLobbyRequest", { lobby: this.lobby }, this.joinLobbyRequest);
 		$(document).on("clientJoin",  	   { lobby: this.lobby }, this.clientJoin);
@@ -63,12 +75,12 @@ export class LobbyWaitingState extends State
 
 	cleanup()
 	{
-		$("#waitingContainer").remove();
+		$("#waitingContainer, #lobbyWaitingStyles").remove();
 
-		$(document).off("startGame",   		 this.startGame);
-		$(document).off("joinLobbyRequest",  this.joinLobbyRequest);
-		$(document).off("clientJoin",  		 this.clientJoin);
-		$(document).off("clientLeave", 		 this.clientLeave);
+		$(document).off("startGame",   		this.startGame);
+		$(document).off("joinLobbyRequest", this.joinLobbyRequest);
+		$(document).off("clientJoin",  		this.clientJoin);
+		$(document).off("clientLeave", 		this.clientLeave);
 	}
 
 	startGame(event)
@@ -105,6 +117,8 @@ export class LobbyWaitingState extends State
 		});
 
 		console.log("New client list: ", event.data.lobby.clients);
+
+		updateClientList(event.data.lobby);
 	}
 
 	clientLeave(event)
@@ -114,5 +128,15 @@ export class LobbyWaitingState extends State
 		event.data.lobby.clients.filter(client => client.id !== event.detail.clientId);
 
 		console.log("New lobby client list: ", event.data.lobby.clients);
+
+		updateClientList(event.data.lobby);
+	}
+
+	updateClientList(lobby)
+	{
+		console.log("updating client list");
+
+		for (let client of lobby.clients)
+			$("#clientList").append("client");
 	}
 };
