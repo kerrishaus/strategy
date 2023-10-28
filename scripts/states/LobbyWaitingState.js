@@ -17,7 +17,7 @@ export class LobbyWaitingState extends State
 
 	init()
 	{
-		let waitingContainer = $("<div id='waitingContainer'>").appendTo($("body"));
+		let waitingContainer = $("<div id='waitingContainer' class='beforeGameMenuContainer'>").appendTo($("body"));
 
         waitingContainer.append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
 

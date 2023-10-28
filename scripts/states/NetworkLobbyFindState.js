@@ -13,7 +13,7 @@ export class NetworkLobbyFindState extends State
 
 	init()
 	{
-        $("body").append(`<div id="mainMenu">`);
+        $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer">`);
         $("#mainMenu").append("<input id='lobbyCode' placeholder='lobby code' /><button id='join'>join</button><button id='create'>create</button>");
 
 		// TODO: set a timeout so that after a few seconds if the request is not accepted we can try again

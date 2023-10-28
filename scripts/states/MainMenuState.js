@@ -19,7 +19,7 @@ export class MainMenuState extends State
 	{
         $("head").append(`<link rel='stylesheet' id="mainMenuStyles" href='./assets/styles/mainMenu.css' />`);
 
-        $("body").append(`<div id="mainMenu">`);
+        $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer">`);
         $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
 
 		$("#playLocal")[0].onclick = () => {

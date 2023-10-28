@@ -14,7 +14,7 @@ body
     color: white;
 
     position: absolute;
-    z-index: 10000;
+    z-index: 2;
 
     width: 100vw;
     height: 100vh;
@@ -28,4 +28,9 @@ body
     color: yellow;
 
     text-align: right;
+}
+
+#notificationContainer
+{
+    z-index: 4;
 }

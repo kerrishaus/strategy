@@ -1,3 +1,13 @@
+.beforeGameMenuContainer
+{
+    position: absolute;
+    z-index: 1;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+}
+
 .gameInterfaceContainer
 {
     box-sizing: border-box;
@@ -6,7 +16,9 @@
     color: white;
 
     position: absolute;
-    z-index: 99999;
+    z-index: 1;
+    top: 0;
+    left: 0;
 
     width: 100vw;
     height: 100vh;
