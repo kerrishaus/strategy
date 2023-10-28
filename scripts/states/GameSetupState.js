@@ -139,8 +139,8 @@ export class GameSetupState extends State
             
             game.world.update(clock.getElapsedTime());
             
-            camera.position.lerp(cameraPosition, 0.03);
-            camera.quaternion.slerp(cameraRotation, 0.03);
+            camera.position.lerp(cameraPosition, 0.01);
+            camera.quaternion.slerp(cameraRotation, 0.01);
             
             renderer.render(scene, camera);
             htmlRenderer.render(scene, camera);

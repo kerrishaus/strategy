@@ -166,7 +166,7 @@ export class GameWorld extends Group
         // TODO: what is this doing?
         this.tiles = terrain.tiles;
 
-        const floorGeometry = new PlaneGeometry(terrain.width + terrain.width * 1.3 + 3, terrain.height + terrain.height * 1.3 + 3);
+        const floorGeometry = new PlaneGeometry(80, 80);
         const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
         const floor = new Mesh(floorGeometry, floorMaterial);
         floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
