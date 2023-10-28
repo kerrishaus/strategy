@@ -12,21 +12,26 @@ export class LobbyWaitingState extends State
 
         this.lobby = lobby;
 
-		console.log("Waitin in lobby: ", this.lobby);
-
-        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`);
+        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`, this.lobby);
 	}
 
 	init()
 	{
-        $("body").append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
+		let waitingContainer = $("<div id='waitingContainer'>").appendTo($("body"));
+
+        waitingContainer.append(`<h1 id="lobbyWaitText">Waiting for game to start</h1>`);
+
+		let clientListContainer   = $("<div id='clientList'>").appendTo(waitingContainer);
+		let gameSettingsContainer = $("<div id='gameSettings'>").appendTo(waitingContainer);
 
         if (this.lobby.ownerId == clientId)
         {
-			$("body").append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
-			$("body").append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
+			gameSettingsContainer.append(`<input id="mapSizeX" value="5" inputmode="numeric" required />`);
+			gameSettingsContainer.append(`<input id="mapSizeY" value="5" inputmode="numeric" required />`);
 
-            $("body").append(`<button id="startGame">start game</button>`);
+			//clientListContainer.append("<button id='addBot'>Add bot</button>");
+
+            waitingContainer.append(`<button id="startGame">start game</button>`);
 
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
 			{
@@ -58,7 +63,7 @@ export class LobbyWaitingState extends State
 
 	cleanup()
 	{
-		$("#lobbyWaitText, #startGame, #mapSizeX, #mapSizeY").remove();
+		$("#waitingContainer").remove();
 
 		$(document).off("startGame",   		 this.startGame);
 		$(document).off("joinLobbyRequest",  this.joinLobbyRequest);
