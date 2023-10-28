@@ -86,7 +86,7 @@ export class BotTurnState extends State
             }
 
             placeTile.raise();
-            placeTile.material.color.set(Colors.enemySelectedColor);
+            placeTile.material.color.set(Colors.shade(game.clients.getById(placeTile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
 
             console.log(`Selected tile ${placeTile.territoryId} for unit drop.`, placeTile);
         }, this.addToDelay());
@@ -134,7 +134,7 @@ export class BotTurnState extends State
             }
 
             attackingTerritory.raise();
-            attackingTerritory.material.color.set(Colors.enemySelectedColor);
+            attackingTerritory.material.color.set(Colors.shade(game.clients.getById(attackingTerritory.userData.ownerId)?.color ?? Colors.unownedColor, -20));
 
             let unownedTerritories = game.world.getTerritoriesNotOwnedBy(this.botId);
             shuffleArray(unownedTerritories);
@@ -146,7 +146,7 @@ export class BotTurnState extends State
                     if (tile.invadeableNeighbors.length > 0 && tile.unitCount > 2)
                     {
                         tile.raise();
-                        tile.material.color.set(Colors.enemySelectedColor);
+                        tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
                         attackingTerritory = tile;
                         break;
                     }
@@ -172,7 +172,7 @@ export class BotTurnState extends State
                 {
                     console.log(tile);
                     tile.raise();
-                    tile.material.color.set(Colors.ownedSelectedColor);
+                    tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
                     defendingTerritory = tile;
                     break;
                 }
