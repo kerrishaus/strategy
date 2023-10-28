@@ -2,6 +2,8 @@ import { Mesh, BoxGeometry, MeshBasicMaterial, Vector3 } from "https://kerrishau
 
 import { CSS2DObject } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
+let depth = -20;
+
 export class WorldObject extends Mesh
 {
     constructor(width, height, color, territoryId, startPosition)
@@ -154,12 +156,12 @@ export class WorldObject extends Mesh
     
     raise()
     {
-        this.targetPosition.z = 0.4;
+        this.targetPosition.z = (depth * 2) + 0.4;
     }
     
     lower()
     {
-        this.targetPosition.z = 0;
+        this.targetPosition.z = depth * 2;
     }
     
     // TODO: remove default value, but first make sure this behaviour is not used anywhere

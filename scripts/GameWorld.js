@@ -6,6 +6,8 @@ import { WorldObject } from "./WorldObject.js";
 
 import { shuffleArray } from "./Utility.js";
 
+let depth = -20;
+
 export class GameWorld extends Group
 {
     constructor()
@@ -37,7 +39,7 @@ export class GameWorld extends Group
         this.height = height;
 
         // used to make the squares kind of spread out from the center of the map
-        const mapMidPoint = new Vector3(this.width, this.height, 0);
+        const mapMidPoint = new Vector3(this.width, this.height, depth * 2);
 
         const tiles = new Array(this.width * this.height);
 
@@ -54,7 +56,7 @@ export class GameWorld extends Group
                 {
                     object.targetPosition.x = x + 1.0 * x;
                     object.targetPosition.y = y + 1.0 * y;
-                    object.targetPosition.z = 0;
+                    object.targetPosition.z = depth * 2;
                 }, 0 + (20 * arrayPosition));
                 
                 tiles[arrayPosition] = object;
@@ -169,6 +171,7 @@ export class GameWorld extends Group
         const floor = new Mesh(floorGeometry, floorMaterial);
         floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
         floor.position.y = terrain.height / 2 + 1.1 * terrain.height / 2 - 0.7;
+        floor.position.z = depth * 2;
         this.add(floor);
 
         const size = new Vector3();
@@ -186,10 +189,14 @@ export class GameWorld extends Group
 
         window.cameraPosition.x = center.x;
         window.cameraPosition.y = center.y;
-        window.cameraPosition.z = distance;
+        window.cameraPosition.z = depth;
+
+        console.log("distance: " + distance);
         
         window.cameraPosition.x = ((this.width / 2) * 2) - 1;
         window.cameraPosition.y = ((this.height / 2) * 2) - 1;
+
+        window.cameraRotation.setFromAxisAngle(new Vector3(0, 0, 0), 0);
     }
     
     calculateInvadeableTerritories()

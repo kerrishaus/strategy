@@ -95,20 +95,12 @@
 			);
 
 			import { StateMachine  } from "./scripts/states/StateMachine.js";
+			import { RenderSetupState } from "./scripts/states/RenderSetupState.js";
 
-			window.stateManager = new StateMachine();
-
-			import { MainMenuState } from "./scripts/states/MainMenuState.js";
-
-			setTimeout(() => {
-				// load the new state first so that all the assets are loaded
-				// and we don't get super bad popping
-				stateManager.pushState(new MainMenuState());
-
-				$("#loadingCover").fadeOut(1000, function() {
-					$(this).remove(); 
-					$("#loadingStyles").remove(); 
-				});
+			setTimeout(() => 
+			{
+				window.stateManager = new StateMachine();
+				stateManager.pushState(new RenderSetupState());
 			}, 1000);
 		</script>
 	</body>
