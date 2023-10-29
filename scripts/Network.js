@@ -5,19 +5,33 @@ export class Network
 {
     constructor()
     {
+        this.socket = null;
+
         this.serverAddress = "wss.kerrishaus.com/games/strategy";
         
-        this.connectionRetryInterval = 3000;
-        this.connectionRetryCount    = 0;
+        this.connectionRetryDelay   = 3000;
+        this.connectionRetryCount   = 0;
+        this.connectionRetryTimeout = null;
 
         console.log("Network class is ready.");
     }
 
+    cleanup()
+    {
+        window.clientId = 0;
+
+        clearTimeout(network.connectionRetryTimeout);
+
+        network.socket.removeEventListener("close",   network.socketClose);
+        network.socket.removeEventListener("message", network.socketMessage);
+        network.socket = null;
+    }
+
     attemptConnection()
     {
-        if (!document.dispatchEvent(new CustomEvent("preServerConnection")))
+        if (!document.dispatchEvent(new CustomEvent("networkConnectionAttempt")))
         {
-            console.log("Aborting server connection because preServerConnection was prevented.");
+            console.log("Aborting server connection because networkConnectionAttempt was prevented.");
             return false;
         }
 
@@ -32,7 +46,7 @@ export class Network
         if (network.connectionRetryCount > 3)
         {
             console.error("Failed to connect to server after 3 retries.");
-            document.dispatchEvent(new CustomEvent("serverConnectionFailed"));
+            document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
             return false;
         }
 
@@ -61,9 +75,9 @@ export class Network
 
         document.dispatchEvent(new CustomEvent("serverSocketError"));
         
-        setTimeout(network.attemptConnection, network.connectionRetryInterval);
+        network.connectionRetryTimeout = setTimeout(network.attemptConnection, network.connectionRetryDelay);
         
-        console.log("Attempting retry in " + network.connectionRetryInterval / 1000 + " seconds.");
+        console.log("Attempting retry in " + network.connectionRetryDelay / 1000 + " seconds.");
     }
  
     socketClose()

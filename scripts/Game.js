@@ -66,6 +66,7 @@ export class Game
             return;
         }
 
+        // TODO: rename this event to networkDisconnected
         $(document).on("serverDisconnected", function(event)
         {
             stateManager.changeState(new MainMenuState());
@@ -217,11 +218,11 @@ export class Game
     
             console.log(`${this.clients.current().id}'s turn is starting.`);
     
-            game.setTurn(this.clients.current().id);
-            game.setStage(0);
+            this.setTurn(this.clients.current().id);
+            this.setStage(0);
         }
         else
-            game.setStage(this.currentTurnStage += 1);
+            this.setStage(this.currentTurnStage += 1);
     }
 
     // uses an underscore because clientId is a global value
