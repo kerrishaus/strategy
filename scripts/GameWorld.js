@@ -1,10 +1,12 @@
 import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh, Box3, Vector3 } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
-			
+		
 import * as Colors from "./Colors.js";
 
 import { WorldObject } from "./WorldObject.js";
 
 import { shuffleArray } from "./Utility.js";
+
+import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
 export class GameWorld extends Group
 {
@@ -99,36 +101,33 @@ export class GameWorld extends Group
         return { width: this.width, height: this.height, tiles: tiles };
     }
 
-    // FIXME: game distributes properly to clients - 1
     distributeTerritories(clients)
     {
-        console.log(`Distributing ${this.tiles.length} territories to ${clients.length()} clients.`);
+        const tilesPerClient   = Math.floor((this.tiles.length / clients.clients.length) / 2);
+        const totalClientTiles = tilesPerClient * clients.clients.length;
 
-        const territories = new Array(this.tiles.length);
+        console.log(`Distributing ${totalClientTiles} (${tilesPerClient} per client) of ${this.tiles.length} territories between ${clients.length()} clients.`);
 
-        for (const tile in this.tiles)
-        {
-            // getRandomInt returns between 0 and client length, which is okay *i think*
-            // TODO: clients are now stored with their ID as the index in the array,
-            // this might not work with non-consecutive client IDs! D:
+        const territories = [];
 
-            // TODO: this needs to be improved, it doesn't give every client enough territory
-            const  owner = clients.getRandom();
+        // first we add all the empty tiles to the map
+        for (let i = 0; i < this.tiles.length - totalClientTiles; i++)
+            territories.push(0);
 
-            // only assign clients some of the board, i don't know how to explain the math oof
-            if (owner.ownedTerritories <= ((this.tiles.length / clients.length()) / 2))
+        // then we add the client id once for each tile a client gets
+        for (const client of clients.clients)
+            for (let i = 0; i < tilesPerClient; i++)
             {
-                owner.ownedTerritories++;
-                territories[tile] = owner.id;
+                client.ownedTerritories += 1;
+                territories.push(client.id);
 
-                continue;
+                console.log(client);
             }
 
-            // unowned territories
-            territories[tile] = 0;
-        }
+        // then when shuffle the entire array
+        shuffleArray(territories);
 
-        shuffleArray(territories)
+        console.log("Distributed territories: ", territories);
 
         return territories;
     }

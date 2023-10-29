@@ -17,7 +17,6 @@ export class Game
         console.log(`Starting game with lobby: `, lobby);
 
         this.ownerId = lobby.ownerId;
-        $("#debug-lobbyOwnerId").text(this.ownerId);
 
         this.clients = new ClientList(lobby.clients);
 
@@ -36,7 +35,7 @@ export class Game
             const territories = this.world.distributeTerritories(this.clients);
 
             if (networked)
-                socket.send(JSON.stringify({ command: "worldData", territories: territories }));
+                network.socket.send(JSON.stringify({ command: "worldData", territories: territories }));
 
             this.world.applyTerritories(territories, this.clients);
 
@@ -57,8 +56,6 @@ export class Game
             return;
 
         window.networked = useNetwork;
-
-        $("#debug-networked").text(networked);
 
         if (networked && !useNetwork)
         {
@@ -95,7 +92,7 @@ export class Game
             }
 
             if (networked)
-                socket.send(JSON.stringify({ command: "nextStage" }));
+                network.socket.send(JSON.stringify({ command: "nextStage" }));
             else
                 document.dispatchEvent(new CustomEvent("nextStage", { detail: { clientId: clientId } }));
         });
@@ -114,7 +111,7 @@ export class Game
         if (networked)
         {
             $(document).on("dropUnits", function(event) {
-                socket.send(JSON.stringify({ command: "dropUnitsResult", ...event.detail }));
+                network.socket.send(JSON.stringify({ command: "dropUnitsResult", ...event.detail }));
             });
         }
         else
@@ -140,7 +137,7 @@ export class Game
         if (networked)
         {
             $(document).on("attack", function(event) {
-                socket.send(JSON.stringify({ command: "attackResult", ...event.detail }));
+                network.socket.send(JSON.stringify({ command: "attackResult", ...event.detail }));
             });
         }
         else
@@ -183,7 +180,7 @@ export class Game
         if (networked)
         {
             $(document).on("moveUnits", function(event) {
-                socket.send(JSON.stringify({ command: "moveUnitsResult", ...event.detail }));
+                network.socket.send(JSON.stringify({ command: "moveUnitsResult", ...event.detail }));
             });
         }
         else

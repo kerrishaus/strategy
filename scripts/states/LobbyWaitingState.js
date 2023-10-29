@@ -13,6 +13,16 @@ export class LobbyWaitingState extends State
 
         this.lobby = lobby;
 
+		// FIXME: this is a hack
+		// we have to manually create and set the ownedTerritories variable for the
+		// first client that joins because it isn't handled by the joinClient function
+		// and I don't want to worry about owned territory count on the server.
+		this.lobby.clients[0].ownedTerritories = 0;
+
+		$("#debug-lobbyId").text(this.lobby.id);
+		$("#debug-lobbyOwnerId").text(this.lobby.ownerId);
+		$("#debug-networked").text(this.lobby.networked);
+
         console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`, this.lobby);
 	}
 
@@ -32,17 +42,21 @@ export class LobbyWaitingState extends State
 			gameSettingsContainer.append(`<label>Width</label><input id="mapSizeX" value="5" inputmode="numeric" required />`);
 			gameSettingsContainer.append(`<label>Height</label><input id="mapSizeY" value="5" inputmode="numeric" required />`);
 
-			//clientListContainer.append("<button id='addBot'>Add bot</button>");
+			if (!this.lobby.networked)
+			{
+				$("<button id='addBot'>Add bot</button>").appendTo(clientListContainer)
+					.click({ lobby: this.lobby }, this.addBot);
+			}
 
-            waitingContainer.append(`<button id="startGame">start game</button>`);
+            waitingContainer.append(`<button id="startGame">Start Game</button>`);
 
-			waitingContainer.append(`<button id="back">Back to main menu</button>`);
+			waitingContainer.append(`<button id="back">Back to Main Menu</button>`);
 
 			$("#startGame").click({ lobby: this.lobby }, (event) => 
 			{
 				if (event.data.lobby.clients.length > 1)
 					if (event.data.lobby.networked)
-						socket.send(JSON.stringify({ 
+						network.socket.send(JSON.stringify({ 
 							command: "startGame", 
 							width: parseInt($("#mapSizeX").val()),
 							height: parseInt($("#mapSizeY").val()) 
@@ -62,7 +76,7 @@ export class LobbyWaitingState extends State
 		// we will need to shutdown the connection to the websocket server for this event.
 		if (!this.lobby.networked)
 			$("#back").click(() => {
-				stateManager.changeState(new MainMenuState);
+				stateManager.changeState(new MainMenuState());
 			});
 
 		$(document).on("startGame",   	   { lobby: this.lobby }, this.startGame);
@@ -70,7 +84,7 @@ export class LobbyWaitingState extends State
 		$(document).on("clientJoin",  	   { lobby: this.lobby }, this.clientJoin);
 		$(document).on("clientLeave", 	   { lobby: this.lobby }, this.clientLeave);
 
-		// TODO: send this when click ready checkbox socket.send(JSON.stringify({ command: "lobbyReady" }));
+		// TODO: send this when click ready checkbox network.socket.send(JSON.stringify({ command: "lobbyReady" }));
 	}
 
 	cleanup()
@@ -98,7 +112,7 @@ export class LobbyWaitingState extends State
 		if (event.data.lobby.ownerId == clientId)
 		{
 			console.log("sending joinLobbyAccept for client " + event.detail.requesterId);
-			socket.send(JSON.stringify({ command: "joinLobbyAccept", requesterId: event.detail.requesterId, type: "player", name: "player", color: randomHex() }));
+			network.socket.send(JSON.stringify({ command: "joinLobbyAccept", requesterId: event.detail.requesterId, type: "player", name: "player", color: randomHex() }));
 		}
 	}
 
@@ -118,7 +132,7 @@ export class LobbyWaitingState extends State
 
 		console.log("New client list: ", event.data.lobby.clients);
 
-		updateClientList(event.data.lobby);
+		//updateClientList(event.data.lobby);
 	}
 
 	clientLeave(event)
@@ -129,7 +143,18 @@ export class LobbyWaitingState extends State
 
 		console.log("New lobby client list: ", event.data.lobby.clients);
 
-		updateClientList(event.data.lobby);
+		//updateClientList(event.data.lobby);
+	}
+
+	addBot(event)
+	{
+		event.data.lobby.clients.push({
+			id: event.data.lobby.clients.length + 1,
+			type: "Bot",
+			name: "Botholamue",
+			ownedTerritories: 0,
+			color: randomHex()
+		});
 	}
 
 	updateClientList(lobby)

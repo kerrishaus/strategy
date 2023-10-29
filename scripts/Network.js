@@ -1,5 +1,5 @@
 // TODO: I can't use `this` in any of these functions, because they are used
-// as event listeners, and when they are called, `this` usually refers to the websocket.
+// as event listeners, and when they are called, `this` usually refers to the webnetwork.socket.
 
 export class Network
 {
@@ -21,7 +21,7 @@ export class Network
         window.clientId = 0;
 
         clearTimeout(network.connectionRetryTimeout);
-
+        
         network.socket.removeEventListener("close",   network.socketClose);
         network.socket.removeEventListener("message", network.socketMessage);
         network.socket = null;
@@ -37,11 +37,11 @@ export class Network
 
         console.log("Attempting to connect to server " + network.serverAddress);
         
-        // TODO: later change this to network.socket
-        window.socket = new WebSocket("wss://" + network.serverAddress);
+        // TODO: finish moving this into the network class and out of the window object.
+        network.socket = new WebSocket("wss://" + network.serverAddress);
         
-        socket.addEventListener("open",  network.connectionSuccessful);
-        socket.addEventListener("error", network.socketError);
+        network.socket.addEventListener("open",  network.connectionSuccessful);
+        network.socket.addEventListener("error", network.socketError);
         
         if (network.connectionRetryCount > 3)
         {
@@ -60,8 +60,8 @@ export class Network
         
         network.connectionRetryCount = 0;
         
-        socket.addEventListener("close",   network.socketClose);
-        socket.addEventListener("message", network.socketMessage);
+        network.socket.addEventListener("close",   network.socketClose);
+        network.socket.addEventListener("message", network.socketMessage);
         
         document.dispatchEvent(new CustomEvent("serverConnected"));
     }

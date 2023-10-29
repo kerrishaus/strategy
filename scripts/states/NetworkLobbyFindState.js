@@ -25,7 +25,7 @@ export class NetworkLobbyFindState extends State
 		
 			const response = JSON.stringify({ command: "joinLobbyRequest", lobbyId: lobbyId });
 
-			socket.send(response);
+			network.socket.send(response);
 
 			console.log("Requested to join lobby " + lobbyId);
         });
@@ -38,9 +38,15 @@ export class NetworkLobbyFindState extends State
 		
 			// TODO: I'd like to not specify client attributes here, but it has to be done
 			// because this is where the first client connects.
-			const response = JSON.stringify({ command: "createLobby", lobbyId: lobbyId, type: "player", name: "player", color: randomHex() });
+			const response = JSON.stringify({ 
+				command: "createLobby",
+				lobbyId: lobbyId,
+				type: "player",
+				name: "player",
+				color: randomHex(),
+			});
 
-			socket.send(response);
+			network.socket.send(response);
         });
 
 		$(document).on("joinLobbyAccept", this.joinLobbyAccept);

@@ -219,6 +219,6 @@ export class GameSetupState extends State
 		animate();
 
 		if (networked)
-			socket.send(JSON.stringify({ command: "gameReady" }));
+			network.socket.send(JSON.stringify({ command: "gameReady" }));
 	}
 }
