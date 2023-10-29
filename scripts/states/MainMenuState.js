@@ -1,6 +1,5 @@
 import { State } from "./State.js";
 
-import { GameSetupState } from "./GameSetupState.js";
 import { NetworkPrepareState } from "./NetworkPrepareState.js";
 
 import { randomHex } from "../Colors.js";
@@ -19,16 +18,15 @@ export class MainMenuState extends State
 	{
         $("head").append(`<link rel='stylesheet' id="mainMenuStyles" href='./assets/styles/mainMenu.css' />`);
 
-        $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer">`);
-        $("#mainMenu").append("<button id='playLocal'>play locally</button><button id='playNetworked'>play networked</button>");
+        $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer"">`);
+        $("#mainMenu").append("<button id='singleplayer'>Singleplayer</button>");
+		$("#mainMenu").append("<button id='multiplayer' >Multiplayer</button>");
 
-		$("#playLocal")[0].onclick = () => {
+		$("#singleplayer").click(() => {
 			window.clientId = 1;
 			$("#debug-clientId").text(clientId);
 
 			stateManager.changeState(new LobbyWaitingState({
-				width: 5 + getRandomInt(5),
-				height: 5 + getRandomInt(5),
 				clientId: clientId,
 				ownerId: clientId,
 				networked: false,
@@ -39,21 +37,14 @@ export class MainMenuState extends State
 						name: "Player",
 						ownedTerritories: 0,
 						color: randomHex()
-					},
-					{
-						id: clientId + 1,
-						type: "bot",
-						name: "Bot",
-						ownedTerritories: 0,
-						color: randomHex()
 					}
 				]
 			})) 
-		};
+		});
 
-		$("#playNetworked")[0].onclick = () => {
+		$("#multiplayer").click(() => {
 			stateManager.changeState(new NetworkPrepareState())
-		};
+		});
 	}
 
 	cleanup()
