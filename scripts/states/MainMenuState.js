@@ -16,8 +16,6 @@ export class MainMenuState extends State
 
 	init()
 	{
-        $("head").append(`<link rel='stylesheet' id="mainMenuStyles" href='./assets/styles/mainMenu.css' />`);
-
         $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer"">`);
         $("#mainMenu").append("<button id='singleplayer'>Singleplayer</button>");
 		$("#mainMenu").append("<button id='multiplayer' >Multiplayer</button>");
@@ -50,6 +48,5 @@ export class MainMenuState extends State
 	cleanup()
 	{
 		$("#mainMenu").remove();
-		$("#mainMenuStyles").remove();
 	}
 };

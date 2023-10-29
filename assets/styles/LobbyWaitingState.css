@@ -1,0 +1,11 @@
+#lobbyWaitText
+{
+    margin: 0;
+}
+
+#gameSettings
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

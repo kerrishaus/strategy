@@ -28,7 +28,7 @@ export class LobbyWaitingState extends State
 
 	init()
 	{
-		$("head").append(`<link rel='stylesheet' id="lobbyWaitingStyles" href='./assets/styles/lobbyWaiting.css' />`);
+		$("head").append(`<link rel='stylesheet' id="lobbyWaitingStyles" href='./assets/styles/LobbyWaitingState.css' />`);
 
 		let waitingContainer = $("<div id='waitingContainer' class='beforeGameMenuContainer'>").appendTo($("body"));
 
