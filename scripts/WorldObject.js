@@ -1,4 +1,4 @@
-import { Mesh, BoxGeometry, MeshBasicMaterial, Vector3 } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+import { Mesh, BoxGeometry, MeshBasicMaterial } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
 
 import { CSS2DObject } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
@@ -154,12 +154,12 @@ export class WorldObject extends Mesh
     
     raise()
     {
-        this.targetPosition.z = 0.4;
+        this.targetPosition.y = 0.4;
     }
     
     lower()
     {
-        this.targetPosition.z = 0;
+        this.targetPosition.y = 0;
     }
     
     // TODO: remove default value, but first make sure this behaviour is not used anywhere

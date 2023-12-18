@@ -1,12 +1,13 @@
-import { Group, PlaneGeometry, MeshBasicMaterial, FrontSide, Mesh, Box3, Vector3 } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
-		
+import { Group, PlaneGeometry, Box3, Vector3, PMREMGenerator, TextureLoader, MathUtils, Scene, RepeatWrapping } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+
+import { Water } from 'https://kerrishaus.com/assets/threejs/examples/jsm/objects/Water.js';
+import { Sky } from 'https://kerrishaus.com/assets/threejs/examples/jsm/objects/Sky.js';
+
 import * as Colors from "./Colors.js";
 
 import { WorldObject } from "./WorldObject.js";
 
 import { shuffleArray } from "./Utility.js";
-
-import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 
 export class GameWorld extends Group
 {
@@ -55,8 +56,8 @@ export class GameWorld extends Group
                 setTimeout(() =>
                 {
                     object.targetPosition.x = x + 1.0 * x;
-                    object.targetPosition.y = y + 1.0 * y;
-                    object.targetPosition.z = 0;
+                    object.targetPosition.y = 0;
+                    object.targetPosition.z = y + 1.0 * y;
                 }, 0 + (20 * arrayPosition));
                 
                 tiles[arrayPosition] = object;
@@ -163,12 +164,76 @@ export class GameWorld extends Group
         // TODO: what is this doing?
         this.tiles = terrain.tiles;
 
+        let sun = new Vector3();
+
+        const waterGeometry = new PlaneGeometry(1000, 1000);
+        this.water = new Water(
+            waterGeometry,
+            {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: new TextureLoader().load('https://kerrishaus.com/assets/threejs/r159/examples/textures/waternormals.jpg', function(texture)
+                {
+                    texture.wrapS = texture.WrapT = RepeatWrapping;
+                }),
+                sunDirection: new Vector3(),
+                sunColor: 0xFFFFFF,
+                waterColor: 0x001e0f,
+                distortionScale: 3.7,
+                fog: scene.fog !== undefined
+            }
+        )
+
+        this.water.rotation.x = - Math.PI /2
+
+        scene.add(this.water);
+
+        const sky = new Sky();
+        sky.scale.setScalar(10000);
+        scene.add(sky);
+
+        const skyUniforms = sky.material.uniforms;
+
+        skyUniforms['turbidity'].value = 10;
+        skyUniforms['rayleigh'].value = 2;
+        skyUniforms['mieCoefficient'].value = 0.005;
+        skyUniforms['mieDirectionalG'].value = 0.8;
+
+        const parameters = {
+            elevation: 2,
+            azimuth: 180
+        };
+
+        const pmremGenerator = new PMREMGenerator(renderer);
+        const sceneEnv = new Scene();
+
+        let renderTarget;
+
+            const phi = MathUtils.degToRad( 90 - parameters.elevation );
+            const theta = MathUtils.degToRad( parameters.azimuth );
+
+            sun.setFromSphericalCoords( 1, phi, theta );
+
+            sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+            this.water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+
+            if ( renderTarget !== undefined ) renderTarget.dispose();
+
+            sceneEnv.add( sky );
+            renderTarget = pmremGenerator.fromScene( sceneEnv );
+            scene.add( sky );
+
+            scene.environment = renderTarget.texture;
+
+
+        /*
         const floorGeometry = new PlaneGeometry(terrain.width + terrain.width * 1.3 + 3, terrain.height + terrain.height * 1.3 + 3);
         const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
         const floor = new Mesh(floorGeometry, floorMaterial);
         floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
         floor.position.y = terrain.height / 2 + 1.1 * terrain.height / 2 - 0.7;
         this.add(floor);
+        */
 
         const size = new Vector3();
 		const center = new Vector3();
@@ -183,12 +248,14 @@ export class GameWorld extends Group
         const fitWidthDistance = fitHeightDistance / camera.aspect;
         const distance = 12 * Math.max(fitHeightDistance, fitWidthDistance);
 
+        /*
         window.cameraPosition.x = center.x;
         window.cameraPosition.y = center.y;
         window.cameraPosition.z = distance;
         
         window.cameraPosition.x = ((this.width / 2) * 2) - 1;
         window.cameraPosition.y = ((this.height / 2) * 2) - 1;
+        */
     }
     
     calculateInvadeableTerritories()

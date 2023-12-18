@@ -1,5 +1,7 @@
 import * as THREE from "https://kerrishaus.com/assets/threejs/build/three.module.js";
-			
+
+import { OrbitControls } from "https://kerrishaus.com/assets/threejs/examples/jsm/controls/OrbitControls.js";
+
 import { CSS2DRenderer } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
 import { Game  } from "../Game.js";
@@ -95,15 +97,19 @@ export class GameSetupState extends State
 	    </div>
 		`);
 
+		window.renderer = new THREE.WebGLRenderer();
+
 		window.scene = new THREE.Scene();
 		window.camera = new ControllableCamera();
-
-		window.cameraPosition = new THREE.Vector3(9, 2, 12);
-
-		window.renderer = new THREE.WebGLRenderer();
+		
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x256d8f);
 		document.body.appendChild(renderer.domElement);
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+
+		camera.position.set( 0, 20, 100 );
+		controls.update();
 
 		window.htmlRenderer = new CSS2DRenderer();
 		htmlRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -210,7 +216,11 @@ export class GameSetupState extends State
 			
 			game.world.update(clock.getElapsedTime());
 			
-			camera.position.lerp(cameraPosition, 0.2);
+			controls.update();
+
+			//camera.position.lerp(cameraPosition, 0.2);
+
+			game.world.water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
 			
 			renderer.render(scene, camera);
 			htmlRenderer.render(scene, camera);
