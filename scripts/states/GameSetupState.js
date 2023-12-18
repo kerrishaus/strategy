@@ -97,11 +97,10 @@ export class GameSetupState extends State
 	    </div>
 		`);
 
-		window.renderer = new THREE.WebGLRenderer();
-
 		window.scene = new THREE.Scene();
 		window.camera = new ControllableCamera();
 		
+		window.renderer = new THREE.WebGLRenderer();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x256d8f);
 		document.body.appendChild(renderer.domElement);
