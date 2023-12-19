@@ -13,15 +13,10 @@ import { WorldObject } from "../WorldObject.js";
 
 export class GameSetupState extends State
 {
-	constructor(lobby)
+	init(lobby)
 	{
-		super();
-
 		this.lobby = lobby;
-	}
 
-	init()
-	{
 		$("body").append(
 		`<div class='gameInterfaceContainer transition-quick'>
 	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
@@ -106,7 +101,7 @@ export class GameSetupState extends State
 		renderer.setClearColor(0x256d8f);
 		document.body.appendChild(renderer.domElement);
 
-		window.controls = new OrbitControls( camera, renderer.domElement );
+		window.controls = new OrbitControls(camera, renderer.domElement);
 		controls.minPolarAngle = 0;
 		controls.maxPolarAngle = 1.309;
 		controls.minDistance = 10;

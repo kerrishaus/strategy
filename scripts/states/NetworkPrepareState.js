@@ -6,11 +6,6 @@ import { MainMenuState } from "./MainMenuState.js";
 
 export class NetworkPrepareState extends State
 {
-	constructor()
-	{
-		super();
-	}
-
 	init()
 	{
         window.network = new Network();

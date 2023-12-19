@@ -7,28 +7,23 @@ import { randomHex } from "../Colors.js";
 
 export class LobbyWaitingState extends State
 {
-	constructor(lobby)
+	init(lobby)
 	{
-		super();
-
-        this.lobby = lobby;
-
+		this.lobby = lobby;
+	
 		// FIXME: this is a hack
 		// we have to manually create and set the ownedTerritories variable for the
 		// first client that joins because it isn't handled by the joinClient function
 		// and I don't want to worry about owned territory count on the server.
 		this.lobby.clients[0].ownedTerritories = 0;
-
+	
 		$("#debug-lobbyId").text(this.lobby.id);
 		$("#debug-lobbyOwnerId").text(this.lobby.ownerId);
 		$("#debug-networked").text(this.lobby.networked);
+	
+		console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`, this.lobby);
 
-        console.log(`Waiting for ${this.lobby.ownerId}'s lobby ${this.lobby.lobbyId}. We are client ${clientId}`, this.lobby);
-	}
-
-	init()
-	{
-		$("head").append(`<link rel='stylesheet' id="lobbyWaitingStyles" href='./assets/styles/LobbyWaitingState.css' />`);
+		$("head").append(`<link rel='stylesheet' id="lobbyWaitingStyles" href='./styles/LobbyWaitingState.css' />`);
 
 		let waitingContainer = $("<div id='waitingContainer' class='beforeGameMenuContainer'>").appendTo($("body"));
 

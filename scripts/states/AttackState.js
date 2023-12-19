@@ -8,16 +8,11 @@ import { WorldObject } from "../WorldObject.js";
 
 export class AttackState extends State
 {
-    constructor()
-    {
-        super();
-
-        this.attackOriginTerritory = null;
-        this.attackTargetTerritory = null;
-    }
-
     init()
     {
+        this.attackOriginTerritory = null;
+        this.attackTargetTerritory = null;
+
         $(this).on("objectHover",     this.onHover);
 		$(this).on("objectHoverStop", this.onStopHover);
 		$(this).on("objectClick",     this.onMouseDown);

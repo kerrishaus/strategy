@@ -6,8 +6,8 @@
 		
 		<script src="https://kerrishaus.com/assets/scripts/jquery-3.6.0.min.js"></script>
 		
-		<link rel='stylesheet' id="gameStyles"      href='./assets/styles/game.css' />
-		<link rel='stylesheet' id="interfaceStyles" href='./assets/styles/interface.css' />
+		<link rel='stylesheet' id="gameStyles"      href='./styles/game.css' />
+		<link rel='stylesheet' id="interfaceStyles" href='./styles/interface.css' />
 		
 		<script>
             const params = new URLSearchParams(window.location.search);
@@ -79,37 +79,11 @@
 	
 	<body>
 	    <script type='module'>
-			$("head").append("<link rel='stylesheet' id='loadingStyles' href='./assets/styles/loading.css' />");
-
-			$("body").prepend(
-				`<div id='loadingCover'>
-					<div id='status'>
-						<img id='kerris' src='https://kerrishaus.com/assets/logo/text-big.png'></img>
-						<img id='threejs' src='https://raw.githubusercontent.com/mrdoob/three.js/43ec48015f23bda9c2a86533343ab3a2e104bfd6/files/icon.svg'></img>
-						<img id='webgl' src='https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/WebGL_Logo.svg/1024px-WebGL_Logo.svg.png'></img>
-					</div>
-					<div class='help'>
-						Copyright &copy;&nbsp;<span translate='no'>Kerris Haus</span>
-					</div>
-				</div>`
-			);
-
 			import { StateMachine  } from "./scripts/states/StateMachine.js";
-
+			import { LoadingState } from "./scripts/states/LoadingState.js";
+			
 			window.stateManager = new StateMachine();
-
-			import { MainMenuState } from "./scripts/states/MainMenuState.js";
-
-			setTimeout(() => {
-				// load the new state first so that all the assets are loaded
-				// and we don't get super bad popping
-				stateManager.pushState(new MainMenuState());
-
-				$("#loadingCover").fadeOut(1000, function() {
-					$(this).remove(); 
-					$("#loadingStyles").remove(); 
-				});
-			}, 1000);
+			stateManager.pushState(new LoadingState());
 		</script>
 	</body>
 </html>

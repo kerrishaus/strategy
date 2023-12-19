@@ -4,17 +4,9 @@ import { State } from "./State.js";
 
 export class UnitDropState extends State
 {
-	constructor(availableUnits)
+	init(availableUnits)
 	{
-		super();
-
 		this.availableUnits = availableUnits;
-
-		this.selectedTerritory = null;
-	}
-
-	init()
-	{
 		this.selectedTerritory = null;
 		
 		console.log("There are " + this.availableUnits + " available units to drop.");

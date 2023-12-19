@@ -1,8 +1,12 @@
 export class State extends EventTarget
 {
-    constructor()
+    constructor(...args)
     {
         super();
+
+        this.constructorArgs = args;
+
+        console.warn("constructor args", args, this.constructorArgs);
     }
     
     init()

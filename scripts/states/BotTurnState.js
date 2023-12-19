@@ -10,17 +10,12 @@ import { WorldObject } from "../WorldObject.js";
 
 export class BotTurnState extends State
 {
-    constructor()
-    {
-        super();
-
-        this.botId = clientId + 1;
-
-        this.delay = 0;
-    }
-    
     init()
     {
+        this.botId = clientId + 1;
+    
+        this.delay = 0;
+
         this.enemyUnitPlaceCount = Math.round(game.world.getTerritoriesOwnedBy(this.botId).length / 3);
 
         console.log("Starting AI turn with " + this.enemyUnitPlaceCount + " units.");

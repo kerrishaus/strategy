@@ -6,11 +6,6 @@ import { randomHex } from "../Colors.js";
 
 export class NetworkLobbyFindState extends State
 {
-	constructor()
-	{
-		super();
-	}
-
 	init()
 	{
         let lobbyFindMenu = $(`<div id="lobbyFindMenu" class="beforeGameMenuContainer">`).appendTo($("body"));

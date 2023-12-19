@@ -4,18 +4,14 @@ import { NetworkPrepareState } from "./NetworkPrepareState.js";
 
 import { randomHex } from "../Colors.js";
 
-import { getRandomInt } from "https://kerrishaus.com/assets/scripts/MathUtility.js";
 import { LobbyWaitingState } from "./LobbyWaitingState.js";
 
 export class MainMenuState extends State
 {
-	constructor()
-	{
-		super();
-	}
-
 	init()
 	{
+		$("head").append("<link rel='stylesheet' id='loadingStyles' href='./styles/loading.css' />");
+
         $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer"">`);
         $("#mainMenu").append("<button id='singleplayer'>Singleplayer</button>");
 		$("#mainMenu").append("<button id='multiplayer' >Multiplayer</button>");

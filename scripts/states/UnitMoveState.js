@@ -1,20 +1,14 @@
 import * as Colors from "../Colors.js";
 
 import { State } from "./State.js";
-import { BotTurnState } from "./BotTurnState.js";
 
 export class UnitMoveState extends State
 {
-    constructor()
-    {
-        super();
-
-        this.startTerritory = null;
-        this.endTerritory = null;
-    }
-    
     init()
     {
+        this.startTerritory = null;
+        this.endTerritory = null;
+
         $(htmlRenderer.domElement).on("click", "#moveUnitButton", callback =>
         {
             if (this.startTerritory === null)

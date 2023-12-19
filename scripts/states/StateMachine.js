@@ -29,9 +29,9 @@ export class StateMachine
             
         this.states.push(state);
         state.stateMachine = this;
-
+        
         console.log("StateMachine: Initialising " + state.constructor.name + "...");
-        this.states[this.states.length - 1].init();
+        state.init.apply(state, state.constructorArgs);
         console.log("StateMachine: Finished initialising " + state.constructor.name + ".");
 
         $("#debug-state").text(state.constructor.name);
