@@ -6,7 +6,7 @@ export class WorldObject extends Mesh
 {
     constructor(width, height, color, territoryId, startPosition)
     {
-        const geometry = new BoxGeometry(width, height, 1);
+        const geometry = new BoxGeometry(width, height, 2);
         const material = new MeshBasicMaterial({ color: color });
         
         super(geometry, material);

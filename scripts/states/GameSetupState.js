@@ -219,7 +219,7 @@ export class GameSetupState extends State
 
 			//camera.position.lerp(cameraPosition, 0.2);
 
-			game.world.water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+			game.world.water.material.uniforms[ 'time' ].value += 0.5 / 60.0;
 			
 			renderer.render(scene, camera);
 			htmlRenderer.render(scene, camera);

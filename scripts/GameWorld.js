@@ -164,9 +164,8 @@ export class GameWorld extends Group
         // TODO: what is this doing?
         this.tiles = terrain.tiles;
 
-        let sun = new Vector3();
+        const waterGeometry = new PlaneGeometry(10000, 10000);
 
-        const waterGeometry = new PlaneGeometry(1000, 1000);
         this.water = new Water(
             waterGeometry,
             {
@@ -174,19 +173,21 @@ export class GameWorld extends Group
                 textureHeight: 512,
                 waterNormals: new TextureLoader().load('https://kerrishaus.com/assets/threejs/r159/examples/textures/waternormals.jpg', function(texture)
                 {
-                    texture.wrapS = texture.WrapT = RepeatWrapping;
+                    texture.wrapS = texture.wrapT = RepeatWrapping;
                 }),
                 sunDirection: new Vector3(),
-                sunColor: 0xFFFFFF,
+                sunColor: 0xffffff,
                 waterColor: 0x001e0f,
                 distortionScale: 3.7,
                 fog: scene.fog !== undefined
             }
-        )
+        );
 
-        this.water.rotation.x = - Math.PI /2
+        this.water.rotation.x = - Math.PI / 2;
 
         scene.add(this.water);
+
+        // Skybox
 
         const sky = new Sky();
         sky.scale.setScalar(10000);
@@ -209,22 +210,23 @@ export class GameWorld extends Group
 
         let renderTarget;
 
-            const phi = MathUtils.degToRad( 90 - parameters.elevation );
-            const theta = MathUtils.degToRad( parameters.azimuth );
+        const sun = new Vector3();
+        const phi = MathUtils.degToRad(90 - parameters.elevation);
+        const theta = MathUtils.degToRad(parameters.azimuth);
 
-            sun.setFromSphericalCoords( 1, phi, theta );
+        sun.setFromSphericalCoords(1, phi, theta);
 
-            sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
-            this.water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+        sky.material.uniforms['sunPosition'].value.copy(sun);
+        this.water.material.uniforms['sunDirection'].value.copy(sun).normalize();
 
-            if ( renderTarget !== undefined ) renderTarget.dispose();
+        if (renderTarget !== undefined)
+            renderTarget.dispose();
 
-            sceneEnv.add( sky );
-            renderTarget = pmremGenerator.fromScene( sceneEnv );
-            scene.add( sky );
+        sceneEnv.add(sky);
+        renderTarget = pmremGenerator.fromScene(sceneEnv);
+        scene.add(sky);
 
-            scene.environment = renderTarget.texture;
-
+        scene.environment = renderTarget.texture;
 
         /*
         const floorGeometry = new PlaneGeometry(terrain.width + terrain.width * 1.3 + 3, terrain.height + terrain.height * 1.3 + 3);
