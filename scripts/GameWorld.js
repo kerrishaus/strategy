@@ -163,11 +163,11 @@ export class GameWorld extends Group
             box.expandByObject(object); // this doesn't seem to be working
         }
 
-        const size = new Vector3();
-		const center = new Vector3();
+        const mapSize = new Vector3();
+		const mapCenter = new Vector3();
 
-        box.getSize(size);
-        box.getCenter(center);
+        box.getSize(mapSize);
+        box.getCenter(mapCenter);
         
         const waterGeometry = new PlaneGeometry(10000, 10000);
 
@@ -233,14 +233,11 @@ export class GameWorld extends Group
 
         scene.environment = renderTarget.texture;
 
-        /*
-        const floorGeometry = new PlaneGeometry(terrain.width + terrain.width * 1.3 + 3, terrain.height + terrain.height * 1.3 + 3);
-        const floorMaterial = new MeshBasicMaterial({color: 0x256d8f, side: FrontSide });
-        const floor = new Mesh(floorGeometry, floorMaterial);
-        floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
-        floor.position.y = terrain.height / 2 + 1.1 * terrain.height / 2 - 0.7;
-        this.add(floor);
-        */
+        console.warn("warning", mapSize, mapCenter);
+
+        controls.target.set(mapCenter.x - 1, 0, mapCenter.y - 1);
+		camera.position.set(mapCenter.x - 1, 0, mapCenter.y - 1);
+        controls.update();
     }
     
     calculateInvadeableTerritories()

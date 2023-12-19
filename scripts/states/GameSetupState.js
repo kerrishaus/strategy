@@ -9,6 +9,7 @@ import { State } from "./State.js";
 
 import * as Colors from "../Colors.js";
 import { ControllableCamera } from "../ControllableCamera.js";
+import { WorldObject } from "../WorldObject.js";
 
 export class GameSetupState extends State
 {
@@ -123,7 +124,7 @@ export class GameSetupState extends State
 		htmlRenderer.domElement.style.top = '0px';
 		document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
 
-		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED;
+		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED = null;
 
 		const clock = new THREE.Clock();
 
@@ -193,7 +194,10 @@ export class GameSetupState extends State
 
 			if (intersects.length > 0)
 			{
-				if (INTERSECTED != intersects[0].object)
+				// if the intersected object is not the old object,
+				// and if the intersected object is an instanceof WorldObject
+				if (INTERSECTED instanceof WorldObject ||
+					INTERSECTED != intersects[0].object)
 				{
 					if (INTERSECTED) // the object is no longer hovered, and we're hovering over another object
 					{
