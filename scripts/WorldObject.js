@@ -1,4 +1,4 @@
-import { Mesh, BoxGeometry, MeshBasicMaterial } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+import { Mesh, BoxGeometry, MeshStandardMaterial } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
 
 import { CSS2DObject } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
@@ -7,7 +7,7 @@ export class WorldObject extends Mesh
     constructor(width, height, color, territoryId, startPosition)
     {
         const geometry = new BoxGeometry(width, height, 2);
-        const material = new MeshBasicMaterial({ color: color });
+        const material = new MeshStandardMaterial({ color: color });
         
         super(geometry, material);
 

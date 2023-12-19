@@ -152,18 +152,23 @@ export class GameWorld extends Group
 
     loadWorld(terrain)
     {
+        this.tiles = terrain.tiles;
+
         const box = new Box3();
         box.makeEmpty();
 
-        for (const object of terrain.tiles)
+        for (const object of this.tiles)
         {
             this.add(object);
             box.expandByObject(object); // this doesn't seem to be working
         }
-        
-        // TODO: what is this doing?
-        this.tiles = terrain.tiles;
 
+        const size = new Vector3();
+		const center = new Vector3();
+
+        box.getSize(size);
+        box.getCenter(center);
+        
         const waterGeometry = new PlaneGeometry(10000, 10000);
 
         this.water = new Water(
@@ -205,9 +210,6 @@ export class GameWorld extends Group
             azimuth: 180
         };
 
-        const pmremGenerator = new PMREMGenerator(renderer);
-        const sceneEnv = new Scene();
-
         let renderTarget;
 
         const sun = new Vector3();
@@ -222,6 +224,9 @@ export class GameWorld extends Group
         if (renderTarget !== undefined)
             renderTarget.dispose();
 
+        const pmremGenerator = new PMREMGenerator(renderer);
+        const sceneEnv = new Scene();
+
         sceneEnv.add(sky);
         renderTarget = pmremGenerator.fromScene(sceneEnv);
         scene.add(sky);
@@ -235,28 +240,6 @@ export class GameWorld extends Group
         floor.position.x = terrain.width / 2 + 1.1 * terrain.width / 2 - 0.7;
         floor.position.y = terrain.height / 2 + 1.1 * terrain.height / 2 - 0.7;
         this.add(floor);
-        */
-
-        const size = new Vector3();
-		const center = new Vector3();
-
-        box.getSize(size);
-        box.getCenter(center);
-
-        console.log(box, size, center);
-
-        const maxSize = Math.max(size.x, size.y, size.z);
-        const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
-        const fitWidthDistance = fitHeightDistance / camera.aspect;
-        const distance = 12 * Math.max(fitHeightDistance, fitWidthDistance);
-
-        /*
-        window.cameraPosition.x = center.x;
-        window.cameraPosition.y = center.y;
-        window.cameraPosition.z = distance;
-        
-        window.cameraPosition.x = ((this.width / 2) * 2) - 1;
-        window.cameraPosition.y = ((this.height / 2) * 2) - 1;
         */
     }
     

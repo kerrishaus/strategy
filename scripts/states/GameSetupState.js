@@ -105,9 +105,16 @@ export class GameSetupState extends State
 		renderer.setClearColor(0x256d8f);
 		document.body.appendChild(renderer.domElement);
 
-		const controls = new OrbitControls( camera, renderer.domElement );
-
-		camera.position.set( 0, 20, 100 );
+		window.controls = new OrbitControls( camera, renderer.domElement );
+		controls.minPolarAngle = 0;
+		controls.maxPolarAngle = 1.309;
+		controls.minDistance = 10;
+		controls.maxDistance = 30;
+		controls.minTargetRadius = 0;
+		controls.maxTargetRadius = 10;
+		
+		controls.target.set( 0, 0, 0 );
+		camera.position.set( 0, 0, 0 );
 		controls.update();
 
 		window.htmlRenderer = new CSS2DRenderer();
