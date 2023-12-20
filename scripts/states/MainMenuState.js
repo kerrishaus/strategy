@@ -10,8 +10,6 @@ export class MainMenuState extends State
 {
 	init()
 	{
-		$("head").append("<link rel='stylesheet' id='loadingStyles' href='./styles/loading.css' />");
-
         $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer"">`);
         $("#mainMenu").append("<button id='singleplayer'>Singleplayer</button>");
 		$("#mainMenu").append("<button id='multiplayer' >Multiplayer</button>");

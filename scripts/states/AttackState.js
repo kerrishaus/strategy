@@ -92,8 +92,6 @@ export class AttackState extends State
             {
                 if (object.userData.invadeable)
                 {
-                    console.log("object is invadeable");
-
                     if (this.attackTargetTerritory !== null)
                         // if we don't own the object, and it's invadeable,
                         // and we already have an attack target, this is probably the target, so keep it at 40
@@ -114,16 +112,10 @@ export class AttackState extends State
     {
         const object = event.detail.object;
 
-        if (this.attackTargetTerritory === null && object.userData.ownerId == clientId)
+        if (this.attackOriginTerritory === null && object.userData.ownerId == clientId)
             this.setAttackOriginTerritory(object);
         else if (this.attackTargetTerritory === null && object.userData.ownerId != clientId)
             this.setAttackTargetTerritory(object);
-        else
-        {
-            console.log("Clearing selected territories.");
-            this.clearAttackTargetTerritory();
-            this.clearAttackOriginTerritory();
-        }
     }
 
     onKeyDown(event)
@@ -243,10 +235,12 @@ export class AttackState extends State
         
         $("#attackPlannerCancelButton").click(function(event)
         {
+            console.log("cancelled attack!");
             $(".gameInterfaceContainer").attr("data-visibility", null);
+            clearAttackTargetTerritory();
         });
         
-        $("#attackPlannerGoButton").click(callback =>
+        $("#attackPlannerGoButton").click((event) =>
         {
             console.log("Running attack");
             this.runAttack();
@@ -255,6 +249,8 @@ export class AttackState extends State
         $("#attackerCount").html(this.attackOriginTerritory.unitCount);
         $("#defenderCount").html(this.attackTargetTerritory.unitCount);
         $(".gameInterfaceContainer").attr("data-visibility", "hidden");
+
+        console.log("Attack dialog ready.");
     }
     
     clearAttackTargetTerritory()
@@ -278,8 +274,6 @@ export class AttackState extends State
                 
             if (tile === this.attackTargetTerritory)
                 continue;
-
-            console.log("tile is invadable");
 
             tile.userData.invadeable = true;
             tile.material.color.set(Colors.shade(game.clients.getById(tile.userData.ownerId)?.color ?? Colors.unownedColor, -20));
