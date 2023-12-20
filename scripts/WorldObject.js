@@ -1,4 +1,8 @@
-import { Mesh, BoxGeometry, MeshStandardMaterial } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+import { Mesh, BoxGeometry, MeshStandardMaterial, MeshBasicMaterial } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
+import { TextGeometry } from "https://kerrishaus.com/assets/threejs/examples/jsm/geometries/TextGeometry.js";
+
+import * as Colors from "./Colors.js";
+import { getFont } from 'https://kerrishaus.com/assets/threejsaddons/r159/FontLoader.js';
 
 import { CSS2DObject } from "https://kerrishaus.com/assets/threejs/examples/jsm/renderers/CSS2DRenderer.js";
 
@@ -17,16 +21,6 @@ export class WorldObject extends Mesh
 
         this.territoryId = territoryId;
         this.hovered = false;
-        this.unitCount = 0;
-        
-        const labelDiv = document.createElement("div");
-        labelDiv.id = this.uuid;
-        labelDiv.className = 'unitCount';
-        labelDiv.textContent = this.unitCount;
-        
-        this.label = new CSS2DObject(labelDiv);
-        this.label.color = "white";
-        this.add(this.label);
         
         this.userData.canClick = true;
         
@@ -35,6 +29,9 @@ export class WorldObject extends Mesh
         this.dialog = null;
         this.world = null;
         this.invadeableNeighbors = [];
+
+        this.unitCount = 0;
+        this.updateText(this.unitCount);
     }
     
     update(deltaTime)
@@ -161,18 +158,57 @@ export class WorldObject extends Mesh
     {
         this.targetPosition.y = 0;
     }
+
+    updateText()
+    {
+        this.remove(this.text);
+        this.text = null
+        
+        // TODO: dispose the text and material
+
+        this.text = new Mesh(
+            new TextGeometry(this.unitCount.toString(),
+            {
+                font: getFont("Arial"),
+                size: 0.5,
+                height: 1,
+                curveSegments: 12,
+                /*
+                bevelEnabled: true,
+                bevelThickness: 10,
+                bevelSize: 8,
+                bevelOffset: 0,
+                bevelSegments: 5
+                */
+            }),
+            new MeshBasicMaterial({ color: Colors.shade(this.material.color.getHexString(), 50) })
+        );
+
+        this.add(this.text);
+
+        // TODO orient text towards camera when it moves
+        
+        this.text.position.y += 0.05;
+        this.text.rotateX(Math.PI / 2);
+        this.text.rotateY(Math.PI);
+    }
+
+    setUnits(amount)
+    {
+        this.updateText(this.unitCount);
+        this.unitCount = amount;
+        $("#" + this.uuid).html(amount);
+    }
     
     // TODO: remove default value, but first make sure this behaviour is not used anywhere
     addUnits(amount = 1)
     {
-        this.unitCount += amount;
-        $("#" + this.uuid).html(this.unitCount);
+        this.setUnits(this.unitCount + amount);
     }
     
     // TODO: remove default value, but first make sure this behaviour is not used anywhere
     removeUnits(amount = 1)
     {
-        this.unitCount -= amount;
-        $("#" + this.uuid).html(this.unitCount);
+        this.setUnits(this.unitCount - amount);
     }
 };

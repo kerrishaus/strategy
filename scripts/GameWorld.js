@@ -144,8 +144,6 @@ export class GameWorld extends Group
             if (this.tiles[territory].userData.ownerId > 0)
                 this.tiles[territory].addUnits(1);
 
-            this.tiles[territory].label.element.innerHTML = this.tiles[territory].unitCount;
-
             this.tiles[territory].material.color.set(clients.getById(territories[territory])?.color ?? Colors.unownedColor);
         }
     }

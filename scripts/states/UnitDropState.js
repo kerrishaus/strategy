@@ -16,7 +16,7 @@ export class UnitDropState extends State
 		{
 			if (this.selectedTerritory === null)
 			{
-				console.error("selectedTerritory is null in UnitDropState::init().");
+				console.error("selectedTerritory is null in DropUnitButton.");
 				return;
 			}
 

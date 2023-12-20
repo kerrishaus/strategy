@@ -1,4 +1,4 @@
-import { getFont } from 'https://kerrishaus.com/assets/threejsaddons/r159/FontLoader.js';
+import { loadFont } from 'https://kerrishaus.com/assets/threejsaddons/r159/FontLoader.js';
 
 import { State } from "./State.js";
 
@@ -34,7 +34,7 @@ export class LoadingState extends State
         {
             $("#progressText").text("Loading");
 
-            const font = await getFont('fonts/Arial.json');
+            await loadFont("Arial");
             $("#progress").val(1);
 
             resolve(true);

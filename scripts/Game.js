@@ -152,8 +152,8 @@ export class Game
             const attackingTerritory = game.world.tiles[event.detail.attacker];
             const defendingTerritory = game.world.tiles[event.detail.defender];
 
-            attackingTerritory.unitCount = event.detail.attackerPopulation;
-            defendingTerritory.unitCount = event.detail.defenderPopulation;
+            attackingTerritory.setUnits(event.detail.attackerPopulation);
+            defendingTerritory.setUnits(event.detail.defenderPopulation);
 
             if (event.detail.result == "won")
             {
@@ -171,8 +171,8 @@ export class Game
                 game.world.calculateInvadeableTerritories();
             }
 
-            attackingTerritory.label.element.innerHTML = attackingTerritory.unitCount;
-            defendingTerritory.label.element.innerHTML = defendingTerritory.unitCount;
+            attackingTerritory.setUnits(attackingTerritory.unitCount);
+            defendingTerritory.setUnits(defendingTerritory.unitCount);
 
             console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
         });
@@ -197,11 +197,11 @@ export class Game
 
             console.log(`Moving ${event.detail.amount} units from origin territory ${event.detail.origin} (${originTerritory.unitCount} -> ${event.detail.originPopulation}) to destination territory ${event.detail.destination} (${destinationTerritory.unitCount} -> ${event.detail.destinationPopulation})`);
 
-            originTerritory.unitCount = event.detail.originPopulation;
-            destinationTerritory.unitCount = event.detail.destinationPopulation;
+            originTerritory.setUnits(event.detail.originPopulation);
+            destinationTerritory.setUnits(event.detail.destinationPopulation);
 
-            originTerritory.label.element.innerHTML = originTerritory.unitCount;
-            destinationTerritory.label.element.innerHTML = destinationTerritory.unitCount;
+            originTerritory.setUnits(originTerritory.unitCount);
+            destinationTerritory.setUnits(destinationTerritory.unitCount);
         });
     }
 
@@ -294,7 +294,7 @@ export class Game
             object.lower();
             object.material.color.set(this.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor);
 
-            object.label.element.innerHTML = object.unitCount;
+            object.setUnits(object.unitCount);
 
             //object.destroyUnitPlaceDialog();
         }
@@ -339,7 +339,7 @@ export class Game
         fromTerritory.unitCount -= amount;
         toTerritory.unitCount += amount;
         
-        fromTerritory.label.element.innerHTML = fromTerritory.unitCount;
-        toTerritory.label.element.innerHTML = toTerritory.unitCount;
+        fromTerritory.setUnits(fromTerritory.unitCount);
+        toTerritory.setUnits(toTerritory.unitCount);
     }
 }
