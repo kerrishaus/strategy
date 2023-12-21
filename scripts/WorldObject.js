@@ -161,8 +161,13 @@ export class WorldObject extends Mesh
 
     updateText()
     {
-        this.remove(this.text);
-        this.text = null
+        if (this.text)
+        {
+            this.remove(this.text);
+            this.text.geometry?.dispose();
+            this.text.material?.dispose();
+            this.text = null
+        }
         
         // TODO: dispose the text and material
 
@@ -191,6 +196,8 @@ export class WorldObject extends Mesh
         // makes the text parallel to the object
         this.text.rotateX(Math.PI / 2);
         this.text.rotateY(Math.PI);
+
+        // TODO: do the camera Z rotation here too
     }
 
     setUnits(amount)
