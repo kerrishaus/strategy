@@ -137,6 +137,12 @@ export class GameSetupState extends State
 		console.warn("Creating a new game instance.");
 		window.game = new Game(this.lobby);
 
+		// make the object text face the camera
+		$(controls).change((event) => {
+			for (const worldObject of game.world.tiles)
+				worldObject.text.rotation.z = controls.getAzimuthalAngle();
+		});
+
 		scene.add(game.world);
 
 		$("#nextStateButton").click(function(event)

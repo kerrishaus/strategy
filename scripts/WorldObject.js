@@ -171,7 +171,7 @@ export class WorldObject extends Mesh
             {
                 font: getFont("Arial"),
                 size: 0.5,
-                height: 1,
+                height: 0.005,
                 curveSegments: 12,
                 /*
                 bevelEnabled: true,
@@ -186,9 +186,9 @@ export class WorldObject extends Mesh
 
         this.add(this.text);
 
-        // TODO orient text towards camera when it moves
-        
-        this.text.position.y += 0.05;
+        this.text.position.y += (this.scale.y / 2) + 0.5;
+
+        // makes the text parallel to the object
         this.text.rotateX(Math.PI / 2);
         this.text.rotateY(Math.PI);
     }
