@@ -31,7 +31,7 @@ export class NetworkPrepareState extends State
 	        });
 
 		$(document).on("serverSocketError", () => {
-			$("#progressText").text(`Attempt ${this.connectionRetryCount} of ${network.connectionRetryLimit} failed.`);
+			$("#progressText").text(`Attempt ${network.connectionRetryCount} of ${network.connectionRetryLimit} failed.`);
 	        });
 	
 	        network.attemptConnection();
