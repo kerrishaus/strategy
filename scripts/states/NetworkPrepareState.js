@@ -30,12 +30,8 @@ export class NetworkPrepareState extends State
 	            stateManager.changeState(new MainMenuState());
 	        });
 
-		this.networkFailures = 0;
-		
 		$(document).on("serverSocketError", () => {
-			this.networkFailures++;
-
-			$("#progressText").text(`Attempt ${this.networkFailures} of ${network.connectionRetryLimit} failed.`);
+			$("#progressText").text(`Attempt ${this.connectionRetryCount} of ${network.connectionRetryLimit} failed.`);
 	        });
 	
 	        network.attemptConnection();
