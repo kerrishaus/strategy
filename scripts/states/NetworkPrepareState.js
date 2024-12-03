@@ -8,19 +8,42 @@ export class NetworkPrepareState extends State
 {
 	init()
 	{
-        window.network = new Network();
+		$("head").append("<link rel='stylesheet' id='networkPrepareStyles' href='./styles/NetworkPrepareState.css' />");
 
-        // TODO: rename networkClientReady to networkConnectionSuccess
-        $(document).on("networkClientReady", () => {
-            console.log("Server connection is ready, switching to lobby finder.");
-            stateManager.changeState(new NetworkLobbyFindState());
-        });
+	        $("body").prepend(
+	           `<div id="networkPrepare">
+		    	<progress></progress>
+		    	<h1 id="progressText">Establishing connection...</h1>
+	            </div>`
+	        );
+		
+	        window.network = new Network();
+	
+	        // TODO: rename networkClientReady to networkConnectionSuccess
+	        $(document).on("networkClientReady", () => {
+	            console.log("Server connection is ready, switching to lobby finder.");
+	            stateManager.changeState(new NetworkLobbyFindState());
+	        });
+	
+	        $(document).on("networkConnectionFailed", () => {
+	            console.error("Failed to connect to server, going back to main menu.");
+	            stateManager.changeState(new MainMenuState());
+	        });
 
-        $(document).on("networkConnectionFailed", () => {
-            console.error("Failed to connect to server, going back to main menu.");
-            stateManager.changeState(new MainMenuState());
-        });
+		this.networkFailures = 0;
+		
+		$(document).on("networkConnectionAttemptFailed", () => {
+			this.networkFailures++;
 
-        network.attemptConnection();
+			$("#progressText").text(`Attempt ${this.networkFailures} of 3 failed.`);
+	        });
+	
+	        network.attemptConnection();
+	}
+
+	cleanup()
+	{
+		$("#networkPrepare").remove(); 
+		$("#networkPrepareStyles").remove();
 	}
 };
