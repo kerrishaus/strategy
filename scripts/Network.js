@@ -11,6 +11,7 @@ export class Network
         
         this.connectionRetryDelay   = 3000;
         this.connectionRetryCount   = 0;
+        this.connectionRetryLimit   = 3;
         this.connectionRetryTimeout = null;
 
         console.log("Network class is ready.");
@@ -43,14 +44,13 @@ export class Network
         network.socket.addEventListener("open",  network.connectionSuccessful);
         network.socket.addEventListener("error", network.socketError);
         
-        if (network.connectionRetryCount > 3)
+        if (network.connectionRetryCount > this.connectionRetryLimit)
         {
-            console.error("Failed to connect to server after 3 retries.");
+            console.error(`Failed to connect to server after ${this.connectionRetryLimit} attempts.`);
             document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
             return false;
         }
 
-        // TODO: give this an upper limit
         network.connectionRetryCount += 1;
     }
 
