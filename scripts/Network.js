@@ -30,6 +30,13 @@ export class Network
 
     attemptConnection()
     {
+        if (++network.connectionRetryCount > this.connectionRetryLimit)
+        {
+            console.error(`Failed to connect to server after ${this.connectionRetryLimit} attempts.`);
+            document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
+            return false;
+        }
+        
         if (!document.dispatchEvent(new CustomEvent("networkConnectionAttempt")))
         {
             console.log("Aborting server connection because networkConnectionAttempt was prevented.");
@@ -43,15 +50,6 @@ export class Network
         
         network.socket.addEventListener("open",  network.connectionSuccessful);
         network.socket.addEventListener("error", network.socketError);
-        
-        if (network.connectionRetryCount > this.connectionRetryLimit)
-        {
-            console.error(`Failed to connect to server after ${this.connectionRetryLimit} attempts.`);
-            document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
-            return false;
-        }
-
-        network.connectionRetryCount += 1;
     }
 
     connectionSuccessful()
