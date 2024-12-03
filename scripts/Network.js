@@ -30,9 +30,9 @@ export class Network
 
     attemptConnection()
     {
-        if (++network.connectionRetryCount > this.connectionRetryLimit)
+        if (++network.connectionRetryCount > network.connectionRetryLimit)
         {
-            console.error(`Failed to connect to server after ${this.connectionRetryLimit} attempts.`);
+            console.error(`Failed to connect to server after ${network.connectionRetryLimit} attempts.`);
             document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
             return false;
         }
