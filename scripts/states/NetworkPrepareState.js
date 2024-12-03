@@ -32,10 +32,10 @@ export class NetworkPrepareState extends State
 
 		this.networkFailures = 0;
 		
-		$(document).on("networkConnectionAttemptFailed", () => {
+		$(document).on("serverSocketError", () => {
 			this.networkFailures++;
 
-			$("#progressText").text(`Attempt ${this.networkFailures} of 3 failed.`);
+			$("#progressText").text(`Attempt ${this.networkFailures} of ${network.connectionRetryLimit} failed.`);
 	        });
 	
 	        network.attemptConnection();
