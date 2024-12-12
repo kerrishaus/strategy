@@ -4,7 +4,7 @@ import { Network } from "../Network.js";
 import { NetworkLobbyFindState } from "./NetworkLobbyFindState.js";
 import { MainMenuState } from "./MainMenuState.js";
 
-import * as PageUtility frmo "../PageUtility.js";
+import * as PageUtility from "../PageUtility.js";
 
 export class NetworkPrepareState extends State
 {
