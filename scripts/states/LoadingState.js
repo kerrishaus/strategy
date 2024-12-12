@@ -4,11 +4,13 @@ import { State } from "./State.js";
 
 import { MainMenuState } from "./MainMenuState.js";
 
+import * as PageUtility frmo "../PageUtility.js";
+
 export class LoadingState extends State
 {
 	init()
 	{
-        $("head").append("<link rel='stylesheet' id='loadingStyles' href='./styles/LoadingState.css' />");
+	PageUtility.addStyle("LoadingState");
 
         $("body").prepend(
            `<div id='loadingCover'>
@@ -54,7 +56,7 @@ export class LoadingState extends State
     
             $("#loadingCover").fadeOut(1000, function() {
                 $(this).remove(); 
-                $("#loadingStyles").remove();
+                PageUtility.removeStyle("LoadingState");
             });
         }, 1000);
 	}
