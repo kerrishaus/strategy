@@ -8,7 +8,7 @@ export class NetworkPrepareState extends State
 {
 	init()
 	{
-		$("head").append("<link rel='stylesheet' id='networkPrepareStyles' href='./styles/NetworkPrepareState.css' />");
+		PageUtility.addStyle("NetworkPrepareState");
 
 	        $("body").prepend(
 	           `<div id="networkPrepare">
@@ -40,6 +40,7 @@ export class NetworkPrepareState extends State
 	cleanup()
 	{
 		$("#networkPrepare").remove(); 
-		$("#networkPrepareStyles").remove();
+		
+		PageUtility.removeStyle("NetworkPrepareState");
 	}
 };
