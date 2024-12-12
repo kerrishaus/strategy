@@ -4,7 +4,7 @@ import { State } from "./State.js";
 
 import { MainMenuState } from "./MainMenuState.js";
 
-import * as PageUtility frmo "../PageUtility.js";
+import * as PageUtility from "../PageUtility.js";
 
 export class LoadingState extends State
 {
