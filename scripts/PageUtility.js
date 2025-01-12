@@ -5,7 +5,7 @@ export function addStyle(filename)
     const style = document.createElement("link");
     style.setAttribute("rel", "stylesheet");
     style.setAttribute("href", `./styles/${filename}.css`);
-    document.head.appendChild(style);
+    $("head").append(style);
 
     loadedStyles.set(filename, style);
 }

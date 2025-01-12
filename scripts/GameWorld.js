@@ -1,7 +1,7 @@
 import { Group, PlaneGeometry, Box3, Vector3, PMREMGenerator, TextureLoader, MathUtils, Scene, RepeatWrapping } from "https://kerrishaus.com/assets/threejs/build/three.module.js";
 
-import { Water } from 'https://kerrishaus.com/assets/threejs/examples/jsm/objects/Water.js';
-import { Sky } from 'https://kerrishaus.com/assets/threejs/examples/jsm/objects/Sky.js';
+import { Water } from "https://kerrishaus.com/assets/threejs/examples/jsm/objects/Water.js";
+import { Sky } from "https://kerrishaus.com/assets/threejs/examples/jsm/objects/Sky.js";
 
 import * as Colors from "./Colors.js";
 
@@ -174,7 +174,7 @@ export class GameWorld extends Group
             {
                 textureWidth: 512,
                 textureHeight: 512,
-                waterNormals: new TextureLoader().load('https://kerrishaus.com/assets/threejs/r159/examples/textures/waternormals.jpg', function(texture)
+                waterNormals: new TextureLoader().load("https://kerrishaus.com/assets/threejs/r159/examples/textures/waternormals.jpg", function(texture)
                 {
                     texture.wrapS = texture.wrapT = RepeatWrapping;
                 }),
@@ -198,10 +198,10 @@ export class GameWorld extends Group
 
         const skyUniforms = sky.material.uniforms;
 
-        skyUniforms['turbidity'].value = 10;
-        skyUniforms['rayleigh'].value = 2;
-        skyUniforms['mieCoefficient'].value = 0.005;
-        skyUniforms['mieDirectionalG'].value = 0.8;
+        skyUniforms["turbidity"].value = 10;
+        skyUniforms["rayleigh"].value = 2;
+        skyUniforms["mieCoefficient"].value = 0.005;
+        skyUniforms["mieDirectionalG"].value = 0.8;
 
         const parameters = {
             elevation: 2,
@@ -216,8 +216,8 @@ export class GameWorld extends Group
 
         sun.setFromSphericalCoords(1, phi, theta);
 
-        sky.material.uniforms['sunPosition'].value.copy(sun);
-        this.water.material.uniforms['sunDirection'].value.copy(sun).normalize();
+        sky.material.uniforms["sunPosition"].value.copy(sun);
+        this.water.material.uniforms["sunDirection"].value.copy(sun).normalize();
 
         if (renderTarget !== undefined)
             renderTarget.dispose();

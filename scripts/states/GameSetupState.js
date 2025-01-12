@@ -18,67 +18,67 @@ export class GameSetupState extends State
 		this.lobby = lobby;
 
 		$("body").append(
-		`<div class='gameInterfaceContainer transition-quick'>
-	        <div class='gameStatus moveableInterfaceElement' data-state='0'>
-	            <div id='me'>
-	                <!--<div id='playerPortrait'></div>-->
+		`<div class="gameInterfaceContainer transition-quick">
+	        <div class="gameStatus moveableInterfaceElement" data-state="0">
+	            <div id="me">
+	                <!--<div id="playerPortrait"></div>-->
 	            </div>
-	            <div id='roundStatus'>
+	            <div id="roundStatus">
 	                <div>
-	                    <span id='flag'></span>
-	                    <span id='playerName'>Super Idiot</span>
-	                    <span id='tags'>&#10004;</span>
+	                    <span id="flag"></span>
+	                    <span id="playerName">Super Idiot</span>
+	                    <span id="tags">&#10004;</span>
 	                </div>
-	                <div id='roundType'>
-	                    <div class='roundSpace'>Place</div>
-	                    <div class='roundSpace'>Attack</div>
-	                    <div class='roundSpace'>Move</div>
+	                <div id="roundType">
+	                    <div class="roundSpace">Place</div>
+	                    <div class="roundSpace">Attack</div>
+	                    <div class="roundSpace">Move</div>
 	                </div>
-                    <button id='nextStateButton' class='moveableInterfaceElement'>
+                    <button id="nextStateButton" class="moveableInterfaceElement">
                         next state
                     </button>
 	            </div>
-	            <div id='counter'>
-	                <div id='statue'>
+	            <div id="counter">
+	                <div id="statue">
 	                    
 	                </div>
-	                <div id='count'>
+	                <div id="count">
 	                    
 	                </div>
 	            </div>
 	        </div>
-            <div class='attackPlanner'>
-                <div class='cancelButton moveableInterfaceElement'>
-                    <button id='attackPlannerCancelButton'>cancel</button>
+            <div class="attackPlanner">
+                <div class="cancelButton moveableInterfaceElement">
+                    <button id="attackPlannerCancelButton">cancel</button>
                 </div>
-                <div class='attacker moveableInterfaceElement'>
+                <div class="attacker moveableInterfaceElement">
                     <h1>Attacking</h1>
-                    <!--<div style='width: 400px;height: 500px;background-color:red;border-radius:10px;'>-->
-                    <div class=''>
-                        <span id='attackerCount'></span>
+                    <!--<div style="width: 400px;height: 500px;background-color:red;border-radius:10px;">-->
+                    <div class="">
+                        <span id="attackerCount"></span>
                     </div>
                 </div>
                 <div>
                     <h1>vs</h1>
                 </div>
-                <div class='defender moveableInterfaceElement'>
+                <div class="defender moveableInterfaceElement">
                     <h1>Defending</h1>
-                    <!--<div style='width: 400px;height: 500px;background-color:blue;border-radius:10px;'>-->
-                    <div class=''>
-                        <span id='defenderCount'></span>
+                    <!--<div style="width: 400px;height: 500px;background-color:blue;border-radius:10px;">-->
+                    <div class="">
+                        <span id="defenderCount"></span>
                     </div>
                 </div>
-                <div class='attackGoButton moveableInterfaceElement'>
-                    <button id='attackPlannerGoButton'>Go!</button>
+                <div class="attackGoButton moveableInterfaceElement">
+                    <button id="attackPlannerGoButton">Go!</button>
                 </div>
             </div>
-            <div id='gameWin'>
+            <div id="gameWin">
                 <h1>You are victorious!</h1>
-                <button id='replayGame'>Replay</button>
+                <button id="replayGame">Replay</button>
             </div>
-			<div id='gameLose'>
+			<div id="gameLose">
                 <h1>You have been defeated!</h1>
-                <button id='replayGame'>Replay</button>
+                <button id="replayGame">Replay</button>
             </div>
 			<!--
 			<div id="networkControls">
@@ -99,7 +99,7 @@ export class GameSetupState extends State
 		window.renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x256d8f);
-		document.body.appendChild(renderer.domElement);
+		$("body").append(renderer.domElement);
 
 		window.controls = new OrbitControls(camera, renderer.domElement);
 		controls.minPolarAngle = 0;
@@ -109,28 +109,28 @@ export class GameSetupState extends State
 		controls.minTargetRadius = 0;
 		controls.maxTargetRadius = 10;
 		
-		controls.target.set( 0, 0, 0 );
-		camera.position.set( 0, 0, 0 );
+		controls.target.set(0, 0, 0);
+		camera.position.set(0, 0, 0);
 		controls.update();
 
 		window.htmlRenderer = new CSS2DRenderer();
 		htmlRenderer.setSize(window.innerWidth, window.innerHeight);
-		htmlRenderer.domElement.style.position = 'absolute';
-		htmlRenderer.domElement.style.top = '0px';
-		document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
+		htmlRenderer.domElement.style.position = "absolute";
+		htmlRenderer.domElement.style.top = "0px";
+		$("body").append(htmlRenderer.domElement)[0].style.pointerEvents = "none";
 
 		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED = null;
 
 		const clock = new THREE.Clock();
 
-		window.addEventListener('resize', onWindowResize);
+		window.addEventListener("resize", onWindowResize);
 
-		document.addEventListener('keydown', onKeyDown);
-		//document.addEventListener('keyup', onKeyUp);
+		document.addEventListener("keydown", onKeyDown);
+		//document.addEventListener("keyup", onKeyUp);
 
-		document.addEventListener('mousedown', onMouseDown);
-		//document.addEventListener('mouseup', onMouseUp);
-		document.addEventListener('mousemove', onPointerMove);
+		document.addEventListener("mousedown", onMouseDown);
+		//document.addEventListener("mouseup", onMouseUp);
+		document.addEventListener("mousemove", onPointerMove);
 
 		console.log(this.lobby);
 
@@ -185,7 +185,7 @@ export class GameSetupState extends State
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			htmlRenderer.setSize(window.innerWidth, window.innerHeight);
 		}
-
+		
 		function animate()
 		{
 			requestAnimationFrame(animate);
@@ -231,7 +231,7 @@ export class GameSetupState extends State
 
 			//camera.position.lerp(cameraPosition, 0.2);
 
-			game.world.water.material.uniforms[ 'time' ].value += 0.5 / 60.0;
+			game.world.water.material.uniforms["time"].value += 0.5 / 60.0;
 			
 			renderer.render(scene, camera);
 			htmlRenderer.render(scene, camera);
