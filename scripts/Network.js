@@ -99,6 +99,7 @@ export class Network
                     if (window.clientId > 0)
                     {
                         console.error("Client ID is already set, wwhy are we being welcomed again?!");
+                        document.dispatchEvent(new CustomEvent("networkConnectionFailed"));
                         return;
                     }
 
