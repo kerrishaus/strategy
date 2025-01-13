@@ -48,6 +48,8 @@ export class LobbyWaitingState extends State
 
 		$("#startGame").click({ lobby: this.lobby }, (event) => 
 		{
+			console.log("Requesting game start.");
+
 			if (event.data.lobby.clients.length < 1)
 			{
 				console.warn("Skipping start game button press because there are not enough clients.");
@@ -82,10 +84,10 @@ export class LobbyWaitingState extends State
 
 		this.updateClientList(this.lobby);
 
-		$(document).on("startGame",   	   { lobby: this.lobby }, this.startGame);
-		$(document).on("joinLobbyRequest", { lobby: this.lobby }, this.joinLobbyRequest);
-		$(document).on("clientJoin",  	   { lobby: this.lobby }, this.clientJoin);
-		$(document).on("clientLeave", 	   { lobby: this.lobby }, this.clientLeave);
+		$(document).on("startGame",   	   (event) => { this.startGame(event); });
+		$(document).on("joinLobbyRequest", (event) => { this.joinLobbyRequest(event); });
+		$(document).on("clientJoin",  	   (event) => { this.clientJoin(event); });
+		$(document).on("clientLeave", 	   (event) => { this.clientLeave(event); });
 
 		// TODO: send this when click ready checkbox network.socket.send(JSON.stringify({ command: "lobbyReady" }));
 	}
@@ -96,28 +98,34 @@ export class LobbyWaitingState extends State
 
 		PageUtility.removeStyle("LobbyWaitingState");
 
-		$(document).off("startGame",   		this.startGame);
-		$(document).off("joinLobbyRequest", this.joinLobbyRequest);
-		$(document).off("clientJoin",  		this.clientJoin);
-		$(document).off("clientLeave", 		this.clientLeave);
+		$(document).off("startGame");
+		$(document).off("joinLobbyRequest");
+		$(document).off("clientJoin");
+		$(document).off("clientLeave");
 	}
 
 	startGame(event)
 	{
-		const lobby = event.data.lobby;
+		this.lobby.width = event.detail.width;
+		this.lobby.height = event.detail.height;
 
-		lobby.width = event.detail.width;
-		lobby.height = event.detail.height;
-
-		stateManager.changeState(new GameSetupState(lobby));
+		stateManager.changeState(new GameSetupState(this.lobby));
 	}
 
 	joinLobbyRequest(event)
 	{
-		if (event.data.lobby.ownerId == clientId)
+		// automatically accept any client's request to join for now.
+		if (this.lobby.ownerId == clientId)
 		{
-			console.log("sending joinLobbyAccept for client " + event.detail.requesterId);
-			network.socket.send(JSON.stringify({ command: "joinLobbyAccept", requesterId: event.detail.requesterId, type: "player", name: "player", color: randomHex() }));
+			console.log(`Sending joinLobbyAccept for client ${event.detail.requesterId}`);
+
+			network.socket.send(JSON.stringify({ 
+				command: "joinLobbyAccept",
+				requesterId: event.detail.requesterId,
+				type: "player",
+				name: "player",
+				color: randomHex()
+			}));
 		}
 	}
 
@@ -125,7 +133,7 @@ export class LobbyWaitingState extends State
 	{
 		console.log(`Client ${event.detail.clientId} has joined the lobby.`, event);
 
-		event.data.lobby.clients.push({
+		this.lobby.clients.push({
 			id: event.detail.clientId,
 			type: event.detail.type,
 			name: event.detail.name,
@@ -133,16 +141,16 @@ export class LobbyWaitingState extends State
 			color: event.detail.color
 		});
 
-		updateClientList(event.data.lobby);
+		this.updateClientList();
 	}
 
 	clientLeave(event)
 	{
 		console.log(`Client ${event.detail.clientId} has left the lobby.`, event);
 
-		event.data.lobby.clients.filter(client => client.id !== event.detail.clientId);
+		this.lobby.clients.filter(client => client.id !== event.detail.clientId);
 
-		updateClientList(event.data.lobby);
+		this.updateClientList();
 	}
 
 	addBot()
@@ -157,19 +165,18 @@ export class LobbyWaitingState extends State
 
 		console.log("Added bot to lobby.", this.lobby);
 
-		this.updateClientList(this.lobby);
+		this.updateClientList();
 	}
 
-	// TODO: eventually remove lobby parameter and use this.lobby in this function
-	updateClientList(lobby)
+	updateClientList()
 	{
-		console.log("Updating client list", lobby.clients);
+		console.log("Updating client list", this.lobby.clients);
 
 		$("#clientList").empty();
 
-		for (let client of lobby.clients)
+		for (let client of this.lobby.clients)
 			$("#clientList").append(`<div>${client.id}: ${client.name}</div>`);
 
-		$("#debug-clientCount").text(lobby.clients.length);
+		$("#debug-clientCount").text(this.lobby.clients.length);
 	}
 };
