@@ -38,6 +38,9 @@ export class MainMenuState extends State
 		$("#multiplayer").click(() => {
 			stateManager.changeState(new NetworkPrepareState())
 		});
+
+		// TODO: setting the clientId should be a function that also updates the debug text etc.
+		window.clientId = -1;
 	}
 
 	cleanup()
