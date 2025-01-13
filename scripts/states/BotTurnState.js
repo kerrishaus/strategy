@@ -315,7 +315,7 @@ export class BotTurnState extends State
                 moveStart.material.color.set(Colors.shade(game.clients.getById(moveStart.userData.ownerId)?.color ?? Colors.unownedColor, -20));
             }
         }, this.addToDelay());
-            
+        
         setTimeout(func =>
         {
             if (moveStart !== null && moveEnd !== null)
@@ -324,12 +324,12 @@ export class BotTurnState extends State
                 moveEnd.material.color.set(Colors.shade(game.clients.getById(moveEnd.userData.ownerId)?.color ?? Colors.unownedColor, -20));
             }
             else
-                console.log("skipping move 2");
+                console.log("Skipping moving units...");
         }, this.addToDelay());
             
         setTimeout(func =>
         {
-            console.log("move");
+            console.log("Moving units...");
             
             if (moveStart !== null && moveEnd !== null)
             {

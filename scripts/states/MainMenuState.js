@@ -19,6 +19,7 @@ export class MainMenuState extends State
 			$("#debug-clientId").text(clientId);
 
 			stateManager.changeState(new LobbyWaitingState({
+				id: "local",
 				clientId: clientId,
 				ownerId: clientId,
 				networked: false,
