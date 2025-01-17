@@ -60,11 +60,8 @@ export class UnitMoveState extends State
 
     cleanup()
     {
-        if (this.startTerritory !== null)
-            this.clearStartPoint();
-
-        if (this.endTerritory !== null)
-            this.clearEndPoint();
+        this.clearStartPoint();
+        this.clearEndPoint();
 
         $(this).off("objectHover",     this.onHover);
         $(this).off("objectHoverStop", this.onStopHover);
@@ -157,6 +154,8 @@ export class UnitMoveState extends State
         object.raise();
         object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -40));
         this.startTerritory = object;
+
+        console.debug("Set startTerritory.", this.startTerritory);
     }
     
     clearStartPoint()
@@ -164,10 +163,15 @@ export class UnitMoveState extends State
         // not strictly necessary, just prevents weird shit
         if (this.endTerritory !== null)
             this.clearEndPoint();
+
+        if (this.startTerritory === null)
+            return;
         
         this.startTerritory.lower();
         this.startTerritory.material.color.set(game.clients.getById(this.startTerritory.userData.ownerId)?.color ?? Colors.unownedColor);
         this.startTerritory = null;
+
+        console.debug("Cleared startTerritory.");
     }
     
     setEndPoint(object)
@@ -176,7 +180,7 @@ export class UnitMoveState extends State
 
         if (this.startTerritory === null)
         {
-            console.error("startTerritory is null.");
+            console.error("Cannot set endTerritory while startTerritory is null.");
             return;
         }
         
@@ -187,6 +191,8 @@ export class UnitMoveState extends State
         object.material.color.set(Colors.shade(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor, -40));
         object.createUnitMoveDialog(this.startTerritory.unitCount - 1);
         this.endTerritory = object;
+
+        console.debug("Set endTerritory.", this.endTerritory);
     }
     
     clearEndPoint()
@@ -198,5 +204,7 @@ export class UnitMoveState extends State
         this.endTerritory.material.color.set(game.clients.getById(this.endTerritory.userData.ownerId).color);
         this.endTerritory.destroyUnitMoveDialog();
         this.endTerritory = null;
+
+        console.debug("Cleared ednTerritory.");
     }
 };
