@@ -151,6 +151,7 @@
 #roundStatus
 {
     background-color: #222222aa;
+    border: 1px solid black;
     padding: 18px 40px;
     padding-bottom: 30px;
     text-align: center;
