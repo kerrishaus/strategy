@@ -113,11 +113,27 @@ export class Game
             $(document).on("dropUnits", function(event) {
                 network.socket.send(JSON.stringify({ command: "dropUnitsResult", ...event.detail }));
             });
+            
+            $(document).on("attack", function(event) {
+                network.socket.send(JSON.stringify({ command: "attackResult", ...event.detail }));
+            });
+
+            $(document).on("moveUnits", function(event) {
+                network.socket.send(JSON.stringify({ command: "moveUnitsResult", ...event.detail }));
+            });
         }
         else
         {
             $(document).on("dropUnits", function(event) {
                 document.dispatchEvent(new CustomEvent("dropUnitsResult", { detail: event.detail }));
+            });
+
+            $(document).on("attack", function(event) {
+                document.dispatchEvent(new CustomEvent("attackResult", { detail: event.detail }));
+            });
+
+            $(document).on("moveUnits", function(event) {
+                document.dispatchEvent(new CustomEvent("moveUnitsResult", { detail: event.detail }));
             });
         }
 
@@ -133,19 +149,6 @@ export class Game
 
             $("#count").html(this.availableUnits);
         });
-        
-        if (networked)
-        {
-            $(document).on("attack", function(event) {
-                network.socket.send(JSON.stringify({ command: "attackResult", ...event.detail }));
-            });
-        }
-        else
-        {
-            $(document).on("attack", function(event) {
-                document.dispatchEvent(new CustomEvent("attackResult", { detail: event.detail }));
-            });
-        }
 
         $(document).on("attackResult", function(event)
         {
@@ -176,19 +179,6 @@ export class Game
 
             console.log(`New unit allocation: Attacker: ${attackingTerritory.unitCount}, Defender: ${defendingTerritory.unitCount}`);
         });
-
-        if (networked)
-        {
-            $(document).on("moveUnits", function(event) {
-                network.socket.send(JSON.stringify({ command: "moveUnitsResult", ...event.detail }));
-            });
-        }
-        else
-        {
-            $(document).on("moveUnits", function(event) {
-                document.dispatchEvent(new CustomEvent("moveUnitsResult", { detail: event.detail }));
-            });
-        }
 
         $(document).on("moveUnitsResult", function(event)
         {
