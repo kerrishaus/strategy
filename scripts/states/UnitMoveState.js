@@ -9,7 +9,7 @@ export class UnitMoveState extends State
         this.startTerritory = null;
         this.endTerritory = null;
 
-        $(htmlRenderer.domElement).on("click", "#moveUnitButton", callback =>
+        $(document).on("click", "#moveUnitButton", callback =>
         {
             if (this.startTerritory === null)
             {

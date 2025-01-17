@@ -12,7 +12,7 @@ export class UnitDropState extends State
 		console.log("There are " + this.availableUnits + " available units to drop.");
 		$("#count").html(this.availableUnits);
 
-		$(htmlRenderer.domElement).on("click", "#dropUnitButton", () =>
+		$(document).on("click", "#dropUnitButton", () =>
 		{
 			if (this.selectedTerritory === null)
 			{
