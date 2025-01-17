@@ -15,6 +15,9 @@ export class WorldObject extends Mesh
         
         super(geometry, material);
 
+        // same as Raycaster so that text objects are ignored
+        this.layers.enable(1);
+
         this.geometry.computeBoundingBox();
 
         this.position.copy(startPosition);
@@ -165,7 +168,7 @@ export class WorldObject extends Mesh
         {
             this.remove(this.text);
             this.text.geometry?.dispose();
-            this.text.material?.dispose();
+            this.text.material?.dispose(); // TODO: the material can be reused
             this.text = null
         }
         

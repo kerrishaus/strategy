@@ -191,7 +191,11 @@ export class GameSetupState extends State
 			requestAnimationFrame(animate);
 			
 			raycaster.setFromCamera(pointer, camera);
-			const intersects = raycaster.intersectObjects(scene.children, true);
+			raycaster.layers.set(1);
+			
+			const intersects = raycaster.intersectObjects(game.world.tiles, true);
+
+			// TODO: ray needs to ignore the unit count numbers
 
 			if (intersects.length > 0)
 			{
@@ -205,7 +209,7 @@ export class GameSetupState extends State
 						stateManager.forwardEvent(new CustomEvent("objectHoverStop", { detail: { object: INTERSECTED } }));
 						INTERSECTED = null;
 					}
-
+					
 					if (intersects[0].object.userData.hasOwnProperty("canClick")) // the object is now hovered
 					{
 						INTERSECTED = intersects[0].object;
