@@ -88,7 +88,11 @@ export class UnitMoveState extends State
 
         if (object.userData.ownerId != clientId)
             return;
+
+        if (object.unitCount < 2)
+            return;
         
+        // raise the object to select start or end territory
         if (this.startTerritory === null ||
             (object !== this.startTerritory && this.endTerritory === null))
         {
@@ -104,8 +108,9 @@ export class UnitMoveState extends State
         if (object.userData.ownerId != clientId)
             return;
         
-        if (this.startTerritory != object &&
-            this.endTerritory != object)
+        // lower objects if they aren't a selected territory
+        // because selected territories stay raised until the next move
+        if (object != this.startTerritory && object != this.endTerritory)
         {
             object.lower();
             object.material.color.set(game.clients.getById(object.userData.ownerId)?.color ?? Colors.unownedColor);
@@ -141,7 +146,9 @@ export class UnitMoveState extends State
     
     setStartPoint(object)
     {
-        if (object.unitCount <= 1)
+        // territory ownership checks are done in onMouseDown
+
+        if (object.unitCount < 2)
         {
             console.warn("This territory does not have enough units.");
             return;
@@ -165,6 +172,8 @@ export class UnitMoveState extends State
     
     setEndPoint(object)
     {
+        // territory ownership checks are done in onMouseDown
+
         if (this.startTerritory === null)
         {
             console.error("startTerritory is null.");
