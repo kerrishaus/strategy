@@ -10,7 +10,7 @@ export class LoadingState extends State
 {
 	init()
 	{
-	PageUtility.addStyle("LoadingState");
+    	PageUtility.addStyle("LoadingState");
 
         $("body").prepend(
            `<div id="loadingCover">
