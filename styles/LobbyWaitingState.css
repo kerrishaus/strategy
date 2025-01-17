@@ -14,3 +14,19 @@
 {
     
 }
+
+#clientList > div
+{
+    position: relative;
+}
+
+#clientList > div::before
+{
+    content: " ";
+    position: absolute;
+    top: 2px;
+    left: -20px;
+    width: 16px;
+    height: 16px;
+    background-color: var(--playerColor);
+}

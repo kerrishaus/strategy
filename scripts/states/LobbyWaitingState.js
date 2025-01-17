@@ -175,7 +175,7 @@ export class LobbyWaitingState extends State
 		$("#clientList").empty();
 
 		for (let client of this.lobby.clients)
-			$("#clientList").append(`<div>${client.id}: ${client.name}</div>`);
+			$("#clientList").append(`<div style="--playerColor: ${client.color}">${client.id}: ${client.name}</div>`);
 
 		$("#debug-clientCount").text(this.lobby.clients.length);
 	}
