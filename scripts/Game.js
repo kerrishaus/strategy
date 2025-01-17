@@ -262,7 +262,7 @@ export class Game
         if (this.clients.current().id == clientId)
         {
             if (this.currentTurnStage == 0)
-                stateManager.changeState(new UnitDropState(Math.floor(this.clients.current().ownedTerritories / 3)));
+                stateManager.changeState(new UnitDropState(this.getNewUnitAllotmentForPlayer(clientId)));
             else if (this.currentTurnStage == 1)
                 stateManager.changeState(new AttackState());
             else if (this.currentTurnStage == 2)
@@ -288,6 +288,11 @@ export class Game
 
             //object.destroyUnitPlaceDialog();
         }
+    }
+
+    getNewUnitAllotmentForPlayer(playerId)
+    {
+        return Math.round(this.world.getTerritoriesOwnedBy(playerId)?.length / 3);
     }
 
     attack(forClientId, againstClientId, fromTerritoryId, toTerritoryId, unitCount)

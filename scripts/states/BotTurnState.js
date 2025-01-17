@@ -16,12 +16,6 @@ export class BotTurnState extends State
     
         this.delay = 0;
 
-        this.enemyUnitPlaceCount = Math.round(game.world.getTerritoriesOwnedBy(this.botId).length / 3);
-
-        console.log("Starting AI turn with " + this.enemyUnitPlaceCount + " units.");
-
-        $("#count").html(this.enemyUnitPlaceCount);
-        
         this.dropUnits();
         setTimeout(() => { game.nextStage() }, this.addToDelay());
         this.attack();
@@ -44,6 +38,11 @@ export class BotTurnState extends State
 
     dropUnits()
     {
+        const newUnits = game.getNewUnitAllotmentForPlayer(this.botId);
+
+        console.log(`Starting AI turn with ${newUnits} units.`);
+        $("#count").html(newUnits);
+
         // TODO: rename this to unitDropTile
         let placeTile = null;
 
@@ -93,10 +92,13 @@ export class BotTurnState extends State
             document.dispatchEvent(new CustomEvent("dropUnits", { detail: {
                 clientId: this.botId, // TODO: this is for local play to work. I need to find a way to always include this if there is no server to add it. I think this is fine here because the server overwrites this value when it is sent by any client
                 territoryId: placeTile.territoryId,
-                amount: this.enemyUnitPlaceCount,
-                population: placeTile.unitCount + this.enemyUnitPlaceCount,
+                amount: newUnits,
+                population: placeTile.unitCount + newUnits,
                 unitsRemaining: 0
             } }));
+ 
+            this.availableUnits -= newUnits;
+			$("#count").html(this.availableUnits);
         }, this.addToDelay());
     }
 

@@ -231,8 +231,6 @@ export class GameWorld extends Group
 
         scene.environment = renderTarget.texture;
 
-        console.warn("warning", mapSize, mapCenter);
-
         controls.target.set(mapCenter.x - 1, 0, mapCenter.y - 1);
 		camera.position.set(mapCenter.x - 1, 0, mapCenter.y - 1);
         controls.update();

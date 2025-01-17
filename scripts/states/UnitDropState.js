@@ -9,7 +9,7 @@ export class UnitDropState extends State
 		this.availableUnits = availableUnits;
 		this.selectedTerritory = null;
 		
-		console.log("There are " + this.availableUnits + " available units to drop.");
+		console.log(`There are ${this.availableUnits} available units to drop.`);
 		$("#count").html(this.availableUnits);
 
 		$(document).on("click", "#dropUnitButton", () =>
@@ -34,7 +34,7 @@ export class UnitDropState extends State
 				return;
 			}
 
-			this.availableUnits -= amount;
+			console.log(`Dropping ${amount} units.`);
 
 			document.dispatchEvent(new CustomEvent("dropUnits", { detail: {
                 territoryId: this.selectedTerritory.territoryId,
@@ -43,7 +43,14 @@ export class UnitDropState extends State
 				unitsRemaining: this.availableUnits
             } }));
 
+			console.log(`Dropped ${amount} units.`);
+
 			// TODO: don't do this stuff until after the units have been sucessfully dropped.
+
+			this.availableUnits -= amount;
+			$("#count").html(this.availableUnits);
+
+			console.log(`Dropped ${amount} new units on tile ${this.selectedTerritory.territoryId}.`);
 
 			this.clearDropPoint();
 
