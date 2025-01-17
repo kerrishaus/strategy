@@ -104,6 +104,7 @@ export class BotTurnState extends State
     {
         let attackingTerritory = null;
 
+        // find territory to attack from
         setTimeout(func =>
         {
             console.log("Selecting territory to attack from...");
@@ -151,6 +152,7 @@ export class BotTurnState extends State
 
         let defendingTerritory = null;
 
+        // find enemy territory to attack
         setTimeout(func =>
         {
             if (attackingTerritory === null)
@@ -182,6 +184,7 @@ export class BotTurnState extends State
             $(".gameInterfaceContainer").attr("data-visibility", "hidden");
         }, this.addToDelay());
 
+        // execute the attack
         setTimeout(func =>
         {
             if (attackingTerritory === null || defendingTerritory === null)
@@ -266,9 +269,8 @@ export class BotTurnState extends State
         let moveStart = null, moveEnd = null;
         
         let iterations = 0;
-        // TODO: improve this loop and don't use while true
-        // find a territory owned by the bot to move units out of
-        while (true)
+        // look for suitable territory owned by the bot to move units from and to
+        while (moveStart === null && moveEnd === null)
         {
             if (iterations > 20)
             {
@@ -298,15 +300,13 @@ export class BotTurnState extends State
                     // tries to move units into territories that can be attacked and have less than 15 units
                     if (game.world.tiles[tileId].invadeableNeighbors.length > 0)
                         if (game.world.tiles[tileId].unitCount < 15)
-                        {
                             moveEnd = game.world.tiles[tileId];
-                            break;
-                        }
                 }
-                    
+            
             iterations++;
         }
         
+        // raise territory troops will move from
         setTimeout(func =>
         {
             if (moveStart !== null && moveEnd !== null)
@@ -316,6 +316,7 @@ export class BotTurnState extends State
             }
         }, this.addToDelay());
         
+        // raise territory troops will move to
         setTimeout(func =>
         {
             if (moveStart !== null && moveEnd !== null)
@@ -326,15 +327,21 @@ export class BotTurnState extends State
             else
                 console.log("Skipping moving units...");
         }, this.addToDelay());
-            
+        
+        // move the units
         setTimeout(func =>
         {
             console.log("Moving units...");
             
             if (moveStart !== null && moveEnd !== null)
             {
-                moveEnd.addUnits(moveEnd.unitCount - 1);
-                moveStart.addUnits(-(moveEnd.unitCount - 1));
+                document.dispatchEvent(new CustomEvent("moveUnits", { detail: {
+                    origin: moveStart.territoryId,
+                    destination: moveEnd.territoryId,
+                    amount: amount,
+                    originPopulation: moveStart.unitCount - amount,
+                    destinationPopulation: moveEnd.unitCount + amount
+                } }));
                 
                 moveStart.lower();
                 moveStart.material.color.set(game.clients.getById(moveEnd.userData.ownerId)?.color ?? Colors.unownedColor);
