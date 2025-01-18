@@ -27,7 +27,7 @@ export class MainMenuState extends State
 					{
 						id: clientId,
 						type: "player",
-						name: "Player",
+						name: "Local Player",
 						ownedTerritories: 0,
 						color: randomHex()
 					}

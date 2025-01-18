@@ -122,8 +122,6 @@ export class LobbyWaitingState extends State
 			network.socket.send(JSON.stringify({ 
 				command: "joinLobbyAccept",
 				requesterId: event.detail.requesterId,
-				type: "player",
-				name: "player",
 				color: randomHex()
 			}));
 		}

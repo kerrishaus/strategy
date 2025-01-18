@@ -57,6 +57,7 @@ export class Network
         console.log("Successfully connected to server.");
         
         network.connectionRetryCount = 0;
+        clearTimeout(network.connectionRetryTimeout);
         
         network.socket.addEventListener("close",   network.socketClose);
         network.socket.addEventListener("message", network.socketMessage);
@@ -85,6 +86,16 @@ export class Network
         document.dispatchEvent(new CustomEvent("serverDisconnected"));
     }
 
+    requestName()
+    {
+        const name = prompt("Choose a name:");
+
+        network.socket.send(JSON.stringify({ 
+            command: "requestName",
+            name: name,
+        }));
+    }
+
     socketMessage(event)
     {
         if (typeof event.data == "string")
@@ -106,7 +117,18 @@ export class Network
                     window.clientId = data.clientId;
                     $("#debug-clientId").text(clientId);
                     console.log("We are client " + clientId);
+                    network.requestName();
+                    return;
+                }
+                else if (data.command == "nameAccepted")
+                {
+                    network.clientName = data.name;
                     document.dispatchEvent(new CustomEvent("networkClientReady"));
+                    return;
+                }
+                else if (data.command == "nameRejected")
+                {
+                    network.requestName();
                     return;
                 }
 

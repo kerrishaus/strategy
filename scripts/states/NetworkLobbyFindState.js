@@ -21,9 +21,10 @@ export class NetworkLobbyFindState extends State
 			
 			const lobbyId = $("#lobbyCode").val();
 		
-			const response = JSON.stringify({ command: "joinLobbyRequest", lobbyId: lobbyId });
-
-			network.socket.send(response);
+			network.socket.send(JSON.stringify({
+				command: "joinLobbyRequest", 
+				lobbyId: lobbyId
+			}));
 
 			console.log("Requested to join lobby " + lobbyId);
         });
@@ -40,7 +41,7 @@ export class NetworkLobbyFindState extends State
 				command: "createLobby",
 				lobbyId: lobbyId,
 				type: "player",
-				name: "player",
+				name: network.clientName,
 				color: randomHex(),
 			});
 
