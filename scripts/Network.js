@@ -5,6 +5,8 @@ export class Network
 {
     constructor()
     {
+        window.clientId = -1;
+
         this.socket = null;
 
         this.serverAddress = "wss.kerrishaus.com/games/strategy";
@@ -19,13 +21,13 @@ export class Network
 
     cleanup()
     {
-        window.clientId = 0;
-
         clearTimeout(network.connectionRetryTimeout);
+
+        network.resetNetwork();
         
         network.socket.removeEventListener("close",   network.socketClose);
         network.socket.removeEventListener("message", network.socketMessage);
-        network.socket = null;
+        network.socket.close();
     }
 
     attemptConnection()
@@ -97,10 +99,12 @@ export class Network
         }));
     }
 
-    resetNetworkState()
+    resetNetwork()
     {
         window.clientId = -1;
         window.clientName = null;
+
+        $("#debug-clientId").text(clientId);
     }
 
     socketMessage(event)

@@ -10,14 +10,17 @@ export class MainMenuState extends State
 {
 	init()
 	{
+		if ("network" in window)
+			// TODO: delete network object
+			network.resetNetwork();
+
+		window.clientId = 1;
+
         $("body").append(`<div id="mainMenu" class="beforeGameMenuContainer"">`);
         $("#mainMenu").append("<button id='singleplayer'>Singleplayer</button>");
 		$("#mainMenu").append("<button id='multiplayer' >Multiplayer</button>");
 
 		$("#singleplayer").click(() => {
-			window.clientId = 1;
-			$("#debug-clientId").text(clientId);
-
 			stateManager.changeState(new LobbyWaitingState({
 				id: "local",
 				clientId: clientId,
@@ -38,9 +41,6 @@ export class MainMenuState extends State
 		$("#multiplayer").click(() => {
 			stateManager.changeState(new NetworkPrepareState())
 		});
-
-		// TODO: setting the clientId should be a function that also updates the debug text etc.
-		window.clientId = -1;
 	}
 
 	cleanup()
