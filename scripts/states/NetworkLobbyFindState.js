@@ -41,7 +41,7 @@ export class NetworkLobbyFindState extends State
 				command: "createLobby",
 				lobbyId: lobbyId,
 				type: "player",
-				name: network.clientName,
+				name: window.clientName,
 				color: randomHex(),
 			});
 

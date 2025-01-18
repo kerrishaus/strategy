@@ -86,14 +86,21 @@ export class Network
         document.dispatchEvent(new CustomEvent("serverDisconnected"));
     }
 
-    requestName()
+    requestName(name = null)
     {
-        const name = prompt("Choose a name:");
+        if (name == null)
+            name = prompt("Choose a name:");
 
         network.socket.send(JSON.stringify({ 
             command: "requestName",
             name: name,
         }));
+    }
+
+    resetNetworkState()
+    {
+        window.clientId = -1;
+        window.clientName = null;
     }
 
     socketMessage(event)
@@ -117,12 +124,13 @@ export class Network
                     window.clientId = data.clientId;
                     $("#debug-clientId").text(clientId);
                     console.log("We are client " + clientId);
-                    network.requestName();
+                    network.requestName(localStorage.getItem("name"));
                     return;
                 }
                 else if (data.command == "nameAccepted")
                 {
-                    network.clientName = data.name;
+                    window.clientName = data.name;
+                    localStorage.setItem("name", data.name);
                     document.dispatchEvent(new CustomEvent("networkClientReady"));
                     return;
                 }
