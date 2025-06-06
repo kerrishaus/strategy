@@ -99,7 +99,7 @@ export class GameSetupState extends State
 		window.renderer = new THREE.WebGLRenderer();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.setClearColor(0x256d8f);
-		$("body").append(renderer.domElement);
+		document.body.appendChild(renderer.domElement);
 
 		window.controls = new OrbitControls(camera, renderer.domElement);
 		controls.minPolarAngle = 0;
@@ -117,8 +117,7 @@ export class GameSetupState extends State
 		htmlRenderer.setSize(window.innerWidth, window.innerHeight);
 		htmlRenderer.domElement.style.position = 'absolute';
 		htmlRenderer.domElement.style.top = '0px';
-		htmlRenderer.domElement.style.pointerEvents = "none";
-		$("body").append(htmlRenderer.domElement);
+		document.body.appendChild(htmlRenderer.domElement).style.pointerEvents = "none";
 
 		let raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2, INTERSECTED = null;
 
